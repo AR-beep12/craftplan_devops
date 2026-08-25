@@ -186,6 +186,34 @@ defmodule CraftplanWeb.Navigation do
           }
         ]
       },
+      purchasing: %{
+        label: "Compras",
+        path: "/manage/purchasing",
+        pages: %{
+          new_purchase_order: %{label: "Nueva orden de compra", path: "/manage/purchasing/new"},
+          purchase_orders: %{label: "Órdenes de compra", path: "/manage/purchasing"},
+          purchase_order: &__MODULE__.crumb_purchase_order/1,
+          po_items: &__MODULE__.crumb_purchase_order_items/1,
+          po_add_item: &__MODULE__.crumb_purchase_order_add_item/1,
+          suppliers: %{label: "Proveedores", path: "/manage/purchasing/suppliers"},
+          new_supplier: %{label: "Nuevo proveedor", path: "/manage/purchasing/suppliers/new"},
+          supplier: &__MODULE__.crumb_supplier/1
+        },
+        sub_links: [
+          %{
+            key: :purchase_orders,
+            label: "Órdenes de compra",
+            navigate: "/manage/purchasing",
+            active?: &__MODULE__.purchasing_orders_active?/1
+          },
+          %{
+            key: :suppliers,
+            label: "Proveedores",
+            navigate: "/manage/purchasing/suppliers",
+            active?: &__MODULE__.purchasing_suppliers_active?/1
+          }
+        ]
+      },
       customers: %{
         label: "Clientes",
         path: "/manage/customers",

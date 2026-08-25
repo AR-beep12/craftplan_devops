@@ -12,10 +12,10 @@ defmodule CraftplanWeb.ProductLive.Index do
 
     ~H"""
     <.header>
-      Products
+      Productos
       <:actions>
         <.link patch={~p"/manage/products/new"}>
-          <.button variant={:primary}>New Product</.button>
+          <.button variant={:primary}>Nuevo producto</.button>
         </.link>
       </:actions>
     </.header>
@@ -29,11 +29,11 @@ defmodule CraftplanWeb.ProductLive.Index do
       <:empty>
         <div class="block py-4 pr-6">
           <span class={["relative"]}>
-            No products found
+            No se encontraron productos
           </span>
         </div>
       </:empty>
-      <:col :let={{_, product}} label="Name">
+      <:col :let={{_, product}} label="Nombre">
         <div class="flex items-center space-x-2">
           <img
             :if={product.featured_photo != nil}
@@ -51,34 +51,34 @@ defmodule CraftplanWeb.ProductLive.Index do
           {product.sku}
         </.kbd>
       </:col>
-      <:col :let={{_, product}} label="Status">
+      <:col :let={{_, product}} label="Estado">
         <.badge
-          text={product.status}
+          text={product_status_label(product.status)}
           colors={[
             {product.status,
              "#{product_status_color(product.status)} #{product_status_bg(product.status)}"}
           ]}
         />
       </:col>
-      <:col :let={{_, product}} label="Price">
+      <:col :let={{_, product}} label="Precio">
         {format_money(@settings.currency, product.price)}
       </:col>
 
-      <:col :let={{_, product}} label="Materials cost">
+      <:col :let={{_, product}} label="Costo de materiales">
         {format_money(@settings.currency, product.materials_cost)}
       </:col>
 
-      <:col :let={{_, product}} label="Gross profit">
+      <:col :let={{_, product}} label="Ganancia bruta">
         {format_money(@settings.currency, product.gross_profit)}
       </:col>
 
       <:action :let={{_, product}}>
         <.link
           phx-click={JS.push("delete", value: %{id: product.id}) |> hide("#product-#{product.id}")}
-          data-confirm="Are you sure?"
+          data-confirm="¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer."
         >
           <.button size={:sm} variant={:danger}>
-            Delete
+            Eliminar
           </.button>
         </.link>
       </:action>
@@ -129,7 +129,7 @@ defmodule CraftplanWeb.ProductLive.Index do
     socket =
       socket
       |> assign(:breadcrumbs, [
-        %{label: "Products", path: ~p"/manage/products", current?: true}
+        %{label: "Productos", path: ~p"/manage/products", current?: true}
       ])
       |> stream(:products, results)
 
@@ -143,13 +143,13 @@ defmodule CraftplanWeb.ProductLive.Index do
 
   defp apply_action(socket, :new, _params) do
     socket
-    |> assign(:page_title, "New Product")
+    |> assign(:page_title, "Nuevo producto")
     |> assign(:product, nil)
   end
 
   defp apply_action(socket, :index, _params) do
     socket
-    |> assign(:page_title, "Catalog")
+    |> assign(:page_title, "Catálogo")
     |> assign(:product, nil)
   end
 
@@ -161,11 +161,11 @@ defmodule CraftplanWeb.ProductLive.Index do
       :ok ->
         {:noreply,
          socket
-         |> put_flash(:info, "Product deleted successfully")
+         |> put_flash(:info, "Producto eliminado correctamente")
          |> stream_delete(:products, %{id: id})}
 
       {:error, _error} ->
-        {:noreply, put_flash(socket, :error, "Failed to delete product.")}
+        {:noreply, put_flash(socket, :error, "No se pudo eliminar el producto.")}
     end
   end
 
@@ -178,4 +178,16 @@ defmodule CraftplanWeb.ProductLive.Index do
 
     {:noreply, stream_insert(socket, :products, product)}
   end
+
+  defp product_status_label(:draft), do: "Borrador"
+  defp product_status_label(:testing), do: "En prueba"
+  defp product_status_label(:active), do: "Activo"
+  defp product_status_label(:paused), do: "Pausado"
+  defp product_status_label(:discontinued), do: "Descontinuado"
+  defp product_status_label(:archived), do: "Archivado"
+
+  defp product_status_label(status) when is_binary(status),
+    do: status |> String.to_existing_atom() |> product_status_label()
+
+  defp product_status_label(status), do: to_string(status)
 end

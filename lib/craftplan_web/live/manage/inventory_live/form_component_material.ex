@@ -16,24 +16,23 @@ defmodule CraftplanWeb.InventoryLive.FormComponentMaterial do
         phx-change="validate"
         phx-submit="save"
       >
-        <.input field={@form[:name]} type="text" label="Name" />
+        <.input field={@form[:name]} type="text" label="Nombre" />
         <.input field={@form[:sku]} type="text" label="SKU" />
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <.input field={@form[:price]} type="number" label="Price" step="0.001" min="0" />
-
+          <.input field={@form[:price]} type="number" label="Precio" step="0.001" min="0" />
           <.input
             field={@form[:unit]}
             type="radiogroup"
-            label="Measured in"
+            label="Medido en"
             value={@form[:unit].value || :gram}
-            options={[{"Gram", :gram}, {"Milliliter", :milliliter}, {"Piece", :piece}]}
+            options={[{"Gramo", :gram}, {"Mililitro", :milliliter}, {"Pieza", :piece}]}
           />
         </div>
 
         <.input
           field={@form[:minimum_stock]}
           type="number"
-          label="Minimum Stock"
+          label="Stock mínimo"
           inline_label={@form[:unit].value || :gram}
           step="0.001"
           min="0"
@@ -42,13 +41,12 @@ defmodule CraftplanWeb.InventoryLive.FormComponentMaterial do
           field={@form[:maximum_stock]}
           inline_label={@form[:unit].value || :gram}
           type="number"
-          label="Maximum Stock"
+          label="Stock máximo"
           step="0.001"
           min="0"
         />
-
         <:actions>
-          <.button variant={:primary} phx-disable-with="Saving...">Save Material</.button>
+          <.button variant={:primary} phx-disable-with="Guardando...">Guardar material</.button>
         </:actions>
       </.simple_form>
     </div>
@@ -72,13 +70,20 @@ defmodule CraftplanWeb.InventoryLive.FormComponentMaterial do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Material #{socket.assigns.form.source.type}d successfully")
+         |> put_flash(
+           :info,
+           "Material #{material_action_label(socket.assigns.form.source.type)} correctamente"
+         )
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->
         {:noreply, assign(socket, :form, form)}
     end
   end
+
+  defp material_action_label(:create), do: "creado"
+  defp material_action_label(:update), do: "actualizado"
+  defp material_action_label(type), do: to_string(type)
 
   defp assign_form(%{assigns: %{material: material}} = socket) do
     form =

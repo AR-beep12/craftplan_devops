@@ -47,25 +47,25 @@ defmodule CraftplanWeb.ImportModalComponent do
 
     ~H"""
     <div id={@id <> "-wrap"}>
-      <.modal :if={@show} id={@id} title={"Import " <> String.capitalize(@entity || "")} show={true}>
+      <.modal :if={@show} id={@id} title={"Importar " <> @config.label} show={true}>
         <div class="h-[600px] overflow-auto">
           <div
             phx-target={@myself}
             class="bg-white/95 sticky top-0 z-20 -mx-6 mb-4 px-6 py-3 backdrop-blur supports-[backdrop-filter]:bg-white/60"
           >
             <.stepper
-              steps={["Provide CSV", "Mapping", "Import"]}
+              steps={["Cargar CSV", "Mapeo", "Importar"]}
               current={wizard_label(@wizard_step)}
               goto_event="wizard_goto"
             />
           </div>
 
           <div class="mb-4 text-sm text-stone-700">
-            <div class="font-medium">Here’s the format:</div>
+            <div class="font-medium">Este es el formato:</div>
             <div :for={line <- @config.instructions}>{line}</div>
             <div class="mt-2">
               <.button variant={:outline} id="csv-template-download" type="button">
-                Download template
+                Descargar plantilla
               </.button>
             </div>
           </div>
@@ -78,13 +78,13 @@ defmodule CraftplanWeb.ImportModalComponent do
             phx-submit="csv_import"
           >
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <.input type="text" name="delimiter" label="Delimiter" value={@csv_delimiter || ","} />
-              <.input type="checkbox" name="dry_run" label="Dry run (preview)" checked />
+              <.input type="text" name="delimiter" label="Delimitador" value={@csv_delimiter || ","} />
+              <.input type="checkbox" name="dry_run" label="Ejecución de prueba (vista previa)" checked />
               <div class="sm:col-span-2">
-                <.input type="textarea" name="csv_content" label="Paste raw CSV" value="" />
+                <.input type="textarea" name="csv_content" label="Pegar CSV" value="" />
               </div>
               <div class="sm:col-span-2">
-                <label class="mb-1 block text-sm font-medium text-stone-700">Or choose file…</label>
+                <label class="mb-1 block text-sm font-medium text-stone-700">O elige un archivo…</label>
                 <.live_file_input upload={@uploads[:csv]} class="block w-full text-sm" />
               </div>
             </div>
@@ -92,9 +92,9 @@ defmodule CraftplanWeb.ImportModalComponent do
 
           <div :if={@wizard_step in [:map, :import]} class="mt-6">
             <div class="mb-2 flex items-center justify-between">
-              <h4 class="font-medium">Data</h4>
+              <h4 class="font-medium">Datos</h4>
               <div :if={@csv_errors && @csv_errors != []} class="text-xs text-red-700">
-                {length(@csv_errors)} error(s)
+                {length(@csv_errors)} error(es)
               </div>
             </div>
             <div class="mb-2">
@@ -114,7 +114,7 @@ defmodule CraftplanWeb.ImportModalComponent do
                     @map_view_tab != :mapping && "border-transparent"
                   ]}
                 >
-                  Mapping
+                  Mapeo
                 </button>
                 <button
                   type="button"
@@ -127,7 +127,7 @@ defmodule CraftplanWeb.ImportModalComponent do
                     @map_view_tab != :preview && "border-transparent"
                   ]}
                 >
-                  Preview
+                  Vista previa
                 </button>
                 <button
                   type="button"
@@ -140,7 +140,7 @@ defmodule CraftplanWeb.ImportModalComponent do
                     @map_view_tab != :errors && "border-transparent"
                   ]}
                 >
-                  Errors
+                  Errores
                 </button>
               </div>
             </div>
@@ -195,14 +195,14 @@ defmodule CraftplanWeb.ImportModalComponent do
                   </table>
                 </div>
                 <div :if={@map_view_tab == :errors}>
-                  <div :if={@csv_errors == []} class="text-sm text-stone-600">No errors.</div>
+                  <div :if={@csv_errors == []} class="text-sm text-stone-600">Sin errores.</div>
                   <div :if={@csv_errors && @csv_errors != []}>
                     <table class="min-w-full divide-y divide-red-200 border">
                       <thead class="bg-red-50">
                         <tr>
-                          <th class="px-2 py-1 text-left text-xs font-medium text-red-700">Row</th>
+                          <th class="px-2 py-1 text-left text-xs font-medium text-red-700">Fila</th>
                           <th class="px-2 py-1 text-left text-xs font-medium text-red-700">
-                            Message
+                            Mensaje
                           </th>
                         </tr>
                       </thead>
@@ -214,7 +214,7 @@ defmodule CraftplanWeb.ImportModalComponent do
                       </tbody>
                     </table>
                     <div :if={length(@csv_errors) > 25} class="mt-1 text-xs text-stone-600">
-                      Showing first 25 errors of {length(@csv_errors)}.
+                      Mostrando los primeros 25 errores de {length(@csv_errors)}.
                     </div>
                   </div>
                 </div>
@@ -232,7 +232,7 @@ defmodule CraftplanWeb.ImportModalComponent do
               form="csv-select-form"
               variant={:primary}
             >
-              Next
+              Siguiente
             </.button>
             <.button
               :if={@wizard_step == :map and @map_view_tab == :mapping}
@@ -241,7 +241,7 @@ defmodule CraftplanWeb.ImportModalComponent do
               form="csv-mapping-form"
               variant={:primary}
             >
-              Verify
+              Verificar
             </.button>
             <.button
               :if={@wizard_step == :map}
@@ -252,7 +252,7 @@ defmodule CraftplanWeb.ImportModalComponent do
               disabled={@csv_errors && @csv_errors != []}
               variant={:primary}
             >
-              Next
+              Siguiente
             </.button>
             <.button
               :if={@wizard_step == :import}
@@ -262,10 +262,10 @@ defmodule CraftplanWeb.ImportModalComponent do
               phx-click="csv_run_import"
               variant={:primary}
             >
-              Import
+              Importar
             </.button>
             <.button variant={:outline} type="button" phx-target={@myself} phx-click="wizard_close">
-              Close
+              Cerrar
             </.button>
           </div>
         </:footer>
@@ -322,11 +322,13 @@ defmodule CraftplanWeb.ImportModalComponent do
             do_csv_preview(entity, csv_content, delimiter, socket)
 
           :error ->
-            {:noreply, put_flash(socket, :info, "Upload a file or paste CSV content for dry run.")}
+            {:noreply,
+             put_flash(socket, :info, "Sube un archivo o pega contenido CSV para la ejecución de prueba.")}
         end
 
       true ->
-        {:noreply, put_flash(socket, :info, "Upload a file or paste CSV content for dry run.")}
+        {:noreply,
+         put_flash(socket, :info, "Sube un archivo o pega contenido CSV para la ejecución de prueba.")}
     end
   end
 
@@ -336,7 +338,7 @@ defmodule CraftplanWeb.ImportModalComponent do
     mapping = normalize_mapping_params(mapping_params)
 
     case socket.assigns[:csv_preview] do
-      nil -> {:noreply, put_flash(socket, :error, "No CSV preview available")}
+      nil -> {:noreply, put_flash(socket, :error, "No hay una vista previa de CSV disponible")}
       csv -> do_csv_dry_run(entity, csv, socket.assigns[:csv_delimiter] || ",", mapping, socket)
     end
   end
@@ -358,14 +360,14 @@ defmodule CraftplanWeb.ImportModalComponent do
 
     cond do
       is_nil(csv) ->
-        {:noreply, put_flash(socket, :error, "No CSV to import. Run Verify first.")}
+        {:noreply, put_flash(socket, :error, "No hay CSV para importar. Primero ejecuta Verificar.")}
 
       function_exported?(importer, :import, 2) ->
         actor = socket.assigns[:current_user]
 
         case importer.import(csv, delimiter: delimiter, mapping: mapping, actor: actor) do
           {:ok, %{inserted: ins, updated: upd, errors: errors}} ->
-            msg = "Imported #{ins + upd} (#{ins} new#{(upd > 0 && ", #{upd} updated") || ""})."
+            msg = "Se importaron #{ins + upd} (#{ins} nuevos#{(upd > 0 && ", #{upd} actualizados") || ""})."
 
             {:noreply,
              socket
@@ -375,30 +377,30 @@ defmodule CraftplanWeb.ImportModalComponent do
              |> put_flash(:info, msg)}
 
           {:error, reason} ->
-            {:noreply, put_flash(socket, :error, "Import failed: #{inspect(reason)}")}
+            {:noreply, put_flash(socket, :error, "Error al importar: #{inspect(reason)}")}
         end
 
       true ->
-        {:noreply, put_flash(socket, :error, "Import not available for #{cfg.label}")}
+        {:noreply, put_flash(socket, :error, "La importación no está disponible para #{cfg.label}")}
     end
   end
 
   # Helpers
   defp wizard_step_from_label(label) do
     case String.downcase(to_string(label)) do
-      "provide csv" -> :provide
-      "mapping" -> :map
-      "import" -> :import
+      "cargar csv" -> :provide
+      "mapeo" -> :map
+      "importar" -> :import
       _ -> :provide
     end
   end
 
   defp wizard_label(step) do
     case step do
-      :provide -> "Provide CSV"
-      :map -> "Mapping"
-      :import -> "Import"
-      _ -> "Provide CSV"
+      :provide -> "Cargar CSV"
+      :map -> "Mapeo"
+      :import -> "Importar"
+      _ -> "Cargar CSV"
     end
   end
 
@@ -436,7 +438,7 @@ defmodule CraftplanWeb.ImportModalComponent do
       {:ok, %{rows: rows, errors: errors}} =
         importer.dry_run(csv, delimiter: delimiter, mapping: mapping)
 
-      msg = "Dry run: #{length(rows)} rows valid, #{length(errors)} errors"
+      msg = "Ejecución de prueba: #{length(rows)} filas válidas, #{length(errors)} errores"
 
       {:noreply,
        socket
@@ -445,7 +447,7 @@ defmodule CraftplanWeb.ImportModalComponent do
        |> assign(:map_view_tab, if(errors == [], do: :preview, else: :errors))
        |> assign(:wizard_step, :map)}
     else
-      {:noreply, put_flash(socket, :error, "Dry-run not available for #{cfg.label}")}
+      {:noreply, put_flash(socket, :error, "La ejecución de prueba no está disponible para #{cfg.label}")}
     end
   end
 
@@ -494,14 +496,14 @@ defmodule CraftplanWeb.ImportModalComponent do
   defp entity_config("products") do
     %{
       key: "products",
-      label: "Products",
+      label: "Productos",
       importer: Craftplan.CSV.Importers.Products,
-      instructions: ["Required: name, sku, price. Optional: status."],
+      instructions: ["Requerido: name, sku, price. Opcional: status."],
       fields: [
-        %{name: "name", label: "Name", required: true},
+        %{name: "name", label: "Nombre", required: true},
         %{name: "sku", label: "SKU", required: true},
-        %{name: "price", label: "Price", required: true},
-        %{name: "status", label: "Status", required: false}
+        %{name: "price", label: "Precio", required: true},
+        %{name: "status", label: "Estado", required: false}
       ],
       default_candidates: %{
         "name" => ["name", "product name"],
@@ -515,14 +517,14 @@ defmodule CraftplanWeb.ImportModalComponent do
   defp entity_config("materials") do
     %{
       key: "materials",
-      label: "Materials",
+      label: "Materiales",
       importer: Craftplan.CSV.Importers.Materials,
-      instructions: ["Required: name, sku, unit, price."],
+      instructions: ["Requerido: name, sku, unit, price."],
       fields: [
-        %{name: "name", label: "Name", required: true},
+        %{name: "name", label: "Nombre", required: true},
         %{name: "sku", label: "SKU", required: true},
-        %{name: "unit", label: "Unit", required: true},
-        %{name: "price", label: "Price", required: true}
+        %{name: "unit", label: "Unidad", required: true},
+        %{name: "price", label: "Precio", required: true}
       ],
       default_candidates: %{
         "name" => ["name"],
@@ -536,14 +538,14 @@ defmodule CraftplanWeb.ImportModalComponent do
   defp entity_config("customers") do
     %{
       key: "customers",
-      label: "Customers",
+      label: "Clientes",
       importer: Craftplan.CSV.Importers.Customers,
-      instructions: ["Required: type, first_name, last_name, email."],
+      instructions: ["Requerido: type, first_name, last_name, email."],
       fields: [
-        %{name: "type", label: "Type", required: true},
-        %{name: "first_name", label: "First name", required: true},
-        %{name: "last_name", label: "Last name", required: true},
-        %{name: "email", label: "Email", required: true}
+        %{name: "type", label: "Tipo", required: true},
+        %{name: "first_name", label: "Nombre", required: true},
+        %{name: "last_name", label: "Apellido", required: true},
+        %{name: "email", label: "Correo electrónico", required: true}
       ],
       default_candidates: %{
         "type" => ["type"],

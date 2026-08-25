@@ -9,7 +9,7 @@ defmodule CraftplanWeb.SetupLive do
     if admin_exists?() do
       {:ok,
        socket
-       |> put_flash(:info, "Setup already complete.")
+       |> put_flash(:info, "La configuración inicial ya se completó.")
        |> redirect(to: ~p"/sign-in")}
     else
       form =
@@ -20,7 +20,7 @@ defmodule CraftplanWeb.SetupLive do
 
       {:ok,
        socket
-       |> assign(:page_title, "Setup")
+       |> assign(:page_title, "Configuración inicial")
        |> assign(:form, to_form(form))}
     end
   end
@@ -31,9 +31,9 @@ defmodule CraftplanWeb.SetupLive do
     <div class="mx-auto flex min-h-screen items-center justify-center bg-stone-50 px-4">
       <div class="w-full max-w-md space-y-6">
         <div class="text-center">
-          <h1 class="text-2xl font-bold text-stone-900">Welcome to Craftplan</h1>
+          <h1 class="text-2xl font-bold text-stone-900">Bienvenido a Craftplan</h1>
           <p class="mt-2 text-sm text-stone-600">
-            Create your admin account to get started.
+            Crea tu cuenta de administrador para comenzar.
           </p>
         </div>
 
@@ -44,17 +44,17 @@ defmodule CraftplanWeb.SetupLive do
             phx-change="validate"
             phx-submit="setup"
           >
-            <.input field={@form[:email]} type="email" label="Email" />
-            <.input field={@form[:password]} type="password" label="Password" />
+            <.input field={@form[:email]} type="email" label="Correo electrónico" />
+            <.input field={@form[:password]} type="password" label="Contraseña" />
             <.input
               field={@form[:password_confirmation]}
               type="password"
-              label="Confirm password"
+              label="Confirmar contraseña"
             />
 
             <:actions>
-              <.button variant={:primary} phx-disable-with="Creating account..." class="w-full">
-                Create Admin Account
+              <.button variant={:primary} phx-disable-with="Creando cuenta..." class="w-full">
+                Crear cuenta de administrador
               </.button>
             </:actions>
           </.simple_form>
@@ -74,7 +74,7 @@ defmodule CraftplanWeb.SetupLive do
     if admin_exists?() do
       {:noreply,
        socket
-       |> put_flash(:error, "Setup already complete.")
+       |> put_flash(:error, "La configuración inicial ya se completó.")
        |> redirect(to: ~p"/sign-in")}
     else
       user_params = Map.put(user_params, "role", "admin")
@@ -83,7 +83,7 @@ defmodule CraftplanWeb.SetupLive do
         {:ok, _user} ->
           {:noreply,
            socket
-           |> put_flash(:info, "Admin account created. Please sign in.")
+           |> put_flash(:info, "Cuenta de administrador creada. Por favor, inicia sesión.")
            |> redirect(to: ~p"/sign-in")}
 
         {:error, form} ->

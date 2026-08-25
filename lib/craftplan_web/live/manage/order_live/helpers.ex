@@ -26,6 +26,37 @@ defmodule CraftplanWeb.OrderLive.Helpers do
   end
 
   @doc """
+  Spanish display label for an order status.
+  """
+  def order_status_label(:unconfirmed), do: "Sin confirmar"
+  def order_status_label(:confirmed), do: "Confirmado"
+  def order_status_label(:in_progress), do: "En progreso"
+  def order_status_label(:ready), do: "Listo"
+  def order_status_label(:delivered), do: "Entregado"
+  def order_status_label(:completed), do: "Completado"
+  def order_status_label(:cancelled), do: "Cancelado"
+  def order_status_label(status) when is_binary(status), do: status |> String.to_existing_atom() |> order_status_label()
+  def order_status_label(status), do: to_string(status)
+
+  @doc """
+  Spanish display label for an order payment status.
+  """
+  def payment_status_label(:paid), do: "Pagado"
+  def payment_status_label(:pending), do: "Pendiente"
+  def payment_status_label(:to_be_refunded), do: "Por reembolsar"
+  def payment_status_label(:refunded), do: "Reembolsado"
+  def payment_status_label(status) when is_binary(status), do: status |> String.to_existing_atom() |> payment_status_label()
+  def payment_status_label(status), do: to_string(status)
+
+  @doc """
+  Spanish display label for an order item's derived fulfillment status.
+  """
+  def order_item_status_label(:todo), do: "Pendiente"
+  def order_item_status_label(:in_progress), do: "En progreso"
+  def order_item_status_label(:done), do: "Completado"
+  def order_item_status_label(status), do: to_string(status)
+
+  @doc """
   Create calendar events from orders
   """
   def create_calendar_events(orders, event_duration) do

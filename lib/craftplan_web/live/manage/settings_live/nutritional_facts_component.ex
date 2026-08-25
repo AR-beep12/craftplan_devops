@@ -12,8 +12,8 @@ defmodule CraftplanWeb.SettingsLive.NutritionalFactsComponent do
     ~H"""
     <div class="space-y-6">
       <.header>
-        <:subtitle>Keep a central list of nutrients you add to recipes and packaging.</:subtitle>
-        Nutritional Facts
+        <:subtitle>Mantén una lista central de los nutrientes que agregas a recetas y empaques.</:subtitle>
+        Datos nutricionales
       </.header>
 
       <div class="flex flex-col gap-6 lg:flex-row">
@@ -31,14 +31,14 @@ defmodule CraftplanWeb.SettingsLive.NutritionalFactsComponent do
                   class="sr-only text-sm font-medium text-stone-700"
                   for="nutritional-fact-filter-query"
                 >
-                  Search nutritional facts
+                  Buscar datos nutricionales
                 </label>
                 <input
                   id="nutritional-fact-filter-query"
                   name="query"
                   type="search"
                   value={@search_query}
-                  placeholder="Filter by name..."
+                  placeholder="Filtrar por nombre..."
                   phx-debounce="300"
                   class="w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 transition focus:border-primary-400 focus:ring-primary-200/60 focus:outline-none focus:ring"
                 />
@@ -51,35 +51,35 @@ defmodule CraftplanWeb.SettingsLive.NutritionalFactsComponent do
                 rows={@visible_facts}
                 wrapper_class="mt-0"
               >
-                <:col :let={fact} label="Name">
+                <:col :let={fact} label="Nombre">
                   <span class={if fact.parent_key, do: "pl-4", else: ""}>
                     {settings_fact_name(fact)}
                   </span>
                 </:col>
-                <:col :let={fact} label="Unit">{unit_label(fact.default_unit)}</:col>
-                <:col :let={fact} label="Type">
-                  <.badge :if={fact.eu_required} text="EU required" />
-                  <.badge :if={!fact.eu_required && fact.system} text="System" />
-                  <span :if={!fact.system} class="text-sm text-stone-500">Custom</span>
+                <:col :let={fact} label="Unidad">{unit_label(fact.default_unit)}</:col>
+                <:col :let={fact} label="Tipo">
+                  <.badge :if={fact.eu_required} text="Requerido por la UE" />
+                  <.badge :if={!fact.eu_required && fact.system} text="Sistema" />
+                  <span :if={!fact.system} class="text-sm text-stone-500">Personalizado</span>
                 </:col>
                 <:action :let={fact}>
                   <.link
                     :if={!fact.system}
                     phx-click={JS.push("delete", value: %{id: fact.id}, target: @myself)}
-                    data-confirm="Are you sure you want to delete this nutritional fact? This action cannot be undone."
+                    data-confirm="¿Estás seguro de que deseas eliminar este dato nutricional? Esta acción no se puede deshacer."
                   >
                     <.button size={:sm} variant={:danger}>
-                      Delete
+                      Eliminar
                     </.button>
                   </.link>
-                  <span :if={fact.system} class="text-sm text-stone-400">Locked</span>
+                  <span :if={fact.system} class="text-sm text-stone-400">Bloqueado</span>
                 </:action>
                 <:empty>
                   <div class="py-6 text-center text-sm text-stone-500">
                     {if String.trim(@search_query) == "" do
-                      "No nutritional facts yet. Add your first entry from the manage panel."
+                      "Aún no hay datos nutricionales. Agrega tu primera entrada desde el panel de gestión."
                     else
-                      "No nutritional facts match your search."
+                      "Ningún dato nutricional coincide con tu búsqueda."
                     end}
                   </div>
                 </:empty>
@@ -90,9 +90,9 @@ defmodule CraftplanWeb.SettingsLive.NutritionalFactsComponent do
 
         <aside class="lg:w-80">
           <div class="space-y-4 rounded-md border border-gray-200 bg-white p-4">
-            <h3 class="text-sm font-semibold text-stone-800">Manage</h3>
+            <h3 class="text-sm font-semibold text-stone-800">Gestionar</h3>
             <p class="text-sm text-stone-600">
-              Add nutritional facts that you frequently reference. These appear anywhere you select nutrients.
+              Agrega datos nutricionales que consultas con frecuencia. Aparecerán en cualquier lugar donde selecciones nutrientes.
             </p>
             <.button
               type="button"
@@ -101,7 +101,7 @@ defmodule CraftplanWeb.SettingsLive.NutritionalFactsComponent do
               phx-click="show_modal"
               phx-target={@myself}
             >
-              <.icon name="hero-plus" class="mr-2 h-4 w-4" /> Add Nutritional Fact
+              <.icon name="hero-plus" class="mr-2 h-4 w-4" /> Agregar dato nutricional
             </.button>
           </div>
         </aside>
@@ -111,8 +111,8 @@ defmodule CraftplanWeb.SettingsLive.NutritionalFactsComponent do
         :if={@show_modal}
         id="add-nutritional-fact-modal"
         show
-        title="Add Nutritional Fact"
-        description="Enter the name of the nutritional fact you want to add"
+        title="Agregar dato nutricional"
+        description="Ingresa el nombre del dato nutricional que deseas agregar"
         on_cancel={JS.push("hide_modal", target: @myself)}
       >
         <.simple_form
@@ -122,9 +122,9 @@ defmodule CraftplanWeb.SettingsLive.NutritionalFactsComponent do
           phx-change="validate"
           phx-submit="save"
         >
-          <.input field={@form[:name]} type="text" label="Nutritional fact name" />
+          <.input field={@form[:name]} type="text" label="Nombre del dato nutricional" />
           <:actions>
-            <.button variant={:primary} phx-disable-with="Saving...">Add Nutritional Fact</.button>
+            <.button variant={:primary} phx-disable-with="Guardando...">Agregar dato nutricional</.button>
           </:actions>
         </.simple_form>
       </.modal>
@@ -170,7 +170,7 @@ defmodule CraftplanWeb.SettingsLive.NutritionalFactsComponent do
           |> assign(:nutritional_facts, nutritional_facts)
           |> assign_filtered_facts(socket.assigns.search_query)
 
-        {:noreply, put_flash(socket, :info, "Nutritional fact added successfully")}
+        {:noreply, put_flash(socket, :info, "Dato nutricional agregado correctamente")}
 
       {:error, form} ->
         {:noreply, assign(socket, :form, form)}
@@ -194,7 +194,7 @@ defmodule CraftplanWeb.SettingsLive.NutritionalFactsComponent do
       |> assign(:nutritional_facts, nutritional_facts)
       |> assign_filtered_facts(socket.assigns.search_query)
 
-    {:noreply, put_flash(socket, :info, "Nutritional fact deleted successfully")}
+    {:noreply, put_flash(socket, :info, "Dato nutricional eliminado correctamente")}
   end
 
   @impl true
@@ -244,7 +244,7 @@ defmodule CraftplanWeb.SettingsLive.NutritionalFactsComponent do
   end
 
   defp settings_fact_name(%{parent_key: parent_key, name: name}) when not is_nil(parent_key) do
-    "of which #{String.downcase(name)}"
+    "de los cuales #{String.downcase(name)}"
   end
 
   defp settings_fact_name(%{name: name}), do: name
@@ -261,7 +261,7 @@ defmodule CraftplanWeb.SettingsLive.NutritionalFactsComponent do
   defp unit_label("milliliter"), do: "ml"
   defp unit_label(:percent), do: "%"
   defp unit_label("percent"), do: "%"
-  defp unit_label(:piece), do: "pc"
-  defp unit_label("piece"), do: "pc"
+  defp unit_label(:piece), do: "ud."
+  defp unit_label("piece"), do: "ud."
   defp unit_label(unit), do: to_string(unit)
 end

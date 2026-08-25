@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Project Context
+
+This is a fork of the upstream Craftplan project, customized for a specific local small-business venture (not a general-purpose deployment). Some navigation and features from upstream have been intentionally removed because they're unneeded for this business — e.g. Allergens was removed from the sidebar/settings nav by design, not by mistake. Before "restoring" or "fixing" a missing nav entry, route, or feature, check whether it was deliberately trimmed rather than assuming it's a bug.
+
 ## Build & Development Commands
 
 ```bash

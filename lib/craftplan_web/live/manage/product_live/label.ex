@@ -11,13 +11,13 @@ defmodule CraftplanWeb.ProductLive.Label do
     <div class="mx-auto max-w-3xl bg-white p-6 print:m-0 print:max-w-full print:border-0 print:p-0 print:shadow-none">
       <div class="mb-4 flex items-start justify-between print:mb-2">
         <div>
-          <h1 class="text-2xl font-semibold print:text-xl">Product Label</h1>
+          <h1 class="text-2xl font-semibold print:text-xl">Etiqueta del producto</h1>
           <div class="text-sm text-stone-600">SKU: {@product.sku}</div>
         </div>
         <div class="text-right text-sm">
-          <div class="text-stone-600">Date</div>
+          <div class="text-stone-600">Fecha</div>
           <div class="font-medium">{format_date(@today, format: "%Y-%m-%d")}</div>
-          <div class="mt-2 text-stone-600">Batch</div>
+          <div class="mt-2 text-stone-600">Lote</div>
           <div class="font-medium">{batch_code(@today, @product.sku)}</div>
         </div>
       </div>
@@ -27,14 +27,14 @@ defmodule CraftplanWeb.ProductLive.Label do
       </div>
 
       <div :if={@ingredients != []} class="mb-4">
-        <div class="mb-1 text-sm font-medium text-stone-700">Ingredients</div>
+        <div class="mb-1 text-sm font-medium text-stone-700">Ingredientes</div>
         <ul class="list-inside list-disc text-sm">
           <li :for={name <- @ingredients}>{name}</li>
         </ul>
       </div>
 
       <div :if={@allergens != []} class="mb-4">
-        <div class="mb-1 text-sm font-medium text-stone-700">Allergens</div>
+        <div class="mb-1 text-sm font-medium text-stone-700">Alérgenos</div>
         <div class="flex flex-wrap gap-2 text-sm">
           <.badge :for={a <- @allergens} text={a.name} />
         </div>
@@ -42,7 +42,7 @@ defmodule CraftplanWeb.ProductLive.Label do
 
       <div :if={nutrition_declaration?(@nutrition_facts)} class="mb-4">
         <div class="mb-1 text-sm font-medium text-stone-700">
-          Nutrition declaration per {nutrition_basis_label(@nutrition_facts)}
+          Declaración nutricional por {nutrition_basis_label(@nutrition_facts)}
         </div>
         <table class="w-full border-collapse text-sm">
           <tbody>
@@ -59,7 +59,7 @@ defmodule CraftplanWeb.ProductLive.Label do
       </div>
 
       <div class="mt-6 flex justify-end print:hidden">
-        <.button variant={:primary} onclick="window.print()">Print</.button>
+        <.button variant={:primary} onclick="window.print()">Imprimir</.button>
       </div>
     </div>
     """
@@ -155,7 +155,7 @@ defmodule CraftplanWeb.ProductLive.Label do
   end
 
   defp nutrient_label(%{parent_key: parent_key, name: name}) when not is_nil(parent_key) do
-    "of which #{String.downcase(name)}"
+    "de los cuales #{String.downcase(name)}"
   end
 
   defp nutrient_label(%{name: name}), do: name

@@ -10,7 +10,7 @@ defmodule CraftplanWeb.BatchSheetController do
 
     if is_nil(actor) do
       conn
-      |> put_flash(:error, "You must be signed in")
+      |> put_flash(:error, "Debes iniciar sesión")
       |> redirect(to: ~p"/sign-in")
     else
       currency = load_currency(actor)
@@ -29,7 +29,7 @@ defmodule CraftplanWeb.BatchSheetController do
           Logger.error("Batch sheet PDF generation failed: #{inspect(reason)}")
 
           conn
-          |> put_flash(:error, "Failed to generate batch sheet: #{inspect(reason)}")
+          |> put_flash(:error, "No se pudo generar la hoja de lote: #{inspect(reason)}")
           |> redirect(to: ~p"/manage/production/batches/#{batch_code}")
       end
     end
@@ -38,7 +38,7 @@ defmodule CraftplanWeb.BatchSheetController do
       Logger.error("Batch sheet error: #{Exception.message(e)}")
 
       conn
-      |> put_flash(:error, "Batch sheet error: #{Exception.message(e)}")
+      |> put_flash(:error, "Error en la hoja de lote: #{Exception.message(e)}")
       |> redirect(to: ~p"/manage/production/batches/#{batch_code}")
   end
 

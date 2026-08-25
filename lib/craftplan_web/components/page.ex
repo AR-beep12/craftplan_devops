@@ -172,7 +172,7 @@ defmodule CraftplanWeb.Components.Page do
       phx-click={JS.push("reset_filters", target: nil)}
       {@rest}
     >
-      <span>{@text || "Reset filters"}</span>
+      <span>{@text || "Restablecer filtros"}</span>
     </button>
     """
   end

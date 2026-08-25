@@ -6,18 +6,18 @@ defmodule CraftplanWeb.CommandPaletteSearch do
   import Ash.Query
 
   @pages [
-    %{label: "Orders", path: "/manage/orders", icon: :orders},
-    %{label: "Inventory", path: "/manage/inventory", icon: :inventory},
-    %{label: "Customers", path: "/manage/customers", icon: :customers},
-    %{label: "Settings", path: "/manage/settings", icon: :settings}
+    %{label: "Pedidos", path: "/manage/orders", icon: :orders},
+    %{label: "Inventario", path: "/manage/inventory", icon: :inventory},
+    %{label: "Clientes", path: "/manage/customers", icon: :customers},
+    %{label: "Configuración", path: "/manage/settings", icon: :settings}
   ]
-
+  
   @actions [
-    %{label: "New Order", path: "/manage/orders/new", icon: :orders},
-    %{label: "New Material", path: "/manage/inventory/new", icon: :inventory},
-    %{label: "New Customer", path: "/manage/customers/new", icon: :customers}
+    %{label: "Nuevo pedido", path: "/manage/orders/new", icon: :orders},
+    %{label: "Nuevo material", path: "/manage/inventory/new", icon: :inventory},
+    %{label: "Nuevo cliente", path: "/manage/customers/new", icon: :customers},
   ]
-
+  
   @doc """
   Searches all categories and returns grouped results.
   """

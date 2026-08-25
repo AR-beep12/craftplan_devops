@@ -20,9 +20,9 @@ defmodule CraftplanWeb.OverviewLive do
     ~H"""
     <Page.page>
       <.header>
-        Today at a glance
+        Resumen de hoy
         <:subtitle>
-          Production commitments, capacity pressure, and material risks for the current cycle.
+          Compromisos de producción, presión de capacidad y riesgos de materiales para el ciclo actual.
         </:subtitle>
       </.header>
       <Page.two_column :if={@live_action == :index}>
@@ -32,9 +32,9 @@ defmodule CraftplanWeb.OverviewLive do
               <Page.surface>
                 <:header>
                   <div>
-                    <h3 class="text-sm font-semibold text-stone-900">Orders today</h3>
+                    <h3 class="text-sm font-semibold text-stone-900">Pedidos de hoy</h3>
                     <p class="text-xs text-stone-500">
-                      Deliveries scheduled for this production date.
+                      Entregas programadas para esta fecha de producción.
                     </p>
                   </div>
                 </:header>
@@ -46,16 +46,16 @@ defmodule CraftplanWeb.OverviewLive do
                   no_margin
                   row_click={fn row -> JS.navigate("/manage/orders/#{row.reference}") end}
                 >
-                  <:col :let={row} label="Reference">
+                  <:col :let={row} label="Referencia">
                     <.kbd>{row.reference}</.kbd>
                   </:col>
-                  <:col :let={row} label="Customer">{row.customer}</:col>
+                  <:col :let={row} label="Cliente">{row.customer}</:col>
                   <:col :let={row} label="Total" align={:right}>
                     {format_money(@settings.currency, row.total)}
                   </:col>
                   <:empty>
                     <div class="rounded-md border border-dashed border-stone-200 bg-stone-50 py-6 text-center text-sm text-stone-500">
-                      No orders scheduled for today.
+                      No hay pedidos programados para hoy.
                     </div>
                   </:empty>
                 </.table>
@@ -64,9 +64,9 @@ defmodule CraftplanWeb.OverviewLive do
               <Page.surface>
                 <:header>
                   <div>
-                    <h3 class="text-sm font-semibold text-stone-900">Outstanding today</h3>
+                    <h3 class="text-sm font-semibold text-stone-900">Pendientes hoy</h3>
                     <p class="text-xs text-stone-500">
-                      Quantities still to prep and those mid-production.
+                      Cantidades por preparar y las que están en producción.
                     </p>
                   </div>
                 </:header>
@@ -77,12 +77,12 @@ defmodule CraftplanWeb.OverviewLive do
                   zebra
                   no_margin
                 >
-                  <:col :let={row} label="Product">{row.product.name}</:col>
-                  <:col :let={row} label="Todo Qty" align={:right}>{row.todo}</:col>
-                  <:col :let={row} label="In Progress Qty" align={:right}>{row.in_progress}</:col>
+                  <:col :let={row} label="Producto">{row.product.name}</:col>
+                  <:col :let={row} label="Cant. pendiente" align={:right}>{row.todo}</:col>
+                  <:col :let={row} label="Cant. en progreso" align={:right}>{row.in_progress}</:col>
                   <:empty>
                     <div class="rounded-md border border-dashed border-stone-200 bg-stone-50 py-6 text-center text-sm text-stone-500">
-                      All production tasks are caught up.
+                      Todas las tareas de producción están al día.
                     </div>
                   </:empty>
                 </.table>
@@ -91,9 +91,9 @@ defmodule CraftplanWeb.OverviewLive do
               <Page.surface>
                 <:header>
                   <div>
-                    <h3 class="text-sm font-semibold text-stone-900">Over-capacity details</h3>
+                    <h3 class="text-sm font-semibold text-stone-900">Detalles de exceso de capacidad</h3>
                     <p class="text-xs text-stone-500">
-                      Products that exceed their daily limit.
+                      Productos que superan su límite diario.
                     </p>
                   </div>
                 </:header>
@@ -104,13 +104,13 @@ defmodule CraftplanWeb.OverviewLive do
                   zebra
                   no_margin
                 >
-                  <:col :let={row} label="Day">{format_date(row.day, format: "%a %d")}</:col>
-                  <:col :let={row} label="Product">{row.product.name}</:col>
-                  <:col :let={row} label="Scheduled" align={:right}>{row.qty}</:col>
-                  <:col :let={row} label="Max" align={:right}>{row.max}</:col>
+                  <:col :let={row} label="Día">{format_date(row.day, format: "%a %d")}</:col>
+                  <:col :let={row} label="Producto">{row.product.name}</:col>
+                  <:col :let={row} label="Programado" align={:right}>{row.qty}</:col>
+                  <:col :let={row} label="Máx." align={:right}>{row.max}</:col>
                   <:empty>
                     <div class="w-full rounded-md border border-dashed border-stone-200 bg-stone-50 py-6 text-center text-sm text-stone-500">
-                      Capacity looks balanced.
+                      La capacidad se ve equilibrada.
                     </div>
                   </:empty>
                 </.table>
@@ -119,9 +119,9 @@ defmodule CraftplanWeb.OverviewLive do
               <Page.surface>
                 <:header>
                   <div>
-                    <h3 class="text-sm font-semibold text-stone-900">Days over order capacity</h3>
+                    <h3 class="text-sm font-semibold text-stone-900">Días que superan la capacidad de pedidos</h3>
                     <p class="text-xs text-stone-500">
-                      When confirmed orders exceed the overall daily cap.
+                      Cuando los pedidos confirmados superan el límite diario general.
                     </p>
                   </div>
                 </:header>
@@ -132,12 +132,12 @@ defmodule CraftplanWeb.OverviewLive do
                   zebra
                   no_margin
                 >
-                  <:col :let={row} label="Day">{format_date(row.day, format: "%a %d")}</:col>
-                  <:col :let={row} label="Orders" align={:right}>{row.count}</:col>
-                  <:col :let={row} label="Cap" align={:right}>{row.cap}</:col>
+                  <:col :let={row} label="Día">{format_date(row.day, format: "%a %d")}</:col>
+                  <:col :let={row} label="Pedidos" align={:right}>{row.count}</:col>
+                  <:col :let={row} label="Límite" align={:right}>{row.cap}</:col>
                   <:empty>
                     <div class="rounded-md border border-dashed border-stone-200 bg-stone-50 py-6 text-center text-sm text-stone-500">
-                      No upcoming days over your order capacity.
+                      No hay próximos días que superen tu capacidad de pedidos.
                     </div>
                   </:empty>
                 </.table>
@@ -147,9 +147,9 @@ defmodule CraftplanWeb.OverviewLive do
               <Page.surface class="mt-4 lg:col-span-2 xl:col-span-3">
                 <:header>
                   <div>
-                    <h3 class="text-sm font-semibold text-stone-900">Upcoming material shortages</h3>
+                    <h3 class="text-sm font-semibold text-stone-900">Próximas escaseces de materiales</h3>
                     <p class="text-xs text-stone-500">
-                      Where inventory falls short once production is applied.
+                      Dónde el inventario resulta insuficiente al aplicar la producción.
                     </p>
                   </div>
                 </:header>
@@ -161,20 +161,20 @@ defmodule CraftplanWeb.OverviewLive do
                   no_margin
                   row_click={fn row -> JS.navigate("/manage/inventory/#{row.material.sku}") end}
                 >
-                  <:col :let={row} label="Day">{format_date(row.day, format: "%a %d")}</:col>
+                  <:col :let={row} label="Día">{format_date(row.day, format: "%a %d")}</:col>
                   <:col :let={row} label="Material">{row.material.name}</:col>
-                  <:col :let={row} label="Required" align={:right}>
+                  <:col :let={row} label="Requerido" align={:right}>
                     {format_amount(row.material.unit, row.required)}
                   </:col>
-                  <:col :let={row} label="Opening" align={:right}>
+                  <:col :let={row} label="Inicial" align={:right}>
                     {format_amount(row.material.unit, row.opening)}
                   </:col>
-                  <:col :let={row} label="End Balance" align={:right}>
+                  <:col :let={row} label="Saldo final" align={:right}>
                     {format_amount(row.material.unit, row.ending)}
                   </:col>
                   <:empty>
                     <div class="rounded-md border border-dashed border-stone-200 bg-stone-50 py-6 text-center text-sm text-stone-500">
-                      Stock levels look healthy for the selected range.
+                      Los niveles de existencias se ven saludables para el rango seleccionado.
                     </div>
                   </:empty>
                 </.table>
@@ -226,17 +226,17 @@ defmodule CraftplanWeb.OverviewLive do
             <div class="space-y-4 px-4 py-3">
               <div class="flex items-center justify-between">
                 <span class="inline-flex items-center rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-medium text-stone-600">
-                  Not Batched
+                  Sin lotear
                 </span>
                 <span class="text-sm text-stone-500">
                   {format_amount(:piece, total_quantity(@selected_unbatched.items))} &middot; {length(
                     Enum.uniq_by(@selected_unbatched.items, & &1.order.id)
-                  )} orders
+                  )} pedidos
                 </span>
               </div>
 
               <div class="space-y-2">
-                <h4 class="text-xs font-semibold uppercase text-stone-400">Orders</h4>
+                <h4 class="text-xs font-semibold uppercase text-stone-400">Pedidos</h4>
                 <div
                   :for={item <- @selected_unbatched.items}
                   class="flex items-center justify-between rounded border border-stone-100 bg-stone-50 px-3 py-2 text-sm"
@@ -250,7 +250,7 @@ defmodule CraftplanWeb.OverviewLive do
                     </.link>
                     <span class="text-stone-500">{item.order.customer.full_name}</span>
                   </div>
-                  <span class="text-stone-700">{item.quantity} pcs</span>
+                  <span class="text-stone-700">{item.quantity} uds</span>
                 </div>
               </div>
 
@@ -267,7 +267,7 @@ defmodule CraftplanWeb.OverviewLive do
                     )
                   }
                 >
-                  Batch All
+                  Lotear todo
                 </.button>
               </div>
             </div>
@@ -278,22 +278,22 @@ defmodule CraftplanWeb.OverviewLive do
         :if={@live_action == :make_sheet}
         id="make-sheet-modal"
         show
-        title={"Make Sheet — #{format_day_name(@today)} #{format_short_date(@today, @time_zone)}"}
+        title={"Hoja de producción — #{format_day_name(@today)} #{format_short_date(@today, @time_zone)}"}
         on_cancel={JS.patch(~p"/manage/production/schedule")}
         fullscreen
       >
         <div class="px-4 py-2 print:p-0">
           <div class="mb-3 flex items-center justify-between print:mb-2">
-            <div class="text-lg font-medium print:text-base">Today's Production</div>
+            <div class="text-lg font-medium print:text-base">Producción de hoy</div>
             <div class="space-x-2 print:hidden">
-              <.button variant={:outline} onclick="window.print()">Print</.button>
+              <.button variant={:outline} onclick="window.print()">Imprimir</.button>
             </div>
           </div>
           <div class="rounded border border-stone-300 bg-white p-4 print:border-black">
             <.table id="make-sheet" no_margin rows={make_sheet_rows(@production_items, @today)}>
-              <:col :let={row} label="Product">{row.product.name}</:col>
-              <:col :let={row} label="Total Qty">{row.total}</:col>
-              <:col :let={row} label="Completed">{row.completed}</:col>
+              <:col :let={row} label="Producto">{row.product.name}</:col>
+              <:col :let={row} label="Cant. total">{row.total}</:col>
+              <:col :let={row} label="Completado">{row.completed}</:col>
             </.table>
           </div>
         </div>
@@ -565,7 +565,7 @@ defmodule CraftplanWeb.OverviewLive do
       |> Enum.filter(fn %{remaining: r} -> Decimal.compare(r, Decimal.new(0)) == :gt end)
 
     if Enum.empty?(items_with_remaining) do
-      {:noreply, put_flash(socket, :info, "Nothing remaining to allocate for this product/day")}
+      {:noreply, put_flash(socket, :info, "No queda nada por asignar para este producto/día")}
     else
       planned_qty =
         Enum.reduce(items_with_remaining, Decimal.new(0), fn %{remaining: r}, acc ->
@@ -586,12 +586,12 @@ defmodule CraftplanWeb.OverviewLive do
         {:ok, batch} ->
           {:noreply,
            socket
-           |> put_flash(:info, "Batch #{batch.batch_code} created")
+           |> put_flash(:info, "Lote #{batch.batch_code} creado")
            |> assign(:selected_unbatched, nil)
            |> update_for_range(socket.assigns.days_range)}
 
         {:error, error} ->
-          {:noreply, put_flash(socket, :error, "Failed to create batch: #{inspect(error)}")}
+          {:noreply, put_flash(socket, :error, "No se pudo crear el lote: #{inspect(error)}")}
       end
     end
   end
@@ -606,16 +606,16 @@ defmodule CraftplanWeb.OverviewLive do
           {:ok, _} ->
             {:noreply,
              socket
-             |> put_flash(:info, "Batch #{batch_code} started")
+             |> put_flash(:info, "Lote #{batch_code} iniciado")
              |> assign(:selected_batch, nil)
              |> update_for_range(socket.assigns.days_range)}
 
           {:error, error} ->
-            {:noreply, put_flash(socket, :error, "Failed to start batch: #{inspect(error)}")}
+            {:noreply, put_flash(socket, :error, "No se pudo iniciar el lote: #{inspect(error)}")}
         end
 
       {:error, _} ->
-        {:noreply, put_flash(socket, :error, "Batch not found")}
+        {:noreply, put_flash(socket, :error, "Lote no encontrado")}
     end
   end
 
@@ -627,14 +627,14 @@ defmodule CraftplanWeb.OverviewLive do
 
       # Backward drags
       to == "open" && from in ["in_progress", "completed"] ->
-        {:noreply, put_flash(socket, :error, "Cannot move a batch backward")}
+        {:noreply, put_flash(socket, :error, "No se puede mover un lote hacia atrás")}
 
       from == "completed" ->
-        {:noreply, put_flash(socket, :error, "Cannot move a completed batch")}
+        {:noreply, put_flash(socket, :error, "No se puede mover un lote completado")}
 
       # Skip open → completed
       from == "open" && to == "completed" ->
-        {:noreply, put_flash(socket, :error, "Batch must be started before completing")}
+        {:noreply, put_flash(socket, :error, "El lote debe iniciarse antes de completarse")}
 
       # Open → In Progress
       from == "open" && to == "in_progress" ->
@@ -649,7 +649,7 @@ defmodule CraftplanWeb.OverviewLive do
 
         case Enum.find(batched, &(&1.batch_code == code)) do
           nil ->
-            {:noreply, put_flash(socket, :error, "Batch not found")}
+            {:noreply, put_flash(socket, :error, "Lote no encontrado")}
 
           batch_group ->
             {:noreply,
@@ -659,7 +659,7 @@ defmodule CraftplanWeb.OverviewLive do
         end
 
       true ->
-        {:noreply, put_flash(socket, :error, "Invalid transition")}
+        {:noreply, put_flash(socket, :error, "Transición no válida")}
     end
   end
 
@@ -679,7 +679,7 @@ defmodule CraftplanWeb.OverviewLive do
         {:noreply, socket}
 
       _ ->
-        {:noreply, put_flash(socket, :error, "Unbatched items can only be moved to Open")}
+        {:noreply, put_flash(socket, :error, "Los artículos sin lotear solo se pueden mover a Abierto")}
     end
   end
 
@@ -711,17 +711,17 @@ defmodule CraftplanWeb.OverviewLive do
           {:ok, _} ->
             {:noreply,
              socket
-             |> put_flash(:info, "Batch #{batch_code} completed — #{produced_qty} pcs produced")
+             |> put_flash(:info, "Lote #{batch_code} completado — #{produced_qty} uds producidas")
              |> assign(:completing_batch_code, nil)
              |> assign(:selected_batch, nil)
              |> update_for_range(socket.assigns.days_range)}
 
           {:error, error} ->
-            {:noreply, put_flash(socket, :error, "Failed to complete batch: #{inspect(error)}")}
+            {:noreply, put_flash(socket, :error, "No se pudo completar el lote: #{inspect(error)}")}
         end
 
       {:error, _} ->
-        {:noreply, put_flash(socket, :error, "Batch not found")}
+        {:noreply, put_flash(socket, :error, "Lote no encontrado")}
     end
   end
 
@@ -735,7 +735,7 @@ defmodule CraftplanWeb.OverviewLive do
     >
       <div class="flex items-center gap-2">
         <span class="text-sm font-medium text-stone-900">{@product.name}</span>
-        <.badge :if={capacity_status(@product, @items) == :over} text="Over cap" />
+        <.badge :if={capacity_status(@product, @items) == :over} text="Sobre capacidad" />
       </div>
       <div class="mt-1.5 text-xs text-stone-500">
         {format_amount(:piece, total_quantity(@items))} &middot; {length(
@@ -807,7 +807,7 @@ defmodule CraftplanWeb.OverviewLive do
                 "bg-white text-stone-700 hover:bg-blue-50"
             ]}
           >
-            Week
+            Semana
           </button>
           <button
             phx-click="set_schedule_view"
@@ -819,7 +819,7 @@ defmodule CraftplanWeb.OverviewLive do
                 "bg-white text-stone-700 hover:bg-blue-50"
             ]}
           >
-            Day
+            Día
           </button>
         </div>
         <!-- Prev / Today / Next segmented control -->
@@ -827,7 +827,7 @@ defmodule CraftplanWeb.OverviewLive do
           <button
             phx-click="previous_week"
             size={:sm}
-            title="Previous"
+            title="Anterior"
             class="px-[6px] cursor-pointer rounded-l-md border border-stone-300 bg-white py-1 transition-colors hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-400"
           >
             <svg
@@ -851,7 +851,7 @@ defmodule CraftplanWeb.OverviewLive do
             size={:sm}
             variant={:outline}
             aria-pressed={@is_today}
-            title="Jump to today"
+            title="Ir a hoy"
             class={[
               "flex cursor-pointer items-center border-y border-r border-l-0 border-stone-300 bg-white px-3 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-400 disabled:cursor-default disabled:bg-stone-100 disabled:text-stone-400",
               (@is_today && "border-blue-300 bg-blue-100 text-blue-700") ||
@@ -873,13 +873,13 @@ defmodule CraftplanWeb.OverviewLive do
                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
-            Today
+            Hoy
           </button>
 
           <button
             phx-click="next_week"
             size={:sm}
-            title="Next"
+            title="Siguiente"
             class="px-[6px] cursor-pointer rounded-r-md border border-l-0 border-stone-300 bg-white py-1 transition-colors hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-400"
           >
             <svg
@@ -913,7 +913,7 @@ defmodule CraftplanWeb.OverviewLive do
       :if={Enum.empty?(@unbatched) && Enum.empty?(@batched)}
       class="mt-4 rounded-md border border-dashed border-stone-200 bg-stone-50 py-6 text-center text-sm text-stone-500"
     >
-      No production scheduled for this day.
+      No hay producción programada para este día.
     </div>
     <div
       :if={!Enum.empty?(@unbatched) || !Enum.empty?(@batched)}
@@ -923,7 +923,7 @@ defmodule CraftplanWeb.OverviewLive do
     >
       <%!-- Unbatched column --%>
       <div class="kanban-column rounded-lg bg-stone-50 p-3" data-status="unbatched">
-        <h4 class="mb-2 text-xs font-semibold uppercase text-stone-400">Unbatched</h4>
+        <h4 class="mb-2 text-xs font-semibold uppercase text-stone-400">Sin lotear</h4>
         <div class="space-y-2">
           <.unbatched_kanban_card
             :for={{product, items} <- @unbatched}
@@ -935,7 +935,7 @@ defmodule CraftplanWeb.OverviewLive do
       </div>
       <%!-- Open column --%>
       <div class="kanban-column bg-blue-50/50 rounded-lg p-3" data-status="open">
-        <h4 class="mb-2 text-xs font-semibold uppercase text-blue-600">Open</h4>
+        <h4 class="mb-2 text-xs font-semibold uppercase text-blue-600">Abierto</h4>
         <div class="space-y-2">
           <.batch_kanban_card
             :for={bg <- Enum.filter(@batched, &(&1.status == :open))}
@@ -945,7 +945,7 @@ defmodule CraftplanWeb.OverviewLive do
       </div>
       <%!-- In Progress column --%>
       <div class="kanban-column bg-amber-50/50 rounded-lg p-3" data-status="in_progress">
-        <h4 class="mb-2 text-xs font-semibold uppercase text-amber-600">In Progress</h4>
+        <h4 class="mb-2 text-xs font-semibold uppercase text-amber-600">En progreso</h4>
         <div class="space-y-2">
           <.batch_kanban_card
             :for={bg <- Enum.filter(@batched, &(&1.status == :in_progress))}
@@ -955,7 +955,7 @@ defmodule CraftplanWeb.OverviewLive do
       </div>
       <%!-- Completed column --%>
       <div class="kanban-column bg-green-50/50 rounded-lg p-3" data-status="completed">
-        <h4 class="mb-2 text-xs font-semibold uppercase text-green-600">Done</h4>
+        <h4 class="mb-2 text-xs font-semibold uppercase text-green-600">Completado</h4>
         <div class="space-y-2">
           <.batch_kanban_card
             :for={bg <- Enum.filter(@batched, &(&1.status == :completed))}
@@ -1042,7 +1042,7 @@ defmodule CraftplanWeb.OverviewLive do
                     </span>
                     <.badge
                       :if={capacity_status(product, items) == :over}
-                      text="Over capacity"
+                      text="Sobre capacidad"
                       class="flex-shrink-0"
                     />
                   </div>
@@ -1051,7 +1051,7 @@ defmodule CraftplanWeb.OverviewLive do
                       {format_amount(:piece, total_quantity(items))}
                     </span>
                     <span class="text-[10px] inline-flex flex-shrink-0 items-center rounded-full bg-stone-100 px-1.5 py-0.5 font-medium text-stone-600">
-                      Unbatched
+                      Sin lotear
                     </span>
                   </div>
                 </div>
@@ -1076,7 +1076,7 @@ defmodule CraftplanWeb.OverviewLive do
                     </span>
                     <.badge
                       :if={capacity_status(batch_group.product, batch_group.items) == :over}
-                      text="Over capacity"
+                      text="Sobre capacidad"
                       class="flex-shrink-0"
                     />
                   </div>
@@ -1089,7 +1089,7 @@ defmodule CraftplanWeb.OverviewLive do
                       batch_status_bg(batch_group.status),
                       batch_status_color(batch_group.status)
                     ]}>
-                      {batch_status_label(batch_group.status)}
+                      {batch_status_text(batch_group.status)}
                     </span>
                   </div>
                 </div>
@@ -1127,19 +1127,19 @@ defmodule CraftplanWeb.OverviewLive do
               batch_status_bg(@selected_batch.status),
               batch_status_color(@selected_batch.status)
             ]}>
-              {batch_status_label(@selected_batch.status)}
+              {batch_status_text(@selected_batch.status)}
             </span>
           </div>
           <span class="text-sm text-stone-500">
             {format_amount(:piece, total_quantity(@selected_batch.items))} &middot; {length(
               Enum.uniq_by(@selected_batch.items, & &1.order.id)
-            )} orders
+            )} pedidos
           </span>
         </div>
 
         <%!-- Order details --%>
         <div class="space-y-2">
-          <h4 class="text-xs font-semibold uppercase text-stone-400">Orders</h4>
+          <h4 class="text-xs font-semibold uppercase text-stone-400">Pedidos</h4>
           <div
             :for={item <- @selected_batch.items}
             class="flex items-center justify-between rounded border border-stone-100 bg-stone-50 px-3 py-2 text-sm"
@@ -1153,7 +1153,7 @@ defmodule CraftplanWeb.OverviewLive do
               </.link>
               <span class="text-stone-500">{item.order.customer.full_name}</span>
             </div>
-            <span class="text-stone-700">{item.quantity} pcs</span>
+            <span class="text-stone-700">{item.quantity} uds</span>
           </div>
         </div>
 
@@ -1163,7 +1163,7 @@ defmodule CraftplanWeb.OverviewLive do
             navigate={~p"/manage/production/batches/#{@selected_batch.batch_code}"}
             class="text-sm font-medium text-blue-700 hover:underline"
           >
-            View full batch &rarr;
+            Ver lote completo &rarr;
           </.link>
           <div class="flex items-center gap-2">
             <%= case @selected_batch.status do %>
@@ -1177,7 +1177,7 @@ defmodule CraftplanWeb.OverviewLive do
                     )
                   }
                 >
-                  Start
+                  Iniciar
                 </.button>
               <% :in_progress -> %>
                 <.button
@@ -1190,7 +1190,7 @@ defmodule CraftplanWeb.OverviewLive do
                     )
                   }
                 >
-                  Mark Done
+                  Marcar como completado
                 </.button>
               <% _ -> %>
             <% end %>
@@ -1213,7 +1213,7 @@ defmodule CraftplanWeb.OverviewLive do
                 <.input
                   type="number"
                   name="produced_qty"
-                  label="Produced qty"
+                  label="Cantidad producida"
                   value={total_quantity(@selected_batch.items) |> Decimal.to_string()}
                   min="0"
                   step="any"
@@ -1224,9 +1224,9 @@ defmodule CraftplanWeb.OverviewLive do
                 <.input
                   type="number"
                   name="duration_minutes"
-                  label="Duration (min)"
+                  label="Duración (min)"
                   value=""
-                  placeholder="optional"
+                  placeholder="opcional"
                   min="0"
                   step="any"
                 />
@@ -1242,10 +1242,10 @@ defmodule CraftplanWeb.OverviewLive do
                     )
                   }
                 >
-                  Cancel
+                  Cancelar
                 </.button>
                 <.button size={:sm} variant={:primary} type="submit">
-                  Complete
+                  Completar
                 </.button>
               </div>
             </div>
@@ -1392,10 +1392,17 @@ defmodule CraftplanWeb.OverviewLive do
     )
   end
 
-  defp page_title(:schedule), do: "Plan: Schedule"
-  defp page_title(:materials), do: "Plan: Inventory Forecast"
-  defp page_title(:make_sheet), do: "Plan: Make Sheet"
-  defp page_title(_), do: "Overview"
+  defp page_title(:schedule), do: "Plan: Programación"
+  defp page_title(:materials), do: "Plan: Pronóstico de inventario"
+  defp page_title(:make_sheet), do: "Plan: Hoja de producción"
+  defp page_title(_), do: "Resumen"
+
+  # Spanish display label for a production batch/kanban status.
+  defp batch_status_text(:not_batched), do: "Sin lotear"
+  defp batch_status_text(:open), do: "Abierto"
+  defp batch_status_text(:in_progress), do: "En progreso"
+  defp batch_status_text(:completed), do: "Completado"
+  defp batch_status_text(status), do: to_string(status)
 
   defp maybe_assign_schedule_view(socket, live_action, schedule_view) do
     if live_action in [:schedule, :make_sheet] do

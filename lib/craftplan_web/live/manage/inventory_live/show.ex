@@ -17,71 +17,80 @@ defmodule CraftplanWeb.InventoryLive.Show do
       {@material.name}
       <:actions>
         <.link patch={~p"/manage/inventory/#{@material.sku}/edit"} phx-click={JS.push_focus()}>
-          <.button>Edit</.button>
+          <.button>Editar</.button>
         </.link>
+
         <.link patch={~p"/manage/inventory/#{@material.sku}/adjust"} phx-click={JS.push_focus()}>
-          <.button variant={:primary}>Adjust Stock</.button>
+          <.button variant={:primary}>Ajustar stock</.button>
         </.link>
       </:actions>
     </.header>
-
     <.sub_nav links={@tabs_links} />
-
     <div class="mt-4 space-y-6">
       <.tabs_content :if={@live_action in [:details, :show]}>
         <.list>
-          <:item title="Name">{@material.name}</:item>
+          <:item title="Nombre">{@material.name}</:item>
+
           <:item title="SKU">
             <.kbd>
               {@material.sku}
             </.kbd>
           </:item>
-          <:item title="Price">
+
+          <:item title="Precio">
             {format_money(@settings.currency, @material.price)}
           </:item>
-          <:item title="Allergens">
+
+          <:item title="Alérgenos">
             <div class="flex-inline items-center space-x-1">
               <.badge :for={allergen <- Enum.map(@material.allergens, & &1.name)} text={allergen} />
-              <span :if={Enum.empty?(@material.allergens)}>None</span>
+              <span :if={Enum.empty?(@material.allergens)}>Ninguno</span>
             </div>
           </:item>
-          <:item title="Nutrition">
+
+          <:item title="Nutrición">
             <div class="flex-inline items-center space-x-1">
               <.badge
                 :for={fact <- @material.material_nutritional_facts}
-                text={"#{fact.nutritional_fact.name}: #{fact.amount} #{fact.unit} per #{fact.basis_quantity || 100} #{fact.basis_unit || @material.unit}"}
-              />
-              <span :if={Enum.empty?(@material.material_nutritional_facts)}>None</span>
+                text={"#{fact.nutritional_fact.name}: #{fact.amount} #{fact.unit} por #{fact.basis_quantity || 100} #{fact.basis_unit || @material.unit}"}
+              /> <span :if={Enum.empty?(@material.material_nutritional_facts)}>Ninguno</span>
             </div>
           </:item>
-          <:item title="Current Stock">
+
+          <:item title="Stock actual">
             {format_amount(@material.unit, @material.current_stock)}
           </:item>
-          <:item title="Minimum Stock">
+
+          <:item title="Stock mínimo">
             {format_amount(@material.unit, @material.minimum_stock)}
           </:item>
-          <:item title="Maximum Stock">
+
+          <:item title="Stock máximo">
             {format_amount(@material.unit, @material.maximum_stock)}
           </:item>
         </.list>
 
         <div :if={!Enum.empty?(@open_po_items)} class="mt-6">
-          <div class="mb-2 text-base font-medium text-stone-900">Open Purchase Orders</div>
+          <div class="mb-2 text-base font-medium text-stone-900">Órdenes de compra abiertas</div>
+
           <.table id="material-open-pos" rows={@open_po_items}>
-            <:col :let={poi} label="Purchase Order">
+            <:col :let={poi} label="Orden de compra">
               <.link navigate={~p"/manage/purchasing/#{poi.purchase_order.reference}"}>
                 <.kbd>{poi.purchase_order.reference}</.kbd>
               </.link>
             </:col>
-            <:col :let={poi} label="Supplier">
+
+            <:col :let={poi} label="Proveedor">
               <.link navigate={~p"/manage/purchasing/suppliers"} class="hover:underline">
                 {poi.purchase_order.supplier.name}
               </.link>
             </:col>
-            <:col :let={poi} label="Quantity">
+
+            <:col :let={poi} label="Cantidad">
               {format_amount(@material.unit, poi.quantity)}
             </:col>
-            <:col :let={poi} label="Status">{poi.purchase_order.status}</:col>
+
+            <:col :let={poi} label="Estado">{po_status_label(poi.purchase_order.status)}</:col>
           </.table>
         </div>
       </.tabs_content>
@@ -116,19 +125,20 @@ defmodule CraftplanWeb.InventoryLive.Show do
             <:empty>
               <div class="block py-4 pr-6">
                 <span class={["relative"]}>
-                  No movements found
+                  No se encontraron movimientos
                 </span>
               </div>
             </:empty>
 
-            <:col :let={entry} label="Date">
+            <:col :let={entry} label="Fecha">
               {format_time(entry.inserted_at, @time_zone)}
             </:col>
 
-            <:col :let={entry} label="Quantity">
+            <:col :let={entry} label="Cantidad">
               {format_amount(@material.unit, entry.quantity)}
             </:col>
-            <:col :let={entry} label="Reason">{entry.reason}</:col>
+
+            <:col :let={entry} label="Motivo">{entry.reason}</:col>
           </.table>
         </div>
       </.tabs_content>
@@ -152,9 +162,10 @@ defmodule CraftplanWeb.InventoryLive.Show do
         patch={~p"/manage/inventory/#{@material.sku}/details"}
       />
     </.modal>
+
     <.modal
       :if={@live_action == :adjust}
-      title={"Adjust Stock for #{@material.name}"}
+      title={"Ajustar stock de #{@material.name}"}
       id="material-movement-modal"
       show
       on_cancel={JS.patch(~p"/manage/inventory/#{@material.sku}")}
@@ -210,17 +221,17 @@ defmodule CraftplanWeb.InventoryLive.Show do
 
     tabs_links = [
       %{
-        label: "Details",
+        label: "Detalles",
         navigate: ~p"/manage/inventory/#{material.sku}/details",
         active: live_action in [:details, :show]
       },
       %{
-        label: "Allergens",
+        label: "Alérgenos",
         navigate: ~p"/manage/inventory/#{material.sku}/allergens",
         active: live_action == :allergens
       },
       %{
-        label: "Nutrition",
+        label: "Nutrición",
         navigate: ~p"/manage/inventory/#{material.sku}/nutritional_facts",
         active: live_action == :nutritional_facts
       },
@@ -315,13 +326,21 @@ defmodule CraftplanWeb.InventoryLive.Show do
     {:noreply, assign(socket, :material, material)}
   end
 
-  defp page_title(:show), do: "Show Material"
-  defp page_title(:adjust), do: "Adjust Material"
-  defp page_title(:edit), do: "Edit Material"
-  defp page_title(:details), do: "Material Details"
-  defp page_title(:allergens), do: "Material Allergens"
-  defp page_title(:nutritional_facts), do: "Material Nutrition"
-  defp page_title(:stock), do: "Material Stock"
+  defp page_title(:show), do: "Ver material"
+  defp page_title(:adjust), do: "Ajustar material"
+  defp page_title(:edit), do: "Editar material"
+  defp page_title(:details), do: "Detalles del material"
+  defp page_title(:allergens), do: "Alérgenos del material"
+  defp page_title(:nutritional_facts), do: "Nutrición del material"
+  defp page_title(:stock), do: "Stock del material"
+
+  defp po_status_label(:draft), do: "Borrador"
+  defp po_status_label(:ordered), do: "Pedido"
+  defp po_status_label(:received), do: "Recibido"
+
+  defp po_status_label(status) when is_binary(status), do: status |> String.to_existing_atom() |> po_status_label()
+
+  defp po_status_label(status), do: to_string(status)
 
   defp material_trail(material, :allergens) do
     [

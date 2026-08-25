@@ -74,7 +74,7 @@ defmodule CraftplanWeb.Layouts do
         <aside
           id="mobile-sidebar-panel"
           class="fixed inset-y-0 left-0 z-50 w-72 -translate-x-full transform bg-stone-50 shadow-lg transition-transform duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-400"
-          aria-label="Primary navigation"
+          aria-label="Navegación principal"
         >
           <div class="flex h-16 items-center justify-between border-b border-stone-200 px-4">
             <.logo_link />
@@ -82,7 +82,7 @@ defmodule CraftplanWeb.Layouts do
               type="button"
               class="rounded-md border border-stone-200 bg-white p-2 text-stone-600 transition hover:text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-400"
               phx-click={hide_sidebar()}
-              aria-label="Close navigation"
+              aria-label="Cerrar navegación"
             >
               <.nav_icon name={:close} />
             </button>
@@ -103,7 +103,7 @@ defmodule CraftplanWeb.Layouts do
       <div class="flex min-h-screen bg-stone-50 text-stone-800">
         <aside
           class="bg-stone-50/90 hidden border-r border-stone-200 backdrop-blur md:fixed md:inset-y-0 md:flex md:w-72 md:flex-col"
-          aria-label="Primary navigation"
+          aria-label="Navegación principal"
         >
           <div class="min-h-14 flex items-center border-b border-stone-200 px-6">
             <.logo_link />
@@ -126,7 +126,7 @@ defmodule CraftplanWeb.Layouts do
               type="button"
               class="ml-1 rounded-md border border-stone-200 bg-white p-2 text-stone-600 transition hover:text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 md:hidden"
               phx-click={show_sidebar()}
-              aria-label="Open navigation"
+              aria-label="Abrir navegación"
             >
               <.nav_icon name={:menu} />
             </button>
@@ -166,7 +166,7 @@ defmodule CraftplanWeb.Layouts do
                     id="user-dropdown"
                     class="absolute right-0 mt-2 hidden w-56 rounded-md border border-stone-200 bg-white py-2 shadow-lg"
                     role="menu"
-                    aria-label="User menu"
+                    aria-label="Menú de usuario"
                   >
                     <.link
                       :if={not @is_manage?}
@@ -174,14 +174,14 @@ defmodule CraftplanWeb.Layouts do
                       class="flex items-center gap-2 px-4 py-2 text-sm text-stone-600 transition hover:bg-stone-50 hover:text-stone-900"
                       role="menuitem"
                     >
-                      <.nav_icon name={:manage} /> Manage dashboard
+                      <.nav_icon name={:manage} /> Panel de gestión
                     </.link>
                     <.link
                       href={~p"/sign-out"}
                       class="flex items-center gap-2 px-4 py-2 text-sm text-stone-600 transition hover:bg-stone-50 hover:text-stone-900"
                       role="menuitem"
                     >
-                      <.nav_icon name={:logout} /> Log out
+                      <.nav_icon name={:logout} /> Cerrar sesión
                     </.link>
                   </div>
                 </div>
@@ -189,7 +189,7 @@ defmodule CraftplanWeb.Layouts do
                 <div :if={is_nil(@current_user)}>
                   <.link href={~p"/sign-in"}>
                     <.button variant={:primary} size={:sm}>
-                      Log in
+                      Iniciar sesión
                     </.button>
                   </.link>
                 </div>
@@ -223,7 +223,7 @@ defmodule CraftplanWeb.Layouts do
     <nav class="h-[calc(100vh-4rem)] flex flex-col justify-between overflow-y-auto px-4 pt-6 pb-6 md:h-full md:pb-8">
       <div>
         <p class="text-xs font-semibold uppercase tracking-wide text-stone-400">
-          {(@is_manage? && "Manage") || "Browse"}
+          {(@is_manage? && "Gestionar") || "Explorar"}
         </p>
 
         <% primary_links = if @is_manage?, do: @manage_links, else: @shop_links %>
@@ -276,18 +276,18 @@ defmodule CraftplanWeb.Layouts do
             navigate={~p"/manage/orders"}
             class="flex items-center justify-between rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium text-stone-600 transition hover:border-stone-300 hover:text-stone-900"
           >
-            <span>Open manage</span>
+            <span>Ir a gestión</span>
             <.nav_icon name={:chevron_right} />
           </.link>
         </div>
 
         <div :if={is_nil(@current_user)} class="space-y-3">
-          <p>Ready to manage your production workflow?</p>
+          <p>¿Listo para gestionar tu flujo de producción?</p>
           <.link
             href={~p"/sign-in"}
             class="inline-flex items-center gap-2 rounded-md bg-black px-3 py-2 text-sm font-medium text-white transition hover:bg-stone-900"
           >
-            <.nav_icon name={:login} class="text-white" /> Log in
+            <.nav_icon name={:login} class="text-white" /> Iniciar sesión
           </.link>
         </div>
       </div>
@@ -528,28 +528,28 @@ defmodule CraftplanWeb.Layouts do
   defp manage_links do
     [
       %{
-        label: "Orders",
+        label: "Pedidos",
         navigate: ~p"/manage/orders",
         icon: :orders,
         nav_section: :orders,
         prefix: "/manage/orders"
       },
       %{
-        label: "Inventory",
+        label: "Inventario",
         navigate: ~p"/manage/inventory",
         icon: :inventory,
         nav_section: :inventory,
         prefix: "/manage/inventory"
       },
       %{
-        label: "Customers",
+        label: "Clientes",
         navigate: ~p"/manage/customers",
         icon: :customers,
         nav_section: :customers,
         prefix: "/manage/customers"
       },
       %{
-        label: "Settings",
+        label: "Configuración",
         navigate: ~p"/manage/settings",
         icon: :settings,
         nav_section: :settings,
@@ -560,9 +560,9 @@ defmodule CraftplanWeb.Layouts do
 
   defp shop_links do
     [
-      %{label: "Home", navigate: ~p"/", icon: :home, exact: "/"},
-      %{label: "Log in", navigate: ~p"/sign-in", icon: :login, exact: "/sign-in"},
-      %{label: "Reset password", navigate: ~p"/reset", icon: :settings, exact: "/reset"}
+      %{label: "Inicio", navigate: ~p"/", icon: :home, exact: "/"},
+      %{label: "Iniciar sesión", navigate: ~p"/sign-in", icon: :login, exact: "/sign-in"},
+      %{label: "Restablecer contraseña", navigate: ~p"/reset", icon: :settings, exact: "/reset"}
     ]
   end
 
@@ -592,7 +592,7 @@ defmodule CraftplanWeb.Layouts do
     assigns = assign(assigns, :count, Enum.count(assigns.breadcrumbs))
 
     ~H"""
-    <nav class="flex min-w-0 items-center text-sm text-stone-500" aria-label="Breadcrumb">
+    <nav class="flex min-w-0 items-center text-sm text-stone-500" aria-label="Ruta de navegación">
       <ol class="flex min-w-0 items-center gap-2 whitespace-nowrap">
         <li
           :for={{crumb, index} <- Enum.with_index(@breadcrumbs)}
@@ -646,7 +646,7 @@ defmodule CraftplanWeb.Layouts do
   defp logo_link(assigns) do
     ~H"""
     <.link navigate={~p"/"} class="flex items-center gap-2">
-      <img src={~p"/images/Hali-logo.svg"} class="h-7 w-auto" alt="My App" />
+      <img src={~p"/images/Hali-logo.svg"} class="h-7 w-auto" alt="Craftplan" />
       <span class="text-base font-semibold tracking-wide text-stone-800">
         Craftplan
       </span>

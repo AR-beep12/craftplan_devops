@@ -24,7 +24,7 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
                 General
               </h3>
               <p class="mt-1 text-sm text-stone-600">
-                Set the default currency used across orders, invoices, and reports.
+                Define la moneda predeterminada utilizada en pedidos, facturas e informes.
               </p>
             </div>
             <div class="space-y-4 p-4">
@@ -32,7 +32,7 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
                 field={@form[:currency]}
                 type="select"
                 options={currency_options()}
-                label="Default currency"
+                label="Moneda predeterminada"
               />
             </div>
           </section>
@@ -44,10 +44,10 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
           >
             <div class="border-b border-stone-200 px-4 py-3">
               <h3 id="tax-settings-title" class="text-base font-semibold text-stone-800">
-                Tax &amp; Pricing
+                Impuestos y precios
               </h3>
               <p class="mt-1 text-sm text-stone-600">
-                Choose how tax is applied and define a default rate. Rates are decimal, e.g. 0.21 for 21%.
+                Elige cómo se aplica el impuesto y define una tasa predeterminada. Las tasas son decimales, por ejemplo, 0.21 para 21%.
               </p>
             </div>
             <div class="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2">
@@ -55,17 +55,17 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
                 field={@form[:tax_mode]}
                 type="select"
                 options={[
-                  {"Exclusive (add tax)", :exclusive},
-                  {"Inclusive (price includes tax)", :inclusive}
+                  {"Exclusivo (agregar impuesto)", :exclusive},
+                  {"Inclusivo (el precio incluye el impuesto)", :inclusive}
                 ]}
-                label="Tax mode"
+                label="Modo de impuesto"
               />
               <.input
                 field={@form[:tax_rate]}
                 type="number"
                 step="0.001"
                 min="0"
-                label="Tax rate"
+                label="Tasa de impuesto"
                 placeholder="0.21"
               />
             </div>
@@ -78,22 +78,22 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
           >
             <div class="border-b border-stone-200 px-4 py-3">
               <h3 id="fulfillment-settings-title" class="text-base font-semibold text-stone-800">
-                Fulfillment &amp; Capacity
+                Cumplimiento y capacidad
               </h3>
               <p class="mt-1 text-sm text-stone-600">
-                Configure how orders are fulfilled and the capacity rules that inform scheduling.
+                Configura cómo se cumplen los pedidos y las reglas de capacidad que orientan la programación.
               </p>
             </div>
             <div class="space-y-6 p-4">
               <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <.input field={@form[:offers_pickup]} type="checkbox" label="Offer pickup" />
-                <.input field={@form[:offers_delivery]} type="checkbox" label="Offer delivery" />
+                <.input field={@form[:offers_pickup]} type="checkbox" label="Ofrecer recogida" />
+                <.input field={@form[:offers_delivery]} type="checkbox" label="Ofrecer entrega" />
                 <.input
                   field={@form[:shipping_flat]}
                   type="number"
                   step="0.01"
                   min="0"
-                  label="Flat shipping"
+                  label="Envío fijo"
                 />
               </div>
               <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -101,15 +101,15 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
                   field={@form[:lead_time_days]}
                   type="number"
                   min="0"
-                  label="Lead time (days)"
-                  placeholder="e.g. 2"
+                  label="Tiempo de espera (días)"
+                  placeholder="ej. 2"
                 />
                 <.input
                   field={@form[:daily_capacity]}
                   type="number"
                   min="0"
-                  label="Daily capacity"
-                  placeholder="0 for unlimited"
+                  label="Capacidad diaria"
+                  placeholder="0 para ilimitado"
                 />
               </div>
             </div>
@@ -121,23 +121,23 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
           >
             <div class="border-b border-stone-200 px-4 py-3">
               <h3 id="email-sender-settings-title" class="text-base font-semibold text-stone-800">
-                Email Sender
+                Remitente de correo
               </h3>
               <p class="mt-1 text-sm text-stone-600">
-                Configure the sender name and address used for outgoing emails.
+                Configura el nombre y la dirección del remitente utilizados para los correos salientes.
               </p>
             </div>
             <div class="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2">
               <.input
                 field={@form[:email_from_name]}
                 type="text"
-                label="Sender name"
+                label="Nombre del remitente"
                 placeholder="Craftplan"
               />
               <.input
                 field={@form[:email_from_address]}
                 type="email"
-                label="Sender email"
+                label="Correo del remitente"
                 placeholder="noreply@craftplan.app"
               />
             </div>
@@ -150,10 +150,10 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
           >
             <div class="border-b border-stone-200 px-4 py-3">
               <h3 id="email-delivery-settings-title" class="text-base font-semibold text-stone-800">
-                Email Delivery
+                Entrega de correo
               </h3>
               <p class="mt-1 text-sm text-stone-600">
-                Choose an email provider and configure its credentials.
+                Elige un proveedor de correo y configura sus credenciales.
               </p>
             </div>
             <div class="space-y-4 p-4">
@@ -161,7 +161,7 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
                 field={@form[:email_provider]}
                 type="select"
                 options={provider_options()}
-                label="Provider"
+                label="Proveedor"
               />
 
               <%= case selected_provider(@form) do %>
@@ -170,13 +170,13 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
                     <.input
                       field={@form[:smtp_host]}
                       type="text"
-                      label="SMTP host"
+                      label="Host SMTP"
                       placeholder="smtp.example.com"
                     />
                     <.input
                       field={@form[:smtp_port]}
                       type="number"
-                      label="SMTP port"
+                      label="Puerto SMTP"
                       placeholder="587"
                     />
                   </div>
@@ -184,13 +184,13 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
                     <.input
                       field={@form[:smtp_username]}
                       type="text"
-                      label="Username"
+                      label="Usuario"
                       placeholder="user@example.com"
                     />
                     <.input
                       field={@form[:smtp_password]}
                       type="password"
-                      label="Password"
+                      label="Contraseña"
                       placeholder="••••••••"
                     />
                   </div>
@@ -198,17 +198,17 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
                     field={@form[:smtp_tls]}
                     type="select"
                     options={[
-                      {"If available", :if_available},
-                      {"Always", :always},
-                      {"Never", :never}
+                      {"Si está disponible", :if_available},
+                      {"Siempre", :always},
+                      {"Nunca", :never}
                     ]}
-                    label="TLS mode"
+                    label="Modo TLS"
                   />
                 <% provider when provider in [:sendgrid, :postmark, :brevo] -> %>
                   <.input
                     field={@form[:email_api_key]}
                     type="password"
-                    label="API key"
+                    label="Clave API"
                     placeholder="••••••••"
                   />
                 <% :mailgun -> %>
@@ -216,13 +216,13 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
                     <.input
                       field={@form[:email_api_key]}
                       type="password"
-                      label="API key"
+                      label="Clave API"
                       placeholder="••••••••"
                     />
                     <.input
                       field={@form[:email_api_domain]}
                       type="text"
-                      label="Domain"
+                      label="Dominio"
                       placeholder="mg.example.com"
                     />
                   </div>
@@ -231,13 +231,13 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
                     <.input
                       field={@form[:email_api_key]}
                       type="password"
-                      label="Access key"
+                      label="Clave de acceso"
                       placeholder="AKIA..."
                     />
                     <.input
                       field={@form[:email_api_secret]}
                       type="password"
-                      label="Secret key"
+                      label="Clave secreta"
                       placeholder="••••••••"
                     />
                   </div>
@@ -245,7 +245,7 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
                     field={@form[:email_api_region]}
                     type="select"
                     options={ses_region_options()}
-                    label="Region"
+                    label="Región"
                   />
                 <% _ -> %>
               <% end %>
@@ -259,10 +259,10 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
           >
             <div class="border-b border-stone-200 px-4 py-3">
               <h3 id="forecasting-settings-title" class="text-base font-semibold text-stone-800">
-                Inventory Forecasting
+                Pronóstico de inventario
               </h3>
               <p class="mt-1 text-sm text-stone-600">
-                Fine-tune how the reorder planner calculates safety stock, reorder points, and suggested quantities.
+                Ajusta cómo el planificador de reabastecimiento calcula el stock de seguridad, los puntos de reorden y las cantidades sugeridas.
               </p>
             </div>
             <div class="space-y-6 p-4">
@@ -272,7 +272,7 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
                   type="number"
                   min="7"
                   max="365"
-                  label="Lookback days"
+                  label="Días de historial"
                   placeholder="42"
                 />
                 <.input
@@ -280,7 +280,7 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
                   type="number"
                   min="7"
                   max="90"
-                  label="Default horizon (days)"
+                  label="Horizonte predeterminado (días)"
                   placeholder="14"
                 />
                 <.input
@@ -288,7 +288,7 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
                   type="number"
                   min="3"
                   max="100"
-                  label="Min samples for variability"
+                  label="Muestras mínimas para variabilidad"
                   placeholder="10"
                 />
               </div>
@@ -299,7 +299,7 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
                   step="0.01"
                   min="0"
                   max="1"
-                  label="Actual usage weight"
+                  label="Peso del uso real"
                   placeholder="0.6"
                 />
                 <.input
@@ -308,7 +308,7 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
                   step="0.01"
                   min="0"
                   max="1"
-                  label="Planned usage weight"
+                  label="Peso del uso planificado"
                   placeholder="0.4"
                 />
                 <.input
@@ -317,19 +317,19 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
                   step="0.01"
                   min="0.8"
                   max="0.999"
-                  label="Default service level"
+                  label="Nivel de servicio predeterminado"
                   placeholder="0.95"
                 />
               </div>
               <p class="text-xs text-stone-500">
-                Actual and planned weights should sum to 1. Higher service levels increase safety stock.
+                Los pesos real y planificado deben sumar 1. Niveles de servicio más altos aumentan el stock de seguridad.
               </p>
             </div>
           </section>
         </div>
 
         <:actions>
-          <.button variant={:primary} phx-disable-with="Saving...">Save Settings</.button>
+          <.button variant={:primary} phx-disable-with="Guardando...">Guardar configuración</.button>
         </:actions>
       </.simple_form>
     </div>
@@ -354,7 +354,7 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Settings updated successfully")
+         |> put_flash(:info, "Configuración actualizada correctamente")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->
@@ -397,25 +397,41 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
 
   defp ses_region_options do
     [
-      {"US East (N. Virginia)", "us-east-1"},
-      {"US West (Oregon)", "us-west-2"},
-      {"EU (Ireland)", "eu-west-1"},
-      {"EU (Frankfurt)", "eu-central-1"},
-      {"Asia Pacific (Mumbai)", "ap-south-1"},
-      {"Asia Pacific (Sydney)", "ap-southeast-2"}
+      {"EE. UU. Este (Norte de Virginia)", "us-east-1"},
+      {"EE. UU. Oeste (Oregón)", "us-west-2"},
+      {"UE (Irlanda)", "eu-west-1"},
+      {"UE (Fráncfort)", "eu-central-1"},
+      {"Asia-Pacífico (Bombay)", "ap-south-1"},
+      {"Asia-Pacífico (Sídney)", "ap-southeast-2"}
     ]
   end
 
+  @priority_currencies [:USD, :EUR]
+
   defp currency_options do
-    [{"US Dollar", :USD}, {"Euro", :EUR}] ++
-      (Craftplan.Types.Currency.values()
-       |> Enum.reject(fn code -> code in [:USD, :EUR] end)
-       |> Enum.map(fn code ->
-         case Money.Currency.currency_for_code(code) do
-           {:ok, currency} -> {currency.name, code}
-           _ -> nil
-         end
-       end)
-       |> Enum.reject(&is_nil/1))
+    priority_options = Enum.map(@priority_currencies, &{currency_display_name(&1), &1})
+
+    rest_options =
+      Craftplan.Types.Currency.values()
+      |> Enum.reject(&(&1 in @priority_currencies))
+      |> Enum.map(&{currency_display_name(&1), &1})
+      |> Enum.reject(fn {name, _code} -> is_nil(name) end)
+      |> Enum.sort_by(fn {name, _code} -> name end)
+
+    priority_options ++ rest_options
   end
+
+  defp currency_display_name(code) do
+    code
+    |> Cldr.Currency.display_name!(backend: Craftplan.Cldr, locale: "es")
+    |> capitalize_first()
+  rescue
+    _ -> code |> to_string() |> String.upcase()
+  end
+
+  # Capitalizes only the first grapheme, since CLDR names may contain
+  # proper nouns mid-string (e.g. "dólar del Caribe Oriental") that
+  # String.capitalize/1 would incorrectly lowercase.
+  defp capitalize_first(<<first::utf8, rest::binary>>), do: String.upcase(<<first::utf8>>) <> rest
+  defp capitalize_first(other), do: other
 end

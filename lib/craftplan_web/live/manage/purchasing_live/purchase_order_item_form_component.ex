@@ -24,11 +24,11 @@ defmodule CraftplanWeb.PurchasingLive.PurchaseOrderItemFormComponent do
           options={for m <- @materials, do: {m.name, m.id}}
         />
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <.input field={@form[:quantity]} type="number" label="Quantity" step="0.001" min="0" />
-          <.input field={@form[:unit_price]} type="number" label="Unit Price" step="0.001" min="0" />
+          <.input field={@form[:quantity]} type="number" label="Cantidad" step="0.001" min="0" />
+          <.input field={@form[:unit_price]} type="number" label="Precio unitario" step="0.001" min="0" />
         </div>
         <:actions>
-          <.button variant={:primary} phx-disable-with="Adding...">Add Item</.button>
+          <.button variant={:primary} phx-disable-with="Agregando...">Agregar artículo</.button>
         </:actions>
       </.simple_form>
     </div>
@@ -51,7 +51,7 @@ defmodule CraftplanWeb.PurchasingLive.PurchaseOrderItemFormComponent do
       {:ok, item} ->
         send(self(), {:po_item_saved, item})
 
-        {:noreply, socket |> put_flash(:info, "Item added") |> push_patch(to: socket.assigns.patch)}
+        {:noreply, socket |> put_flash(:info, "Artículo agregado") |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->
         {:noreply, assign(socket, :form, form)}

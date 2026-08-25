@@ -3,6 +3,7 @@ defmodule CraftplanWeb.OrderLive.Show do
   use CraftplanWeb, :live_view
 
   import Ash.Expr
+  import CraftplanWeb.OrderLive.Helpers
 
   alias Craftplan.Catalog
   alias Craftplan.Catalog.Product.Photo
@@ -41,10 +42,10 @@ defmodule CraftplanWeb.OrderLive.Show do
       {@order.reference}
       <:actions>
         <.link patch={~p"/manage/orders/#{@order.reference}/edit"} phx-click={JS.push_focus()}>
-          <.button variant={:primary}>Edit order</.button>
+          <.button variant={:primary}>Editar pedido</.button>
         </.link>
         <.link href={~p"/manage/orders/#{@order.reference}/invoice.pdf"} target="_blank">
-          <.button variant={:outline}>View Invoice</.button>
+          <.button variant={:outline}>Ver factura</.button>
         </.link>
       </:actions>
     </.header>
@@ -54,15 +55,15 @@ defmodule CraftplanWeb.OrderLive.Show do
     <div class="mt-4 space-y-6">
       <.tabs_content :if={@live_action in [:details, :show, :edit]}>
         <.list>
-          <:item title="Reference">
+          <:item title="Referencia">
             <.kbd>
               {format_reference(@order.reference)}
             </.kbd>
           </:item>
 
-          <:item title="Status">
+          <:item title="Estado">
             <.badge
-              text={@order.status}
+              text={order_status_label(@order.status)}
               colors={[
                 {@order.status,
                  "#{order_status_color(@order.status)} #{order_status_bg(@order.status)}"}
@@ -70,7 +71,7 @@ defmodule CraftplanWeb.OrderLive.Show do
             />
           </:item>
 
-          <:item title="Customer">
+          <:item title="Cliente">
             <.link
               class="hover:text-blue-800 hover:underline"
               navigate={~p"/manage/customers/#{@order.customer.reference}"}
@@ -78,11 +79,11 @@ defmodule CraftplanWeb.OrderLive.Show do
               {@order.customer.full_name}
             </.link>
           </:item>
-          <:item title="Shipping Address">
+          <:item title="Dirección de envío">
             {if @order.customer.shipping_address do
               @order.customer.shipping_address.full_address
             else
-              "N/A"
+              "N/D"
             end}
           </:item>
 
@@ -90,11 +91,11 @@ defmodule CraftplanWeb.OrderLive.Show do
             {format_money(@settings.currency, @order.total_cost)}
           </:item>
 
-          <:item title="Delivery Date">
+          <:item title="Fecha de entrega">
             {format_time(@order.delivery_date, @time_zone)}
           </:item>
 
-          <:item title="Created At">
+          <:item title="Creado el">
             {format_time(@order.inserted_at, @time_zone)}
           </:item>
         </.list>
@@ -102,7 +103,7 @@ defmodule CraftplanWeb.OrderLive.Show do
 
       <.tabs_content :if={@live_action == :items}>
         <.table id="order-items" rows={@order.items}>
-          <:col :let={item} label="Product">
+          <:col :let={item} label="Producto">
             <.link
               class="hover:text-blue-800 hover:underline"
               navigate={~p"/manage/products/#{item.product.sku}"}
@@ -120,14 +121,14 @@ defmodule CraftplanWeb.OrderLive.Show do
               </div>
             </.link>
           </:col>
-          <:col :let={item} label="Quantity">{item.quantity}</:col>
-          <:col :let={item} label="Unit Price">
+          <:col :let={item} label="Cantidad">{item.quantity}</:col>
+          <:col :let={item} label="Precio unitario">
             {format_money(@settings.currency, item.product.price)}
           </:col>
           <:col :let={item} label="Total">
             {format_money(@settings.currency, item.cost)}
           </:col>
-          <:col :let={item} label="Status">
+          <:col :let={item} label="Estado">
             <% _planned = item.planned_qty_sum || Decimal.new(0) %>
             <% completed = item.completed_qty_sum || Decimal.new(0) %>
             <% status =
@@ -137,7 +138,7 @@ defmodule CraftplanWeb.OrderLive.Show do
                 true -> :todo
               end %>
             <.badge
-              text={status}
+              text={order_item_status_label(status)}
               colors={[
                 {:todo, "#{order_item_status_bg(:todo)} #{order_item_status_color(:todo)}"},
                 {:in_progress,
@@ -146,13 +147,13 @@ defmodule CraftplanWeb.OrderLive.Show do
               ]}
             />
           </:col>
-          <:col :let={item} label="Allocations">
+          <:col :let={item} label="Asignaciones">
             <div class="flex items-center gap-2 text-xs">
               <span class="inline-flex items-center rounded bg-stone-100 px-2 py-0.5">
-                Planned: {item.planned_qty_sum || Decimal.new(0)}
+                Planificado: {item.planned_qty_sum || Decimal.new(0)}
               </span>
               <span class="inline-flex items-center rounded bg-stone-100 px-2 py-0.5">
-                Completed: {item.completed_qty_sum || Decimal.new(0)}
+                Completado: {item.completed_qty_sum || Decimal.new(0)}
               </span>
             </div>
           </:col>
@@ -163,10 +164,10 @@ defmodule CraftplanWeb.OrderLive.Show do
               phx-click="open_add_to_batch"
               phx-value-item_id={item.id}
             >
-              Add to Batch…
+              Agregar al lote…
             </.button>
           </:action>
-          <:col :let={item} label="Batch">
+          <:col :let={item} label="Lote">
             <%= if item.batch_code do %>
               <.link
                 navigate={~p"/manage/production/batches/#{item.batch_code}"}
@@ -178,7 +179,7 @@ defmodule CraftplanWeb.OrderLive.Show do
               <span class="text-xs text-stone-600">-</span>
             <% end %>
           </:col>
-          <:col :let={item} label="Unit Cost">
+          <:col :let={item} label="Costo unitario">
             {format_money(@settings.currency, item.unit_cost || Decimal.new(0))}
           </:col>
         </.table>
@@ -189,22 +190,22 @@ defmodule CraftplanWeb.OrderLive.Show do
       :if={@pending_consumption_item_id}
       id="consume-confirm-modal"
       show
-      title="Confirm Materials Consumption"
+      title="Confirmar consumo de materiales"
       on_cancel={JS.push("cancel_consume")}
     >
       <p class="mb-3 text-sm text-stone-700">
-        Completing this item will consume materials per the product's BOM. Review the quantities and confirm.
+        Completar este artículo consumirá materiales según la lista de materiales (BOM) del producto. Revisa las cantidades y confirma.
       </p>
       <.table id="order-consumption-recap" rows={@pending_consumption_recap}>
         <:col :let={row} label="Material">{row.material.name}</:col>
-        <:col :let={row} label="Required">{format_amount(row.material.unit, row.required)}</:col>
-        <:col :let={row} label="Current Stock">
+        <:col :let={row} label="Requerido">{format_amount(row.material.unit, row.required)}</:col>
+        <:col :let={row} label="Stock actual">
           {format_amount(row.material.unit, row.current_stock || Decimal.new(0))}
         </:col>
       </.table>
       <footer>
-        <.button variant={:outline} phx-click="cancel_consume">Close</.button>
-        <.button variant={:primary} phx-click="confirm_consume">Consume Now</.button>
+        <.button variant={:outline} phx-click="cancel_consume">Cerrar</.button>
+        <.button variant={:primary} phx-click="confirm_consume">Consumir ahora</.button>
       </footer>
     </.modal>
 
@@ -233,32 +234,32 @@ defmodule CraftplanWeb.OrderLive.Show do
       :if={@add_to_batch_item}
       id="add-to-batch-modal"
       show
-      title="Add Item to Batch"
+      title="Agregar artículo al lote"
       on_cancel={JS.push("cancel_add_to_batch")}
     >
       <.form id="add-to-batch-form" for={%{}} phx-submit="save_add_to_batch">
         <div class="space-y-3">
           <div class="text-sm text-stone-700">
-            Product: <span class="font-medium">{@add_to_batch_item.product.name}</span>
+            Producto: <span class="font-medium">{@add_to_batch_item.product.name}</span>
           </div>
           <.input
             type="select"
             name="batch_id"
-            label="Open Batch"
+            label="Lote abierto"
             options={for b <- @open_batches, do: {b.batch_code, b.id}}
             value={@selected_batch_id}
           />
           <.input
             type="number"
             name="planned_qty"
-            label="Planned Quantity"
+            label="Cantidad planificada"
             min="0"
             step="any"
             value={@default_planned_qty}
           />
           <div class="flex items-center justify-end gap-2">
-            <.button type="button" variant={:outline} phx-click="cancel_add_to_batch">Cancel</.button>
-            <.button type="submit" variant={:primary}>Add</.button>
+            <.button type="button" variant={:outline} phx-click="cancel_add_to_batch">Cancelar</.button>
+            <.button type="submit" variant={:primary}>Agregar</.button>
           </div>
         </div>
       </.form>
@@ -299,12 +300,12 @@ defmodule CraftplanWeb.OrderLive.Show do
 
     tabs_links = [
       %{
-        label: "Details",
+        label: "Detalles",
         navigate: ~p"/manage/orders/#{order.reference}/details",
         active: live_action in [:details, :show]
       },
       %{
-        label: "Items",
+        label: "Artículos",
         navigate: ~p"/manage/orders/#{order.reference}/items",
         active: live_action == :items
       }
@@ -409,10 +410,10 @@ defmodule CraftplanWeb.OrderLive.Show do
      |> assign(:add_to_batch_item, nil)
      |> assign(:open_batches, [])
      |> assign(:selected_batch_id, nil)
-     |> put_flash(:info, "Allocation added")}
+     |> put_flash(:info, "Asignación agregada")}
   rescue
     e ->
-      {:noreply, put_flash(socket, :error, "Failed to add allocation: #{Exception.message(e)}")}
+      {:noreply, put_flash(socket, :error, "No se pudo agregar la asignación: #{Exception.message(e)}")}
   end
 
   @impl true
@@ -434,7 +435,7 @@ defmodule CraftplanWeb.OrderLive.Show do
 
     {:noreply,
      socket
-     |> put_flash(:info, "Order items updated successfully")
+     |> put_flash(:info, "Artículos del pedido actualizados correctamente")
      |> assign(:order, order)
      |> push_event("close-modal", %{id: "order-item-modal"})}
   end
@@ -449,14 +450,14 @@ defmodule CraftplanWeb.OrderLive.Show do
 
     {:noreply,
      socket
-     |> put_flash(:info, "Order updated successfully")
+     |> put_flash(:info, "Pedido actualizado correctamente")
      |> assign(:order, order)}
   end
 
-  defp page_title(:show), do: "Show Order"
-  defp page_title(:edit), do: "Edit Order"
-  defp page_title(:details), do: "Order Details"
-  defp page_title(:items), do: "Order Items"
+  defp page_title(:show), do: "Ver pedido"
+  defp page_title(:edit), do: "Editar pedido"
+  defp page_title(:details), do: "Detalles del pedido"
+  defp page_title(:items), do: "Artículos del pedido"
 
   defp order_trail(order, :items) do
     [

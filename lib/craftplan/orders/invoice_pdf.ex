@@ -61,7 +61,7 @@ defmodule Craftplan.Orders.InvoicePdf do
   defp build_items(items, currency) do
     Enum.map(items || [], fn item ->
       %{
-        "product_name" => (item.product && item.product.name) || "Unknown",
+        "product_name" => (item.product && item.product.name) || "Desconocido",
         "quantity" => format_decimal(item.quantity),
         "unit_price" => format_money(currency, item.unit_price),
         "line_total" => format_money(currency, item.cost)

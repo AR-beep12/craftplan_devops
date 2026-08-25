@@ -22,7 +22,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentPhotos do
         phx-submit="save"
       >
         <div class="space-y-4">
-          <h3 class="text-lg font-medium">Product Photos</h3>
+          <h3 class="text-lg font-medium">Fotos del producto</h3>
 
           <div class="mb-4 hidden">
             <.live_file_input upload={@uploads.photos} />
@@ -50,7 +50,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentPhotos do
                       </svg>
                     </div>
                     <div class="ml-3">
-                      <h3 class="text-sm font-medium text-yellow-800">Upload Warning</h3>
+                      <h3 class="text-sm font-medium text-yellow-800">Advertencia de carga</h3>
                       <div class="mt-2 text-sm text-yellow-700">
                         <p>{@upload_warning}</p>
                       </div>
@@ -85,7 +85,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentPhotos do
                             </div>
                           </div>
                           <p class="mt-1.5 text-xs text-stone-500">
-                            {entry.progress}% uploaded
+                            {entry.progress}% subido
                           </p>
                         </div>
                         <div class="flex-shrink-0">
@@ -95,9 +95,9 @@ defmodule CraftplanWeb.ProductLive.FormComponentPhotos do
                             phx-click="cancel-upload"
                             phx-value-ref={entry.ref}
                             phx-target={@myself}
-                            aria-label="Cancel upload"
+                            aria-label="Cancelar carga"
                           >
-                            Cancel
+                            Cancelar
                           </.button>
                         </div>
                       </div>
@@ -120,7 +120,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentPhotos do
 
               <%= if Enum.empty?(@uploads.photos.entries) do %>
                 <p class="py-4 text-center text-stone-500">
-                  Drop files here or click to upload
+                  Suelta los archivos aquí o haz clic para subirlos
                 </p>
               <% end %>
             </section>
@@ -128,7 +128,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentPhotos do
 
           <%= if not Enum.empty?(@product_photos) or not Enum.empty?(@uploaded_files) do %>
             <div class="mt-6">
-              <h4 class="text-md mb-2 font-medium">Current Photos</h4>
+              <h4 class="text-md mb-2 font-medium">Fotos actuales</h4>
               <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
                 <%= for photo <- @product_photos ++ @uploaded_files do %>
                   <div class="relative">
@@ -168,8 +168,8 @@ defmodule CraftplanWeb.ProductLive.FormComponentPhotos do
                         phx-target={@myself}
                       >
                         {if @form[:featured_photo].value == photo,
-                          do: "Featured",
-                          else: "Set as Featured"}
+                          do: "Destacada",
+                          else: "Marcar como destacada"}
                       </.button>
                       <.button
                         type="button"
@@ -179,7 +179,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentPhotos do
                         phx-value-photo={photo}
                         phx-target={@myself}
                       >
-                        Remove
+                        Quitar
                       </.button>
                     </div>
                   </div>
@@ -192,11 +192,11 @@ defmodule CraftplanWeb.ProductLive.FormComponentPhotos do
         <:actions>
           <.button
             variant={:primary}
-            phx-disable-with="Saving..."
+            phx-disable-with="Guardando..."
             disabled={@has_changes == false}
             class={if @has_changes == false, do: "cursor-not-allowed opacity-50", else: ""}
           >
-            Save
+            Guardar
           </.button>
         </:actions>
       </.simple_form>
@@ -314,7 +314,10 @@ defmodule CraftplanWeb.ProductLive.FormComponentPhotos do
 
           {:noreply,
            socket
-           |> put_flash(:info, "Product photos #{socket.assigns.form.source.type}d successfully")
+           |> put_flash(
+             :info,
+             "Fotos del producto #{if socket.assigns.form.source.type == :create, do: "creadas", else: "actualizadas"} correctamente"
+           )
            |> reset_state(product)}
 
         {:error, form} ->
@@ -443,8 +446,8 @@ defmodule CraftplanWeb.ProductLive.FormComponentPhotos do
 
   defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
 
-  defp error_to_string(:too_large), do: "File is too large"
-  defp error_to_string(:too_many_files), do: "You have selected too many files"
-  defp error_to_string(:not_accepted), do: "You have selected an unacceptable file type"
-  defp error_to_string(_), do: "Unknown error occurred during upload"
+  defp error_to_string(:too_large), do: "El archivo es demasiado grande"
+  defp error_to_string(:too_many_files), do: "Has seleccionado demasiados archivos"
+  defp error_to_string(:not_accepted), do: "Has seleccionado un tipo de archivo no permitido"
+  defp error_to_string(_), do: "Ocurrió un error desconocido durante la carga"
 end

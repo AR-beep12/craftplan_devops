@@ -22,12 +22,12 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
     <div class="space-y-6">
       <.header>
         <:subtitle>
-          Manage team members and their access roles.
+          Gestiona los miembros del equipo y sus roles de acceso.
         </:subtitle>
-        Members
+        Miembros
         <:actions>
           <.button type="button" variant={:primary} phx-click="show_invite_modal" phx-target={@myself}>
-            <.icon name="hero-plus" class="mr-2 -ml-1 h-4 w-4" /> Invite Member
+            <.icon name="hero-plus" class="mr-2 -ml-1 h-4 w-4" /> Invitar miembro
           </.button>
         </:actions>
       </.header>
@@ -35,25 +35,25 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
       <div class="rounded-md border border-gray-200 bg-white">
         <div class="p-4">
           <.table id="members" rows={@members} wrapper_class="mt-0">
-            <:col :let={member} label="Email">{member.email}</:col>
-            <:col :let={member} label="Role">
-              <.badge text={member.role} colors={role_colors()} />
+            <:col :let={member} label="Correo electrónico">{member.email}</:col>
+            <:col :let={member} label="Rol">
+              <.badge text={role_label(member.role)} colors={role_colors()} />
             </:col>
-            <:col :let={member} label="Status">
+            <:col :let={member} label="Estado">
               <span
                 :if={member.confirmed_at}
                 class="ring-green-600/20 inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset"
               >
-                Active
+                Activo
               </span>
               <span
                 :if={is_nil(member.confirmed_at)}
                 class="ring-yellow-600/20 inline-flex items-center rounded-full bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-700 ring-1 ring-inset"
               >
-                Pending
+                Pendiente
               </span>
             </:col>
-            <:col :let={member} label="Joined">
+            <:col :let={member} label="Se unió">
               {if Map.get(member, :confirmed_at),
                 do: Calendar.strftime(member.confirmed_at, "%Y-%m-%d"),
                 else: "—"}
@@ -65,21 +65,21 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
                 variant={:secondary}
                 phx-click={JS.push("show_edit_modal", value: %{id: member.id}, target: @myself)}
               >
-                Edit
+                Editar
               </.button>
               <.button
                 :if={member.id != @current_user.id}
                 size={:sm}
                 variant={:danger}
                 phx-click={JS.push("remove_member", value: %{id: member.id}, target: @myself)}
-                data-confirm="Are you sure you want to remove this member? This action cannot be undone."
+                data-confirm="¿Estás seguro de que deseas quitar a este miembro? Esta acción no se puede deshacer."
               >
-                Remove
+                Quitar
               </.button>
             </:action>
             <:empty>
               <div class="py-6 text-center text-sm text-stone-500">
-                No team members yet. Invite one using the button above.
+                Aún no hay miembros del equipo. Invita a uno usando el botón de arriba.
               </div>
             </:empty>
           </.table>
@@ -90,8 +90,8 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
         :if={@show_invite_modal}
         id="invite-member-modal"
         show
-        title="Invite Member"
-        description="Send an invitation to a new team member"
+        title="Invitar miembro"
+        description="Envía una invitación a un nuevo miembro del equipo"
         on_cancel={JS.push("hide_invite_modal", target: @myself)}
       >
         <.simple_form
@@ -104,19 +104,19 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
           <.input
             field={@invite_form[:email]}
             type="email"
-            label="Email"
+            label="Correo electrónico"
             placeholder="member@example.com"
           />
           <.input
             field={@invite_form[:role]}
             type="radiogroup"
-            label="Role"
-            options={[{"Staff", :staff}, {"Admin", :admin}]}
+            label="Rol"
+            options={[{"Personal", :staff}, {"Administrador", :admin}]}
             value={@invite_form[:role].value || :staff}
           />
 
           <:actions>
-            <.button variant={:primary} phx-disable-with="Sending...">Send Invite</.button>
+            <.button variant={:primary} phx-disable-with="Enviando...">Enviar invitación</.button>
           </:actions>
         </.simple_form>
       </.modal>
@@ -125,8 +125,8 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
         :if={@show_edit_modal}
         id="edit-role-modal"
         show
-        title="Edit Role"
-        description={"Change role for #{@editing_member && @editing_member.email}"}
+        title="Editar rol"
+        description={"Cambiar rol de #{@editing_member && @editing_member.email}"}
         on_cancel={JS.push("hide_edit_modal", target: @myself)}
       >
         <.simple_form
@@ -139,13 +139,13 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
           <.input
             field={@role_form[:role]}
             type="radiogroup"
-            label="Role"
-            options={[{"Staff", :staff}, {"Admin", :admin}]}
+            label="Rol"
+            options={[{"Personal", :staff}, {"Administrador", :admin}]}
             value={@role_form[:role].value}
           />
 
           <:actions>
-            <.button variant={:primary} phx-disable-with="Updating...">Update Role</.button>
+            <.button variant={:primary} phx-disable-with="Actualizando...">Actualizar rol</.button>
           </:actions>
         </.simple_form>
       </.modal>
@@ -220,10 +220,10 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
          |> assign(:members, members)
          |> assign(:show_invite_modal, false)
          |> assign(:invite_form, invite_form())
-         |> put_flash(:info, "Member invited successfully")}
+         |> put_flash(:info, "Miembro invitado correctamente")}
 
       {:error, _error} ->
-        {:noreply, put_flash(socket, :error, "Failed to invite member. The email may already be in use.")}
+        {:noreply, put_flash(socket, :error, "No se pudo invitar al miembro. Es posible que el correo ya esté en uso.")}
     end
   end
 
@@ -240,10 +240,10 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
          |> assign(:members, members)
          |> assign(:show_edit_modal, false)
          |> assign(:editing_member, nil)
-         |> put_flash(:info, "Role updated successfully")}
+         |> put_flash(:info, "Rol actualizado correctamente")}
 
       {:error, _error} ->
-        {:noreply, put_flash(socket, :error, "Failed to update role.")}
+        {:noreply, put_flash(socket, :error, "No se pudo actualizar el rol.")}
     end
   end
 
@@ -258,10 +258,10 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
         {:noreply,
          socket
          |> assign(:members, members)
-         |> put_flash(:info, "Member removed successfully")}
+         |> put_flash(:info, "Miembro eliminado correctamente")}
 
       {:error, _error} ->
-        {:noreply, put_flash(socket, :error, "Failed to remove member.")}
+        {:noreply, put_flash(socket, :error, "No se pudo quitar al miembro.")}
     end
   end
 
@@ -278,4 +278,10 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
   end
 
   defp role_colors, do: @role_colors
+
+  defp role_label(:admin), do: "Administrador"
+  defp role_label(:staff), do: "Personal"
+  defp role_label(:customer), do: "Cliente"
+  defp role_label(role) when is_binary(role), do: role |> String.to_existing_atom() |> role_label()
+  defp role_label(role), do: to_string(role)
 end

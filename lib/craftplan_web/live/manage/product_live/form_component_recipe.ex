@@ -19,15 +19,15 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
             :if={@bom.version != nil}
             class="flex flex-wrap items-center gap-2 text-sm text-stone-700"
           >
-            <span>Version <span>v{@bom.version}</span></span>
+            <span>Versión <span>v{@bom.version}</span></span>
 
             <%= if latest_version(@boms) == @bom.version do %>
               <span class="text-[11px] rounded bg-green-100 px-1 py-0.5 font-medium text-green-700">
-                Latest
+                Más reciente
               </span>
             <% end %>
             <span> · </span>
-            <span>Changed on</span>
+            <span>Modificado el</span>
             <span class="underline decoration-stone-400 decoration-dashed">
               {@bom.published_at && format_date(@bom.published_at)}
             </span>
@@ -38,13 +38,13 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
             phx-click={JS.push("show_history", target: @myself)}
             class="text-sm text-blue-700 hover:underline"
           >
-            <.button size={:sm} variant={:outline}>Show version history</.button>
+            <.button size={:sm} variant={:outline}>Ver historial de versiones</.button>
           </.link>
         </div>
       </div>
       <%= if Enum.any?(@boms || []) and @bom && @bom.id && latest_version(@boms) != @bom.version do %>
         <div class="mb-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-          You are viewing an older version (v{@bom.version}). Latest is v{latest_version(@boms)}.
+          Estás viendo una versión anterior (v{@bom.version}). La más reciente es v{latest_version(@boms)}.
           <.button
             class="ml-2"
             size={:sm}
@@ -53,7 +53,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
             phx-target={@myself}
             phx-value-bom_version={latest_version(@boms)}
           >
-            Go to latest
+            Ir a la más reciente
           </.button>
         </div>
       <% end %>
@@ -69,9 +69,9 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
           <.input field={@form[:product_id]} type="hidden" value={@product.id} />
 
           <div id="recipe-materials-list">
-            <h3 class="text-lg font-medium">Materials</h3>
+            <h3 class="text-lg font-medium">Materiales</h3>
             <p class="mb-2 text-sm text-stone-500">
-              Add materials needed for this product
+              Agrega los materiales necesarios para este producto
             </p>
             <div
               id="recipe"
@@ -86,23 +86,23 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                   Material
                 </div>
                 <div class="border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0 md:border-r">
-                  Quantity
+                  Cantidad
                 </div>
                 <div class="hidden border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0 md:block">
-                  <span>Total Cost</span>
+                  <span>Costo total</span>
                   <span class="text-stone-700">
                     ({format_money(@settings.currency, @materials_total || D.new(0))})
                   </span>
                 </div>
                 <div class="hidden border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0 md:block">
-                  <span class="opacity-0">Actions</span>
+                  <span class="opacity-0">Acciones</span>
                 </div>
               </div>
 
               <!-- Empty State -->
               <div role="row" class="hidden py-4 text-stone-400 last:block">
                 <div>
-                  No materials in recipe
+                  No hay materiales en la receta
                 </div>
               </div>
 
@@ -135,7 +135,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                               {material.name}
                             </.link>
                             <span :if={!material} class="text-stone-400">
-                              Select material
+                              Seleccionar material
                             </span>
                           <% else %>
                             <span class="flex items-center gap-2">
@@ -150,10 +150,10 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                                 :if={product}
                                 class="text-[10px] rounded bg-blue-100 px-1.5 py-0.5 font-medium text-blue-700"
                               >
-                                Product
+                                Producto
                               </span>
                               <span :if={!product} class="text-stone-400">
-                                Select product
+                                Seleccionar producto
                               </span>
                             </span>
                           <% end %>
@@ -195,7 +195,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
 
                   <!-- Quantity Column (Col 2) -->
                   <div class="relative mt-1.5 border-stone-200 p-0 last:border-r-0 md:mt-0 md:border-r md:pl-4">
-                    <label class="mb-0.5 block text-xs text-stone-500 md:hidden">Quantity</label>
+                    <label class="mb-0.5 block text-xs text-stone-500 md:hidden">Cantidad</label>
                     <div class="block md:py-4 md:pr-6">
                       <span class="relative block md:-mt-2">
                         <div class="md:border-b md:border-dashed md:border-stone-300">
@@ -233,7 +233,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                   <div class="relative hidden border-stone-200 p-0 pl-4 last:border-r-0 md:block md:border-r">
                     <div class="block py-4 pr-6">
                       <%= if latest_version(@boms) != @bom.version do %>
-                        <span class="text-stone-400">Read-only</span>
+                        <span class="text-stone-400">Solo lectura</span>
                       <% else %>
                         <label class="cursor-pointer">
                           <input
@@ -244,7 +244,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                             class="hidden"
                           />
                           <span class="font-semibold leading-6 text-stone-900 hover:text-stone-700">
-                            Remove
+                            Quitar
                           </span>
                         </label>
                       <% end %>
@@ -267,7 +267,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                     Enum.empty?(@available_materials) || latest_version(@boms) != @bom.version
                   }
                 >
-                  <.icon name="hero-plus" class="mr-2 h-4 w-4" /> Add Material
+                  <.icon name="hero-plus" class="mr-2 h-4 w-4" /> Agregar material
                 </button>
                 <button
                   type="button"
@@ -280,7 +280,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                   ]}
                   disabled={Enum.empty?(@available_products) || latest_version(@boms) != @bom.version}
                 >
-                  <.icon name="hero-plus" class="mr-2 h-4 w-4" /> Add Product
+                  <.icon name="hero-plus" class="mr-2 h-4 w-4" /> Agregar producto
                 </button>
               </div>
             </div>
@@ -289,15 +289,15 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
           <hr class="my-10 text-stone-300" />
 
           <div class="">
-            <h3 class="text-lg font-medium">Labor steps</h3>
+            <h3 class="text-lg font-medium">Pasos de mano de obra</h3>
             <p class="mb-2 text-sm text-stone-500">
-              Track each step that consumes paid time. Override the hourly rate per step to fine-tune costs.
+              Registra cada paso que consume tiempo pagado. Anula la tarifa por hora en cada paso para ajustar los costos.
             </p>
             <div class="mt-4 rounded-md border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-600">
               <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p>
-                    Hourly rate: {format_money(@settings.currency, @settings.labor_hourly_rate)} · Overhead: {format_percentage(
+                    Tarifa por hora: {format_money(@settings.currency, @settings.labor_hourly_rate)} · Gastos generales: {format_percentage(
                       @settings.labor_overhead_percent
                     )}%
                   </p>
@@ -306,7 +306,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                   navigate={~p"/manage/settings/general"}
                   class="text-sm font-medium text-blue-700 hover:underline"
                 >
-                  Update in settings
+                  Actualizar en configuración
                 </.link>
               </div>
             </div>
@@ -322,33 +322,33 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                   class="hidden grid-cols-6 border-b border-stone-300 text-left text-sm leading-6 text-stone-500 md:grid"
                 >
                   <div class="border-r border-stone-200 p-0 pr-6 pb-4 font-normal last:border-r-0">
-                    Step
+                    Paso
                   </div>
                   <div class="border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0">
-                    Minutes
+                    Minutos
                     <span class="text-stone-700">
                       ({Decimal.to_string(@labor_total_minutes || D.new(0))})
                     </span>
                   </div>
                   <div class="border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0">
-                    Units per run
+                    Unidades por lote
                   </div>
                   <div class="border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0">
-                    Hourly rate override
+                    Anulación de tarifa por hora
                   </div>
                   <div class="border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0">
-                    Cost per unit
+                    Costo por unidad
                     <span class="text-stone-700">
                       ({format_money(@settings.currency, @labor_per_unit_cost || D.new(0))})
                     </span>
                   </div>
                   <div class="border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0">
-                    <span class="opacity-0">Actions</span>
+                    <span class="opacity-0">Acciones</span>
                   </div>
                 </div>
 
                 <div role="row" class="hidden py-4 text-stone-400 last:block">
-                  <div>No labor steps yet</div>
+                  <div>Aún no hay pasos de mano de obra</div>
                 </div>
 
                 <.inputs_for :let={labor_form} field={@form[:labor_steps]}>
@@ -365,7 +365,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                             flat={true}
                             field={labor_form[:name]}
                             type="text"
-                            placeholder="e.g. Mix dough"
+                            placeholder="p. ej. Mezclar masa"
                             disabled={latest_version(@boms) != @bom.version}
                             class="font-medium md:font-normal"
                           />
@@ -382,7 +382,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                     <div class="mt-2 grid grid-cols-2 gap-x-2 gap-y-2 md:contents">
                       <!-- 2. Minutes -->
                       <div class="md:relative md:border-r md:border-stone-200 md:p-0 md:pl-4 md:last:border-r-0">
-                        <label class="mb-0.5 block text-xs text-stone-500 md:hidden">Duration</label>
+                        <label class="mb-0.5 block text-xs text-stone-500 md:hidden">Duración</label>
                         <div class="block md:py-4 md:pr-6">
                           <div class="md:border-b md:border-dashed md:border-stone-300">
                             <.input
@@ -401,7 +401,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
 
                       <!-- 3. Units Per Run -->
                       <div class="md:relative md:border-r md:border-stone-200 md:p-0 md:pl-4 md:last:border-r-0">
-                        <label class="mb-0.5 block text-xs text-stone-500 md:hidden">Units/Run</label>
+                        <label class="mb-0.5 block text-xs text-stone-500 md:hidden">Unid./Lote</label>
                         <div class="block md:py-4 md:pr-6">
                           <div class="md:border-b md:border-dashed md:border-stone-300">
                             <.input
@@ -411,7 +411,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                               min="1"
                               step="0.01"
                               phx-debounce="10"
-                              placeholder="Default 1"
+                              placeholder="Predeterminado 1"
                               disabled={latest_version(@boms) != @bom.version}
                             />
                           </div>
@@ -421,7 +421,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                       <!-- 4. Rate Override -->
                       <div class="md:relative md:border-r md:border-stone-200 md:p-0 md:pl-4 md:last:border-r-0">
                         <label class="mb-0.5 block text-xs text-stone-500 md:hidden">
-                          Rate Override
+                          Anulación de tarifa
                         </label>
                         <div class="block md:py-4 md:pr-6">
                           <div class="md:border-b md:border-dashed md:border-stone-300">
@@ -432,7 +432,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                               min="0"
                               step="0.01"
                               phx-debounce="10"
-                              placeholder="Uses default when blank"
+                              placeholder="Usa el valor predeterminado si está vacío"
                               disabled={latest_version(@boms) != @bom.version}
                             />
                           </div>
@@ -441,7 +441,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
 
                       <!-- 5. Cost -->
                       <div class="md:relative md:border-r md:border-stone-200 md:p-0 md:pl-4 md:last:border-r-0">
-                        <label class="mb-0.5 block text-xs text-stone-500 md:hidden">Cost</label>
+                        <label class="mb-0.5 block text-xs text-stone-500 md:hidden">Costo</label>
                         <div class="block text-sm text-stone-800 md:py-4 md:pr-6">
                           <span>
                             {format_money(
@@ -471,7 +471,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                     <div class="hidden border-stone-200 p-0 last:border-r-0 md:block md:border-r md:pl-4">
                       <div class="block md:py-4 md:pr-6">
                         <%= if latest_version(@boms) != @bom.version do %>
-                          <span class="text-stone-400">Read-only</span>
+                          <span class="text-stone-400">Solo lectura</span>
                         <% else %>
                           <label class="cursor-pointer">
                             <input
@@ -482,7 +482,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                               class="hidden"
                             />
                             <span class="font-semibold leading-6 text-stone-900 hover:text-stone-700">
-                              Remove
+                              Quitar
                             </span>
                           </label>
                         <% end %>
@@ -502,7 +502,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                     ]}
                     disabled={latest_version(@boms) != @bom.version}
                   >
-                    <.icon name="hero-plus" class="mr-2 h-4 w-4" /> Add labor step
+                    <.icon name="hero-plus" class="mr-2 h-4 w-4" /> Agregar paso de mano de obra
                   </button>
                 </div>
               </div>
@@ -511,7 +511,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
 
           <hr class="my-10 text-stone-300" />
 
-          <h3 class="text-lg font-medium">General notes</h3>
+          <h3 class="text-lg font-medium">Notas generales</h3>
 
           <.input
             class="field-sizing-content mt-6"
@@ -533,16 +533,16 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                 (@bom.id && not @form.source.changed?) ||
                 not @form.source.valid?
             }
-            phx-disable-with="Saving..."
+            phx-disable-with="Guardando..."
           >
-            Save Recipe
+            Guardar receta
           </.button>
         </:actions>
       </.simple_form>
 
       <%= if @show_modal do %>
         <.modal
-          title="Select a material to add to the recipe:"
+          title="Selecciona un material para agregar a la receta:"
           id="add-recipe-material-modal"
           show
           on_cancel={JS.push("hide_modal", target: @myself)}
@@ -558,7 +558,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                 type="search"
                 name="query"
                 value={@material_query}
-                placeholder="Search by name or SKU..."
+                placeholder="Buscar por nombre o SKU..."
                 phx-debounce="300"
                 class="w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 transition focus:border-primary-400 focus:ring-primary-200/60 focus:outline-none focus:ring"
               />
@@ -573,13 +573,13 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                   role="row"
                   class="col-span-3 grid grid-cols-3 border-b border-stone-300 text-left text-sm leading-6 text-stone-500"
                 >
-                  <div class="border-r border-stone-200 p-0 pr-6 pb-1 font-normal">Name</div>
+                  <div class="border-r border-stone-200 p-0 pr-6 pb-1 font-normal">Nombre</div>
                   <div class="border-r border-stone-200 p-0 pr-6 pb-1 pl-4 font-normal">SKU</div>
-                  <div class="p-0 pr-6 pb-1 pl-4 font-normal">Price</div>
+                  <div class="p-0 pr-6 pb-1 pl-4 font-normal">Precio</div>
                 </div>
 
                 <div role="row" class="col-span-4 hidden py-4 text-stone-400 last:block">
-                  <div>No materials match your search.</div>
+                  <div>Ningún material coincide con tu búsqueda.</div>
                 </div>
 
                 <%= for material <- @visible_materials do %>
@@ -599,7 +599,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                     </div>
                     <div class="relative border-b border-stone-200 p-0 pl-4">
                       <div class="block py-3 text-sm text-stone-800">
-                        {format_money(@settings.currency, material.price || D.new(0))} per {material.unit}
+                        {format_money(@settings.currency, material.price || D.new(0))} por {material.unit}
                       </div>
                     </div>
                   </button>
@@ -608,7 +608,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
             </div>
 
             <div class="flex justify-end">
-              <.button phx-click="hide_modal" phx-target={@myself} variant={:outline}>Close</.button>
+              <.button phx-click="hide_modal" phx-target={@myself} variant={:outline}>Cerrar</.button>
             </div>
           </div>
         </.modal>
@@ -616,7 +616,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
 
       <%= if @show_product_modal do %>
         <.modal
-          title="Select a product to add to the recipe:"
+          title="Selecciona un producto para agregar a la receta:"
           id="add-recipe-product-modal"
           show
           on_cancel={JS.push("hide_product_modal", target: @myself)}
@@ -632,7 +632,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                 type="search"
                 name="query"
                 value={@product_query}
-                placeholder="Search by name or SKU..."
+                placeholder="Buscar por nombre o SKU..."
                 phx-debounce="300"
                 class="w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 transition focus:border-primary-400 focus:ring-primary-200/60 focus:outline-none focus:ring"
               />
@@ -647,13 +647,13 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                   role="row"
                   class="col-span-3 grid grid-cols-3 border-b border-stone-300 text-left text-sm leading-6 text-stone-500"
                 >
-                  <div class="border-r border-stone-200 p-0 pr-6 pb-1 font-normal">Name</div>
+                  <div class="border-r border-stone-200 p-0 pr-6 pb-1 font-normal">Nombre</div>
                   <div class="border-r border-stone-200 p-0 pr-6 pb-1 pl-4 font-normal">SKU</div>
-                  <div class="p-0 pr-6 pb-1 pl-4 font-normal">Unit Cost</div>
+                  <div class="p-0 pr-6 pb-1 pl-4 font-normal">Costo unitario</div>
                 </div>
 
                 <div role="row" class="col-span-4 hidden py-4 text-stone-400 last:block">
-                  <div>No products match your search.</div>
+                  <div>Ningún producto coincide con tu búsqueda.</div>
                 </div>
 
                 <%= for product <- @visible_products do %>
@@ -673,7 +673,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                     </div>
                     <div class="relative border-b border-stone-200 p-0 pl-4">
                       <div class="block py-3 text-sm text-stone-800">
-                        {format_money(@settings.currency, product.bom_unit_cost || D.new(0))} per unit
+                        {format_money(@settings.currency, product.bom_unit_cost || D.new(0))} por unidad
                       </div>
                     </div>
                   </button>
@@ -683,7 +683,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
 
             <div class="flex justify-end">
               <.button phx-click="hide_product_modal" phx-target={@myself} variant={:outline}>
-                Close
+                Cerrar
               </.button>
             </div>
           </div>
@@ -694,17 +694,17 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
         :if={@show_history}
         id="bom-history-modal"
         show
-        title="Recipe History"
+        title="Historial de la receta"
         max_width="max-w-4xl"
         on_cancel={JS.push("hide_history", target: @myself)}
       >
         <.table id="bom-history-modal-table" rows={@boms || []}>
-          <:col :let={b} label="Version">v{b.version}</:col>
-          <:col :let={b} label="Status">{b.status}</:col>
-          <:col :let={b} label="Published">
+          <:col :let={b} label="Versión">v{b.version}</:col>
+          <:col :let={b} label="Estado">{bom_status_label(b.status)}</:col>
+          <:col :let={b} label="Publicado">
             {if b.published_at, do: format_date(b.published_at, format: :short), else: "-"}
           </:col>
-          <:col :let={b} label="Unit Cost">
+          <:col :let={b} label="Costo unitario">
             {case b.rollup do
               %{} = r -> format_money(@settings.currency, r.unit_cost || Decimal.new(0))
               _ -> "-"
@@ -718,12 +718,12 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
               phx-click="switch_version"
               phx-value-bom_version={b.version}
             >
-              View
+              Ver
             </.button>
           </:action>
         </.table>
         <div class="mt-4 flex justify-end">
-          <.button variant={:outline} phx-click="hide_history" phx-target={@myself}>Close</.button>
+          <.button variant={:outline} phx-click="hide_history" phx-target={@myself}>Cerrar</.button>
         </div>
       </.modal>
     </div>
@@ -830,7 +830,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
      socket
      |> assign(:selected_version, new_bom.version)
      |> assign_form()
-     |> put_flash(:info, "Recipe saved successfully")
+     |> put_flash(:info, "Receta guardada correctamente")
      |> push_patch(to: socket.assigns.patch)}
   end
 
@@ -1246,10 +1246,16 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
 
   defp get_component_unit(materials_map, components_form) do
     case get_component_type(components_form) do
-      :product -> "units"
+      :product -> "unidades"
       _ -> get_material_unit(materials_map, components_form)
     end
   end
+
+  defp bom_status_label(:draft), do: "Borrador"
+  defp bom_status_label(:active), do: "Activo"
+  defp bom_status_label(:archived), do: "Archivado"
+  defp bom_status_label(status) when is_binary(status), do: status |> String.to_existing_atom() |> bom_status_label()
+  defp bom_status_label(status), do: to_string(status)
 
   defp get_component_type(components_form) do
     type =

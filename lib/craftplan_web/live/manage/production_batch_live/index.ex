@@ -21,7 +21,7 @@ defmodule CraftplanWeb.ProductionBatchLive.Index do
      |> assign(:batches, [])
      |> assign(:filters, @default_filters)
      |> assign(:products, products)
-     |> assign(:page_title, "Batches")}
+     |> assign(:page_title, "Lotes")}
   end
 
   @impl true
@@ -63,18 +63,18 @@ defmodule CraftplanWeb.ProductionBatchLive.Index do
     ~H"""
     <Page.page>
       <.header>
-        Production Batches
+        Lotes de producción
         <:subtitle>
-          All production batches with status and cost information.
+          Todos los lotes de producción con estado e información de costos.
         </:subtitle>
       </.header>
 
       <Page.surface>
         <:header>
           <div class="space-y-1">
-            <h2 class="text-sm font-semibold text-stone-900">Filter batches</h2>
+            <h2 class="text-sm font-semibold text-stone-900">Filtrar lotes</h2>
             <p class="text-sm text-stone-500">
-              Narrow the list by status or product.
+              Reduce la lista por estado o producto.
             </p>
           </div>
         </:header>
@@ -85,17 +85,17 @@ defmodule CraftplanWeb.ProductionBatchLive.Index do
           <Page.form_grid columns={2} class="max-w-full">
             <div class="min-w-[12rem]">
               <.input
-                label="Status"
+                label="Estado"
                 type="checkdrop"
                 name="filters[status][]"
                 id="status"
                 value={@filters["status"]}
                 multiple={true}
                 options={[
-                  {"Open", "open"},
-                  {"In Progress", "in_progress"},
-                  {"Completed", "completed"},
-                  {"Canceled", "canceled"}
+                  {"Abierto", "open"},
+                  {"En progreso", "in_progress"},
+                  {"Completado", "completed"},
+                  {"Cancelado", "canceled"}
                 ]}
               />
             </div>
@@ -105,8 +105,8 @@ defmodule CraftplanWeb.ProductionBatchLive.Index do
               name="filters[product_name]"
               id="product_name"
               value={@filters["product_name"]}
-              label="Product"
-              options={[{"All products", ""} | Enum.map(@products, &{&1.name, &1.name})]}
+              label="Producto"
+              options={[{"Todos los productos", ""} | Enum.map(@products, &{&1.name, &1.name})]}
             />
           </Page.form_grid>
         </form>
@@ -117,20 +117,21 @@ defmodule CraftplanWeb.ProductionBatchLive.Index do
           <.table id="batches-table" rows={@batches}>
             <:empty>
               <div class="rounded border border-dashed border-stone-200 bg-stone-50 py-8 text-center text-sm text-stone-500">
-                No batches match the current filters.
+                Ningún lote coincide con los filtros actuales.
               </div>
             </:empty>
-            <:col :let={batch} label="Batch">
+            <:col :let={batch} label="Lote">
               <.link navigate={~p"/manage/production/batches/#{batch.batch_code}"}>
                 <.kbd>{batch.batch_code}</.kbd>
               </.link>
             </:col>
-            <:col :let={batch} label="Product">
+            <:col :let={batch} label="Producto">
               {(batch.product && batch.product.name) || "—"}
             </:col>
-            <:col :let={batch} label="Status">
+            <:col :let={batch} label="Estado">
               <.badge
-                text={batch.status}
+                text={batch_status_text(batch.status)}
+                value={batch.status}
                 colors={[
                   open: "bg-blue-50 text-blue-700 border-blue-200",
                   in_progress: "bg-amber-50 text-amber-700 border-amber-200",
@@ -139,18 +140,18 @@ defmodule CraftplanWeb.ProductionBatchLive.Index do
                 ]}
               />
             </:col>
-            <:col :let={batch} label="Planned qty">
+            <:col :let={batch} label="Cant. planificada">
               {Decimal.to_string(batch.planned_qty)}
             </:col>
-            <:col :let={batch} label="Produced qty">
+            <:col :let={batch} label="Cant. producida">
               {if batch.status == :completed, do: Decimal.to_string(batch.produced_qty), else: "—"}
             </:col>
-            <:col :let={batch} label="Created">
+            <:col :let={batch} label="Creado">
               {format_time(batch.inserted_at, @time_zone)}
             </:col>
             <:action :let={batch}>
               <.link navigate={~p"/manage/production/batches/#{batch.batch_code}"}>
-                <.button size={:sm} variant={:outline}>View</.button>
+                <.button size={:sm} variant={:outline}>Ver</.button>
               </.link>
             </:action>
           </.table>
@@ -175,4 +176,11 @@ defmodule CraftplanWeb.ProductionBatchLive.Index do
   def handle_event("refresh", _params, socket) do
     {:noreply, load_batches(socket)}
   end
+
+  # Spanish display label for a production batch status.
+  defp batch_status_text(:open), do: "Abierto"
+  defp batch_status_text(:in_progress), do: "En progreso"
+  defp batch_status_text(:completed), do: "Completado"
+  defp batch_status_text(:canceled), do: "Cancelado"
+  defp batch_status_text(status), do: to_string(status)
 end

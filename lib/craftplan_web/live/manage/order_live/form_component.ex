@@ -21,17 +21,17 @@ defmodule CraftplanWeb.OrderLive.FormComponent do
             <.input
               field={@form[:customer_id]}
               type="select"
-              label="Customer"
+              label="Cliente"
               options={Enum.map(@customers, &{&1.full_name, &1.id})}
             />
           </div>
 
           <div class="mb-8">
-            <.input field={@form[:delivery_date]} type="datetime-local" label="Delivery date" />
+            <.input field={@form[:delivery_date]} type="datetime-local" label="Fecha de entrega" />
             <.timezone />
           </div>
 
-          <.label>Items</.label>
+          <.label>Artículos</.label>
           <div
             id="order-items"
             class="mt-2 grid w-full grid-cols-4 gap-x-4 text-sm leading-6 text-stone-700"
@@ -41,22 +41,22 @@ defmodule CraftplanWeb.OrderLive.FormComponent do
               class="col-span-4 grid grid-cols-4 border-b border-stone-300 text-left text-sm leading-6 text-stone-500"
             >
               <div class="border-r border-stone-200 p-0 pr-6 pb-4 font-normal last:border-r-0 ">
-                Product
+                Producto
               </div>
               <div class="border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0">
-                Quantity
+                Cantidad
               </div>
               <div class="border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0">
                 Total
               </div>
               <div class="border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0">
-                <span class="opacity-0">Actions</span>
+                <span class="opacity-0">Acciones</span>
               </div>
             </div>
 
             <div role="row" class="col-span-4 hidden py-4 text-stone-400 last:block">
               <div>
-                No items
+                Sin artículos
               </div>
             </div>
 
@@ -113,7 +113,7 @@ defmodule CraftplanWeb.OrderLive.FormComponent do
                       phx-target={@myself}
                       phx-value-path={items_form.name}
                     >
-                      Remove
+                      Quitar
                     </.link>
                   </div>
                 </div>
@@ -148,7 +148,7 @@ defmodule CraftplanWeb.OrderLive.FormComponent do
                     phx-target={@myself}
                     phx-value-path={@form[:items].name}
                   >
-                    Add
+                    Agregar
                   </.link>
                 </div>
               </div>
@@ -163,9 +163,9 @@ defmodule CraftplanWeb.OrderLive.FormComponent do
               not @form.source.changed? || not @form.source.valid? ||
                 Enum.empty?((@form.source.forms && @form.source.forms[:items]) || [])
             }
-            phx-disable-with="Saving..."
+            phx-disable-with="Guardando..."
           >
-            Save Order
+            Guardar pedido
           </.button>
         </:actions>
       </.simple_form>
@@ -218,7 +218,7 @@ defmodule CraftplanWeb.OrderLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Order saved successfully")
+         |> put_flash(:info, "Pedido guardado correctamente")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->

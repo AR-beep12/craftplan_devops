@@ -2,6 +2,8 @@ defmodule CraftplanWeb.CustomerLive.Show do
   @moduledoc false
   use CraftplanWeb, :live_view
 
+  import CraftplanWeb.OrderLive.Helpers, only: [order_status_label: 1]
+
   alias Craftplan.CRM
   alias CraftplanWeb.Navigation
 
@@ -22,14 +24,14 @@ defmodule CraftplanWeb.CustomerLive.Show do
         <div class="mt-8 space-y-8">
           <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
             <.list>
-              <:item title="Type"><.badge text={@customer.type} /></:item>
-              <:item title="Name">{@customer.full_name}</:item>
-              <:item title="Email">{@customer.email}</:item>
-              <:item title="Phone">{@customer.phone}</:item>
-              <:item title="Billing Address">
+              <:item title="Tipo"><.badge text={customer_type_label(@customer.type)} /></:item>
+              <:item title="Nombre">{@customer.full_name}</:item>
+              <:item title="Correo electrónico">{@customer.email}</:item>
+              <:item title="Teléfono">{@customer.phone}</:item>
+              <:item title="Dirección de facturación">
                 {@customer.billing_address && @customer.billing_address.full_address}
               </:item>
-              <:item title="Shipping Address">
+              <:item title="Dirección de envío">
                 {@customer.shipping_address && @customer.shipping_address.full_address}
               </:item>
             </.list>
@@ -40,9 +42,9 @@ defmodule CraftplanWeb.CustomerLive.Show do
       <.tabs_content :if={@live_action == :orders}>
         <div class="mt-6 space-y-4">
           <div class="flex items-center justify-between">
-            <h3 class="text-lg font-semibold">Orders History</h3>
+            <h3 class="text-lg font-semibold">Historial de pedidos</h3>
             <.link navigate={~p"/manage/orders/new?customer_id=#{@customer.reference}"}>
-              <.button variant={:primary}>New Order</.button>
+              <.button variant={:primary}>Nuevo pedido</.button>
             </.link>
           </div>
 
@@ -51,22 +53,23 @@ defmodule CraftplanWeb.CustomerLive.Show do
             rows={@customer.orders}
             row_click={fn order -> JS.navigate(~p"/manage/orders/#{order.reference}") end}
           >
-            <:col :let={order} label="Reference">
+            <:col :let={order} label="Referencia">
               <.kbd>{order.reference}</.kbd>
             </:col>
-            <:col :let={order} label="Status">
+            <:col :let={order} label="Estado">
               <.badge
-                text={order.status}
+                text={order_status_label(order.status)}
+                value={order.status}
                 colors={[
                   {order.status,
                    "#{order_status_color(order.status)} #{order_status_bg(order.status)}"}
                 ]}
               />
             </:col>
-            <:col :let={order} label="Created at">
+            <:col :let={order} label="Creado">
               {format_time(order.inserted_at, @time_zone)}
             </:col>
-            <:col :let={order} label="Delivery Date">
+            <:col :let={order} label="Fecha de entrega">
               {format_time(order.delivery_date, @time_zone)}
             </:col>
             <:col :let={order} label="Total">
@@ -79,10 +82,10 @@ defmodule CraftplanWeb.CustomerLive.Show do
       <.tabs_content :if={@live_action == :statistics}>
         <div class="mt-6 space-y-8">
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <.stat_card title="Total Orders" value={@customer.total_orders} />
+            <.stat_card title="Total de pedidos" value={@customer.total_orders} />
 
             <.stat_card
-              title="Total Spent"
+              title="Total gastado"
               value={format_money(@settings.currency, @customer.total_orders_value)}
             />
           </div>
@@ -117,17 +120,17 @@ defmodule CraftplanWeb.CustomerLive.Show do
 
     tabs_links = [
       %{
-        label: "Details",
+        label: "Detalles",
         navigate: ~p"/manage/customers/#{customer.reference}/details",
         active: live_action in [:details, :show]
       },
       %{
-        label: "Orders",
+        label: "Pedidos",
         navigate: ~p"/manage/customers/#{customer.reference}/orders",
         active: live_action == :orders
       },
       %{
-        label: "Statistics",
+        label: "Estadísticas",
         navigate: ~p"/manage/customers/#{customer.reference}/statistics",
         active: live_action == :statistics
       }
@@ -142,10 +145,10 @@ defmodule CraftplanWeb.CustomerLive.Show do
     {:noreply, Navigation.assign(socket, :customers, customer_trail(customer, live_action))}
   end
 
-  defp page_title(:show), do: "Customer Details"
-  defp page_title(:details), do: "Customer Details"
-  defp page_title(:orders), do: "Customer Orders"
-  defp page_title(:statistics), do: "Customer Statistics"
+  defp page_title(:show), do: "Detalles del cliente"
+  defp page_title(:details), do: "Detalles del cliente"
+  defp page_title(:orders), do: "Pedidos del cliente"
+  defp page_title(:statistics), do: "Estadísticas del cliente"
 
   defp customer_trail(customer, :orders) do
     [
@@ -164,4 +167,12 @@ defmodule CraftplanWeb.CustomerLive.Show do
   end
 
   defp customer_trail(customer, _), do: [Navigation.root(:customers), Navigation.resource(:customer, customer)]
+
+  defp customer_type_label(:individual), do: "Individual"
+  defp customer_type_label(:company), do: "Empresa"
+
+  defp customer_type_label(type) when is_binary(type),
+    do: type |> String.to_existing_atom() |> customer_type_label()
+
+  defp customer_type_label(type), do: to_string(type)
 end

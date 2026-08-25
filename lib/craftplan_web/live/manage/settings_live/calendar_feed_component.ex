@@ -15,9 +15,9 @@ defmodule CraftplanWeb.SettingsLive.CalendarFeedComponent do
     ~H"""
     <div class="space-y-6">
       <.header>
-        Calendar Feed
+        Feed de calendario
         <:subtitle>
-          Subscribe to your Craftplan orders and production batches in Google Calendar, Apple Calendar, or any app that supports iCal feeds.
+          Suscríbete a tus pedidos y lotes de producción de Craftplan en Google Calendar, Apple Calendar o cualquier app compatible con feeds iCal.
         </:subtitle>
       </.header>
 
@@ -26,10 +26,10 @@ defmodule CraftplanWeb.SettingsLive.CalendarFeedComponent do
           <.icon name="hero-calendar-days" class="mt-0.5 h-5 w-5 text-green-600" />
           <div class="flex-1">
             <p class="text-sm font-semibold text-green-800">
-              Your new calendar subscription URL
+              Tu nueva URL de suscripción al calendario
             </p>
             <p class="mt-1 text-xs text-green-700">
-              Copy this URL now — the full key won't be shown again.
+              Copia esta URL ahora — la clave completa no se volverá a mostrar.
             </p>
             <div class="mt-2 flex items-center gap-2">
               <code
@@ -48,7 +48,7 @@ defmodule CraftplanWeb.SettingsLive.CalendarFeedComponent do
                   |> JS.set_attribute({"data-copied", "true"}, to: "#copy-new-feed-url-btn")
                 }
               >
-                Copy
+                Copiar
               </.button>
             </div>
           </div>
@@ -60,9 +60,9 @@ defmodule CraftplanWeb.SettingsLive.CalendarFeedComponent do
           <div class="rounded-md border border-gray-200 bg-white p-6">
             <div class="flex items-center justify-between">
               <div>
-                <h3 class="text-base font-semibold text-stone-900">Calendar feeds</h3>
+                <h3 class="text-base font-semibold text-stone-900">Feeds de calendario</h3>
                 <p class="mt-1 text-sm text-stone-600">
-                  Each feed has its own API key. Revoking a feed disables its URL.
+                  Cada feed tiene su propia clave API. Revocar un feed deshabilita su URL.
                 </p>
               </div>
               <.button
@@ -72,12 +72,12 @@ defmodule CraftplanWeb.SettingsLive.CalendarFeedComponent do
                 phx-target={@myself}
                 id="generate-calendar-feed-btn"
               >
-                <.icon name="hero-plus" class="mr-2 -ml-1 h-4 w-4" /> Generate Calendar Feed
+                <.icon name="hero-plus" class="mr-2 -ml-1 h-4 w-4" /> Generar feed de calendario
               </.button>
             </div>
 
             <div :if={@suitable_keys == []} class="mt-6 py-6 text-center text-sm text-stone-500">
-              No calendar feeds yet. Click "Generate Calendar Feed" to create one.
+              Aún no hay feeds de calendario. Haz clic en "Generar feed de calendario" para crear uno.
             </div>
 
             <div :if={@suitable_keys != []} class="mt-4">
@@ -87,26 +87,26 @@ defmodule CraftplanWeb.SettingsLive.CalendarFeedComponent do
                 wrapper_class="mt-0"
                 variant={:compact}
               >
-                <:col :let={key} label="Name">{key.name}</:col>
-                <:col :let={key} label="Feed URL">
+                <:col :let={key} label="Nombre">{key.name}</:col>
+                <:col :let={key} label="URL del feed">
                   <code class="text-xs text-stone-600">…/feed.ics?key={key.prefix}••••••</code>
                 </:col>
-                <:col :let={key} label="Created" class="whitespace-nowrap">
+                <:col :let={key} label="Creado" class="whitespace-nowrap">
                   {Calendar.strftime(key.inserted_at, "%Y-%m-%d")}
                 </:col>
-                <:col :let={key} label="Last used" class="whitespace-nowrap">
+                <:col :let={key} label="Último uso" class="whitespace-nowrap">
                   {if key.last_used_at,
                     do: Calendar.strftime(key.last_used_at, "%Y-%m-%d %H:%M"),
-                    else: "Never"}
+                    else: "Nunca"}
                 </:col>
                 <:action :let={key}>
                   <.button
                     size={:sm}
                     variant={:danger}
                     phx-click={JS.push("revoke_calendar_key", value: %{id: key.id}, target: @myself)}
-                    data-confirm="Revoke this calendar feed? Any calendar app using this URL will stop receiving updates."
+                    data-confirm="¿Revocar este feed de calendario? Cualquier app de calendario que use esta URL dejará de recibir actualizaciones."
                   >
-                    Revoke
+                    Revocar
                   </.button>
                 </:action>
               </.table>
@@ -116,36 +116,36 @@ defmodule CraftplanWeb.SettingsLive.CalendarFeedComponent do
 
         <aside class="space-y-6 lg:w-96">
           <section class="rounded-md border border-gray-200 bg-white p-6">
-            <h3 class="text-base font-semibold text-stone-900">How to subscribe</h3>
+            <h3 class="text-base font-semibold text-stone-900">Cómo suscribirse</h3>
 
             <div class="mt-4 space-y-4 text-sm text-stone-600">
               <div>
                 <h4 class="font-medium text-stone-800">Google Calendar</h4>
                 <ol class="mt-1 list-inside list-decimal space-y-1">
-                  <li>Click "Generate Calendar Feed" and copy the URL</li>
-                  <li>Open Google Calendar Settings</li>
+                  <li>Haz clic en "Generar feed de calendario" y copia la URL</li>
+                  <li>Abre la configuración de Google Calendar</li>
                   <li>
-                    Under "Other calendars", click <strong>+</strong> → <strong>From URL</strong>
+                    En "Otros calendarios", haz clic en <strong>+</strong> → <strong>Desde URL</strong>
                   </li>
-                  <li>Paste the URL and click "Add calendar"</li>
+                  <li>Pega la URL y haz clic en "Agregar calendario"</li>
                 </ol>
               </div>
 
               <div>
                 <h4 class="font-medium text-stone-800">Apple Calendar</h4>
                 <ol class="mt-1 list-inside list-decimal space-y-1">
-                  <li>Click "Generate Calendar Feed" and copy the URL</li>
-                  <li>In Calendar, go to <strong>File → New Calendar Subscription</strong></li>
-                  <li>Paste the URL and click "Subscribe"</li>
+                  <li>Haz clic en "Generar feed de calendario" y copia la URL</li>
+                  <li>En Calendar, ve a <strong>Archivo → Nueva suscripción de calendario</strong></li>
+                  <li>Pega la URL y haz clic en "Suscribirse"</li>
                 </ol>
               </div>
             </div>
           </section>
 
           <section class="border-primary-200 bg-primary-50 text-primary-800 rounded-md border border-dashed p-6 text-sm">
-            <h4 class="text-primary-900 font-semibold">Tip</h4>
+            <h4 class="text-primary-900 font-semibold">Consejo</h4>
             <p class="mt-2">
-              The feed includes order deliveries and production batch schedules from the past 30 days through the next 90 days. Your calendar app will refresh automatically.
+              El feed incluye entregas de pedidos y programaciones de lotes de producción desde los últimos 30 días hasta los próximos 90 días. Tu app de calendario se actualizará automáticamente.
             </p>
           </section>
         </aside>
@@ -178,10 +178,10 @@ defmodule CraftplanWeb.SettingsLive.CalendarFeedComponent do
          socket
          |> assign(:suitable_keys, suitable_keys)
          |> assign(:just_created_url, build_feed_url(raw_key))
-         |> put_flash(:info, "Calendar feed generated")}
+         |> put_flash(:info, "Feed de calendario generado")}
 
       {:error, _changeset} ->
-        {:noreply, put_flash(socket, :error, "Failed to create calendar feed")}
+        {:noreply, put_flash(socket, :error, "No se pudo crear el feed de calendario")}
     end
   end
 
@@ -195,12 +195,12 @@ defmodule CraftplanWeb.SettingsLive.CalendarFeedComponent do
      socket
      |> assign(:suitable_keys, suitable_keys)
      |> assign(:just_created_url, nil)
-     |> put_flash(:info, "Calendar feed revoked")}
+     |> put_flash(:info, "Feed de calendario revocado")}
   end
 
   defp create_calendar_key(user) do
     Accounts.create_api_key(
-      %{name: "Calendar Feed", scopes: @calendar_scopes},
+      %{name: "Feed de calendario", scopes: @calendar_scopes},
       actor: user
     )
   end

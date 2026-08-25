@@ -393,7 +393,7 @@ defmodule CraftplanWeb.Components.Forms do
         >
           <div class="w-full p-1">
             <div class="px-2 py-1.5 text-xs font-medium text-stone-500">
-              Select an option
+              Selecciona una opción
             </div>
             <div :for={{label, val} <- @options} class="flex items-center">
               <label
@@ -491,7 +491,7 @@ defmodule CraftplanWeb.Components.Forms do
     options
     |> Enum.find(fn {_label, value} -> to_string(value) == to_string(selected_value) end)
     |> case do
-      nil -> placeholder || "Select option..."
+      nil -> placeholder || "Selecciona una opción..."
       {label, _value} -> label
     end
   end
@@ -501,7 +501,7 @@ defmodule CraftplanWeb.Components.Forms do
     |> Enum.filter(fn {_label, value} -> value in selected_values end)
     |> Enum.map(fn {label, _value} -> label end)
     |> case do
-      [] -> placeholder || "Select options..."
+      [] -> placeholder || "Selecciona opciones..."
       selected -> Enum.join(selected, ", ")
     end
   end

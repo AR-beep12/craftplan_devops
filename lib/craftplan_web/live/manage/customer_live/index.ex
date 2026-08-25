@@ -8,11 +8,11 @@ defmodule CraftplanWeb.CustomerLive.Index do
   def render(assigns) do
     ~H"""
     <.header>
-      Customers
-      <:subtitle>Manage your customer records</:subtitle>
+      Clientes
+      <:subtitle>Gestiona los registros de tus clientes</:subtitle>
       <:actions>
         <.link patch={~p"/manage/customers/new"}>
-          <.button variant={:primary}>New Customer</.button>
+          <.button variant={:primary}>Nuevo cliente</.button>
         </.link>
       </:actions>
     </.header>
@@ -25,20 +25,20 @@ defmodule CraftplanWeb.CustomerLive.Index do
       <:empty>
         <div class="block py-4 pr-6">
           <span class={["relative"]}>
-            No customers found
+            No se encontraron clientes
           </span>
         </div>
       </:empty>
-      <:col :let={{_id, customer}} label="Name">{customer.full_name}</:col>
-      <:col :let={{_id, customer}} label="Reference">
+      <:col :let={{_id, customer}} label="Nombre">{customer.full_name}</:col>
+      <:col :let={{_id, customer}} label="Referencia">
         <.kbd>
           {format_reference(customer.reference)}
         </.kbd>
       </:col>
-      <:col :let={{_id, customer}} label="Email">{customer.email}</:col>
-      <:col :let={{_id, customer}} label="Phone">{customer.phone}</:col>
-      <:col :let={{_id, customer}} label="Type">
-        <.badge text={customer.type} />
+      <:col :let={{_id, customer}} label="Correo electrónico">{customer.email}</:col>
+      <:col :let={{_id, customer}} label="Teléfono">{customer.phone}</:col>
+      <:col :let={{_id, customer}} label="Tipo">
+        <.badge text={customer_type_label(customer.type)} />
       </:col>
     </.table>
 
@@ -46,7 +46,7 @@ defmodule CraftplanWeb.CustomerLive.Index do
       :if={@live_action in [:new, :edit]}
       id="customer-modal"
       title={@page_title}
-      description="Use this form to manage customer records in your database."
+      description="Usa este formulario para gestionar los registros de clientes en tu base de datos."
       show
       on_cancel={JS.patch(~p"/manage/customers")}
     >
@@ -87,7 +87,7 @@ defmodule CraftplanWeb.CustomerLive.Index do
 
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
-    |> assign(:page_title, "Edit Customer")
+    |> assign(:page_title, "Editar cliente")
     |> assign(
       :customer,
       Craftplan.CRM.get_customer_by_id!(id,
@@ -99,7 +99,7 @@ defmodule CraftplanWeb.CustomerLive.Index do
 
   defp apply_action(socket, :edit, %{"reference" => reference}) do
     socket
-    |> assign(:page_title, "Edit Customer")
+    |> assign(:page_title, "Editar cliente")
     |> assign(
       :customer,
       Craftplan.CRM.get_customer_by_reference!(reference,
@@ -111,13 +111,13 @@ defmodule CraftplanWeb.CustomerLive.Index do
 
   defp apply_action(socket, :new, _params) do
     socket
-    |> assign(:page_title, "New Customer")
+    |> assign(:page_title, "Nuevo cliente")
     |> assign(:customer, nil)
   end
 
   defp apply_action(socket, :index, _params) do
     socket
-    |> assign(:page_title, "Customers")
+    |> assign(:page_title, "Clientes")
     |> assign(:customer, nil)
   end
 
@@ -142,11 +142,16 @@ defmodule CraftplanWeb.CustomerLive.Index do
       :ok ->
         {:noreply,
          socket
-         |> put_flash(:info, "Customer deleted successfully")
+         |> put_flash(:info, "Cliente eliminado correctamente")
          |> stream_delete(:customers, %{id: id})}
 
       {:error, _error} ->
-        {:noreply, put_flash(socket, :error, "Failed to delete customer.")}
+        {:noreply, put_flash(socket, :error, "No se pudo eliminar el cliente.")}
     end
   end
+
+  defp customer_type_label(:individual), do: "Individual"
+  defp customer_type_label(:company), do: "Empresa"
+  defp customer_type_label(type) when is_binary(type), do: type |> String.to_existing_atom() |> customer_type_label()
+  defp customer_type_label(type), do: to_string(type)
 end

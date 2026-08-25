@@ -17,7 +17,7 @@ defmodule CraftplanWeb.ProductLive.Show do
       {@product.name}
       <:actions>
         <.link patch={~p"/manage/products/#{@product.sku}/edit"} phx-click={JS.push_focus()}>
-          <.button variant={:primary}>Edit product</.button>
+          <.button variant={:primary}>Editar producto</.button>
         </.link>
       </:actions>
     </.header>
@@ -27,19 +27,19 @@ defmodule CraftplanWeb.ProductLive.Show do
     <div class="mt-6 space-y-6">
       <.tabs_content :if={@live_action in [:details, :show]}>
         <.list>
-          <:item title="Status">
+          <:item title="Estado">
             <.badge
-              text={@product.status}
+              text={product_status_label(@product.status)}
               colors={[
                 {@product.status,
                  "#{product_status_color(@product.status)} #{product_status_bg(@product.status)}"}
               ]}
             />
           </:item>
-          <:item title="Availability">
-            <.badge text={@product.selling_availability} />
+          <:item title="Disponibilidad">
+            <.badge text={selling_availability_label(@product.selling_availability)} />
           </:item>
-          <:item title="Name">{@product.name}</:item>
+          <:item title="Nombre">{@product.name}</:item>
 
           <:item title="SKU">
             <.kbd>
@@ -47,33 +47,33 @@ defmodule CraftplanWeb.ProductLive.Show do
             </.kbd>
           </:item>
 
-          <:item title="Allergens">
+          <:item title="Alérgenos">
             <div class="flex-inline items-center space-x-1">
               <.badge :for={allergen <- Enum.map(@product.allergens, & &1.name)} text={allergen} />
-              <span :if={Enum.empty?(@product.allergens)}>None</span>
+              <span :if={Enum.empty?(@product.allergens)}>Ninguno</span>
             </div>
           </:item>
 
-          <:item title="Price">
+          <:item title="Precio">
             {format_money(@settings.currency, @product.price)}
           </:item>
 
-          <:item title="Materials cost">
+          <:item title="Costo de materiales">
             {format_money(@settings.currency, @product.materials_cost)}
           </:item>
 
-          <:item title="Gross profit">
+          <:item title="Ganancia bruta">
             {format_money(@settings.currency, @product.gross_profit)}
           </:item>
 
-          <:item title="Markup percentage">
+          <:item title="Porcentaje de margen">
             {format_percentage(@product.markup_percentage)}%
           </:item>
 
-          <:item title="Suggested Prices">
+          <:item title="Precios sugeridos">
             <div class="space-y-1">
               <div>
-                <span class="text-stone-500">Retail:</span>
+                <span class="text-stone-500">Minorista:</span>
                 <span class="ml-2 font-medium">
                   {format_money(
                     @settings.currency,
@@ -82,7 +82,7 @@ defmodule CraftplanWeb.ProductLive.Show do
                 </span>
               </div>
               <div>
-                <span class="text-stone-500">Wholesale:</span>
+                <span class="text-stone-500">Mayorista:</span>
                 <span class="ml-2 font-medium">
                   {format_money(
                     @settings.currency,
@@ -95,14 +95,14 @@ defmodule CraftplanWeb.ProductLive.Show do
 
           <:item
             :if={@product.max_daily_quantity && @product.max_daily_quantity > 0}
-            title="Max units per day"
+            title="Unidades máximas por día"
           >
             {@product.max_daily_quantity}
           </:item>
 
           <:item
             :if={@product.nutrition_output_quantity}
-            title="Nutrition output"
+            title="Producción nutricional"
           >
             {format_amount(
               @product.nutrition_output_unit || :gram,
@@ -138,11 +138,11 @@ defmodule CraftplanWeb.ProductLive.Show do
             }
             class="mb-4 text-sm text-stone-500"
           >
-            Finished output is not set, so amounts are shown for one product unit.
+            La producción final no está definida, por lo que los valores se muestran para una unidad de producto.
           </p>
         </div>
         <.table id="nutritional-facts" rows={@product.nutritional_facts}>
-          <:col :let={fact} label="Nutrient">
+          <:col :let={fact} label="Nutriente">
             <span class={if Map.get(fact, :parent_key), do: "pl-4", else: ""}>
               {nutrient_label(fact)}
             </span>
@@ -171,7 +171,7 @@ defmodule CraftplanWeb.ProductLive.Show do
       :if={@live_action == :edit}
       id="product-modal"
       title={@page_title}
-      description="Update product information and details."
+      description="Actualiza la información y los detalles del producto."
       show
       on_cancel={JS.patch(~p"/manage/products/#{@product.sku}")}
     >
@@ -229,22 +229,22 @@ defmodule CraftplanWeb.ProductLive.Show do
 
     tabs_links = [
       %{
-        label: "Details",
+        label: "Detalles",
         navigate: ~p"/manage/products/#{product.sku}/details",
         active: live_action in [:details, :show]
       },
       %{
-        label: "Recipe",
+        label: "Receta",
         navigate: ~p"/manage/products/#{product.sku}/recipe",
         active: live_action == :recipe
       },
       %{
-        label: "Nutrition",
+        label: "Nutrición",
         navigate: ~p"/manage/products/#{product.sku}/nutrition",
         active: live_action == :nutrition
       },
       %{
-        label: "Photos",
+        label: "Fotos",
         navigate: ~p"/manage/products/#{product.sku}/photos",
         active: live_action == :photos
       }
@@ -278,7 +278,7 @@ defmodule CraftplanWeb.ProductLive.Show do
 
     {:noreply,
      socket
-     |> put_flash(:info, "Photos updated successfully")
+     |> put_flash(:info, "Fotos actualizadas correctamente")
      |> assign(:product, product)}
   end
 
@@ -300,7 +300,7 @@ defmodule CraftplanWeb.ProductLive.Show do
 
     {:noreply,
      socket
-     |> put_flash(:info, "Recipe updated successfully")
+     |> put_flash(:info, "Receta actualizada correctamente")
      |> assign(:product, product)
      |> push_event("close-modal", %{id: "product-material-modal"})}
   end
@@ -321,7 +321,7 @@ defmodule CraftplanWeb.ProductLive.Show do
 
     {:noreply,
      socket
-     |> put_flash(:info, "Product updated successfully")
+     |> put_flash(:info, "Producto actualizado correctamente")
      |> assign(:product, product)}
   end
 
@@ -331,7 +331,7 @@ defmodule CraftplanWeb.ProductLive.Show do
       {:ok, product} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Product updated successfully")
+         |> put_flash(:info, "Producto actualizado correctamente")
          |> assign(:product, product)}
 
       {:error, _} ->
@@ -339,16 +339,16 @@ defmodule CraftplanWeb.ProductLive.Show do
     end
   end
 
-  defp page_title(:show), do: "Product"
-  defp page_title(:nutrition), do: "Product Nutritional Information"
-  defp page_title(:edit), do: "Modify Product"
-  defp page_title(:recipe), do: "Product Recipe"
-  defp page_title(:details), do: "Product"
-  defp page_title(_), do: "Product"
+  defp page_title(:show), do: "Producto"
+  defp page_title(:nutrition), do: "Información nutricional del producto"
+  defp page_title(:edit), do: "Modificar producto"
+  defp page_title(:recipe), do: "Receta del producto"
+  defp page_title(:details), do: "Producto"
+  defp page_title(_), do: "Producto"
 
   defp product_breadcrumbs(product, live_action) do
     base = [
-      %{label: "Products", path: ~p"/manage/products", current?: false},
+      %{label: "Productos", path: ~p"/manage/products", current?: false},
       %{
         label: product.name,
         path: ~p"/manage/products/#{product.sku}",
@@ -360,14 +360,14 @@ defmodule CraftplanWeb.ProductLive.Show do
       :recipe ->
         base ++
           [
-            %{label: "Recipe", path: ~p"/manage/products/#{product.sku}/recipe", current?: true}
+            %{label: "Receta", path: ~p"/manage/products/#{product.sku}/recipe", current?: true}
           ]
 
       :nutrition ->
         base ++
           [
             %{
-              label: "Nutrition",
+              label: "Nutrición",
               path: ~p"/manage/products/#{product.sku}/nutrition",
               current?: true
             }
@@ -376,7 +376,7 @@ defmodule CraftplanWeb.ProductLive.Show do
       :photos ->
         base ++
           [
-            %{label: "Photos", path: ~p"/manage/products/#{product.sku}/photos", current?: true}
+            %{label: "Fotos", path: ~p"/manage/products/#{product.sku}/photos", current?: true}
           ]
 
       _ ->
@@ -393,14 +393,14 @@ defmodule CraftplanWeb.ProductLive.Show do
   end
 
   defp nutrition_heading(facts) do
-    if nutrition_declaration?(facts), do: "Nutrition Declaration", else: "Nutritional Facts"
+    if nutrition_declaration?(facts), do: "Declaración nutricional", else: "Datos nutricionales"
   end
 
   defp nutrition_amount_label(facts) do
     if nutrition_declaration?(facts) do
-      "Per #{nutrition_basis_label(facts)}"
+      "Por #{nutrition_basis_label(facts)}"
     else
-      "Amount"
+      "Cantidad"
     end
   end
 
@@ -419,7 +419,7 @@ defmodule CraftplanWeb.ProductLive.Show do
   defp nutrition_declaration?(facts), do: Enum.any?(facts, &Map.get(&1, :declaration?, false))
 
   defp nutrient_label(%{parent_key: parent_key, name: name}) when not is_nil(parent_key) do
-    "of which #{String.downcase(name)}"
+    "de los cuales #{String.downcase(name)}"
   end
 
   defp nutrient_label(%{name: name}), do: name
@@ -460,4 +460,25 @@ defmodule CraftplanWeb.ProductLive.Show do
         unit
     end
   end
+
+  defp product_status_label(:draft), do: "Borrador"
+  defp product_status_label(:testing), do: "En prueba"
+  defp product_status_label(:active), do: "Activo"
+  defp product_status_label(:paused), do: "Pausado"
+  defp product_status_label(:discontinued), do: "Descontinuado"
+  defp product_status_label(:archived), do: "Archivado"
+
+  defp product_status_label(status) when is_binary(status),
+    do: status |> String.to_existing_atom() |> product_status_label()
+
+  defp product_status_label(status), do: to_string(status)
+
+  defp selling_availability_label(:available), do: "Disponible"
+  defp selling_availability_label(:preorder), do: "Preventa"
+  defp selling_availability_label(:off), do: "Desactivado"
+
+  defp selling_availability_label(status) when is_binary(status),
+    do: status |> String.to_existing_atom() |> selling_availability_label()
+
+  defp selling_availability_label(status), do: to_string(status)
 end

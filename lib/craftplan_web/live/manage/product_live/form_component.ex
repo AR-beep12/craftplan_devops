@@ -15,32 +15,32 @@ defmodule CraftplanWeb.ProductLive.FormComponent do
         phx-change="validate"
         phx-submit="save"
       >
-        <.input field={@form[:name]} type="text" label="Name" />
+        <.input field={@form[:name]} type="text" label="Nombre" />
         <.input field={@form[:sku]} type="text" label="SKU" />
-        <.input field={@form[:price]} type="number" label="Price" />
+        <.input field={@form[:price]} type="number" label="Precio" />
 
         <.input
           field={@form[:status]}
           type="radiogroup"
-          label="Status"
+          label="Estado"
           options={[
-            {"Draft", :draft},
-            {"Testing", :testing},
-            {"Active", :active},
-            {"Paused", :paused},
-            {"Discontinued", :discontinued},
-            {"Archived", :archived}
+            {"Borrador", :draft},
+            {"En prueba", :testing},
+            {"Activo", :active},
+            {"Pausado", :paused},
+            {"Descontinuado", :discontinued},
+            {"Archivado", :archived}
           ]}
         />
 
         <.input
           field={@form[:selling_availability]}
           type="radiogroup"
-          label="Selling availability"
+          label="Disponibilidad de venta"
           options={[
-            {"Available", :available},
-            {"Preorder", :preorder},
-            {"Off", :off}
+            {"Disponible", :available},
+            {"Preventa", :preorder},
+            {"Desactivado", :off}
           ]}
         />
 
@@ -48,7 +48,7 @@ defmodule CraftplanWeb.ProductLive.FormComponent do
           field={@form[:max_daily_quantity]}
           type="number"
           min="0"
-          label="Max units per day (0 = unlimited)"
+          label="Unidades máximas por día (0 = ilimitado)"
         />
 
         <div class="grid gap-4 sm:grid-cols-2">
@@ -57,18 +57,18 @@ defmodule CraftplanWeb.ProductLive.FormComponent do
             type="number"
             min="0"
             step="0.01"
-            label="Finished output"
+            label="Producción final"
           />
           <.input
             field={@form[:nutrition_output_unit]}
             type="select"
-            label="Output unit"
-            options={[{"Gram (g)", :gram}, {"Milliliter (ml)", :milliliter}]}
+            label="Unidad de producción"
+            options={[{"Gramo (g)", :gram}, {"Mililitro (ml)", :milliliter}]}
           />
         </div>
 
         <:actions>
-          <.button variant={:primary} phx-disable-with="Saving...">Save Product</.button>
+          <.button variant={:primary} phx-disable-with="Guardando...">Guardar producto</.button>
         </:actions>
       </.simple_form>
     </div>
@@ -93,7 +93,7 @@ defmodule CraftplanWeb.ProductLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Product #{socket.assigns.form.source.type}d successfully")
+         |> put_flash(:info, "Producto #{if socket.assigns.form.source.type == :create, do: "creado", else: "actualizado"} correctamente")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->

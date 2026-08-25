@@ -188,15 +188,6 @@ defmodule CraftplanWeb.Components.CommandPalette do
               />
 
               <.result_section
-                :if={@results.products != []}
-                title="Productos"
-                items={@results.products}
-                flat_results={@flat_results}
-                selected_index={@selected_index}
-                myself={@myself}
-              />
-
-              <.result_section
                 :if={@results.materials != []}
                 title="Materiales"
                 items={@results.materials}
@@ -222,34 +213,6 @@ defmodule CraftplanWeb.Components.CommandPalette do
                 selected_index={@selected_index}
                 myself={@myself}
               />
-
-              <.result_section
-                :if={@results.suppliers != []}
-                title="Proveedores"
-                items={@results.suppliers}
-                flat_results={@flat_results}
-                selected_index={@selected_index}
-                myself={@myself}
-              />
-
-              <.result_section
-                :if={@results.purchase_orders != []}
-                title="Órdenes de Compra"
-                items={@results.purchase_orders}
-                flat_results={@flat_results}
-                selected_index={@selected_index}
-                myself={@myself}
-              />
-
-              <.result_section
-                :if={@results.batches != []}
-                title="Lotes de Producción"
-                items={@results.batches}
-                flat_results={@flat_results}
-                selected_index={@selected_index}
-                myself={@myself}
-              />
-
               <div
                 :if={empty_results?(@results)}
                 class="py-8 text-center text-sm text-stone-500"
@@ -431,13 +394,9 @@ defmodule CraftplanWeb.Components.CommandPalette do
   defp empty_results?(results) do
     results.pages == [] and
       results.actions == [] and
-      results.products == [] and
       results.materials == [] and
       results.orders == [] and
-      results.customers == [] and
-      results.suppliers == [] and
-      results.purchase_orders == [] and
-      results.batches == []
+      results.customers == []
   end
 
   defp cmd_key do

@@ -10,7 +10,7 @@ defmodule CraftplanWeb.InvoiceController do
 
     if is_nil(actor) do
       conn
-      |> put_flash(:error, "You must be signed in")
+      |> put_flash(:error, "Debes iniciar sesión")
       |> redirect(to: ~p"/sign-in")
     else
       currency = load_currency(actor)
@@ -29,7 +29,7 @@ defmodule CraftplanWeb.InvoiceController do
           Logger.error("Invoice PDF generation failed: #{inspect(reason)}")
 
           conn
-          |> put_flash(:error, "Failed to generate invoice: #{inspect(reason)}")
+          |> put_flash(:error, "No se pudo generar la factura: #{inspect(reason)}")
           |> redirect(to: ~p"/manage/orders/#{reference}")
       end
     end
@@ -38,7 +38,7 @@ defmodule CraftplanWeb.InvoiceController do
       Logger.error("Invoice error: #{Exception.message(e)}")
 
       conn
-      |> put_flash(:error, "Invoice error: #{Exception.message(e)}")
+      |> put_flash(:error, "Error de factura: #{Exception.message(e)}")
       |> redirect(to: ~p"/manage/orders/#{reference}")
   end
 

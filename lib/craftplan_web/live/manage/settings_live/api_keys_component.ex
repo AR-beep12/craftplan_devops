@@ -18,12 +18,12 @@ defmodule CraftplanWeb.SettingsLive.ApiKeysComponent do
     <div class="space-y-6">
       <.header>
         <:subtitle>
-          Manage API keys for programmatic access to Craftplan. Keys use scoped permissions per resource.
+          Gestiona las claves API para el acceso programático a Craftplan. Las claves usan permisos delimitados por recurso.
         </:subtitle>
-        API Keys
+        Claves API
         <:actions>
           <.button type="button" variant={:primary} phx-click="show_create_modal" phx-target={@myself}>
-            <.icon name="hero-plus" class="mr-2 -ml-1 h-4 w-4" /> Create API Key
+            <.icon name="hero-plus" class="mr-2 -ml-1 h-4 w-4" /> Crear clave API
           </.button>
         </:actions>
       </.header>
@@ -33,7 +33,7 @@ defmodule CraftplanWeb.SettingsLive.ApiKeysComponent do
           <.icon name="hero-key" class="mt-0.5 h-5 w-5 text-green-600" />
           <div class="flex-1">
             <p class="text-sm font-semibold text-green-800">
-              API key created — copy it now, it won't be shown again
+              Clave API creada — cópiala ahora, no se volverá a mostrar
             </p>
             <div class="mt-2 flex items-center gap-2">
               <code
@@ -52,7 +52,7 @@ defmodule CraftplanWeb.SettingsLive.ApiKeysComponent do
                 }
                 id="copy-key-btn"
               >
-                Copy
+                Copiar
               </.button>
             </div>
           </div>
@@ -62,32 +62,32 @@ defmodule CraftplanWeb.SettingsLive.ApiKeysComponent do
       <div class="rounded-md border border-gray-200 bg-white">
         <div class="p-4">
           <.table id="api-keys" rows={@api_keys} wrapper_class="mt-0">
-            <:col :let={key} label="Name">{key.name}</:col>
-            <:col :let={key} label="Prefix">
+            <:col :let={key} label="Nombre">{key.name}</:col>
+            <:col :let={key} label="Prefijo">
               <code class="text-xs">{key.prefix}...</code>
             </:col>
-            <:col :let={key} label="Scopes">
+            <:col :let={key} label="Alcances">
               <span class="text-xs text-stone-600">
                 {format_scopes_summary(key.scopes)}
               </span>
             </:col>
-            <:col :let={key} label="Last used">
+            <:col :let={key} label="Último uso">
               {if key.last_used_at,
                 do: Calendar.strftime(key.last_used_at, "%Y-%m-%d %H:%M"),
-                else: "Never"}
+                else: "Nunca"}
             </:col>
-            <:col :let={key} label="Status">
+            <:col :let={key} label="Estado">
               <span
                 :if={key.revoked_at}
                 class="ring-red-600/20 inline-flex items-center rounded-full bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset"
               >
-                Revoked
+                Revocada
               </span>
               <span
                 :if={is_nil(key.revoked_at)}
                 class="ring-green-600/20 inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset"
               >
-                Active
+                Activa
               </span>
             </:col>
             <:action :let={key}>
@@ -96,14 +96,14 @@ defmodule CraftplanWeb.SettingsLive.ApiKeysComponent do
                 size={:sm}
                 variant={:danger}
                 phx-click={JS.push("revoke_key", value: %{id: key.id}, target: @myself)}
-                data-confirm="Are you sure you want to revoke this API key? This action cannot be undone."
+                data-confirm="¿Estás seguro de que deseas revocar esta clave API? Esta acción no se puede deshacer."
               >
-                Revoke
+                Revocar
               </.button>
             </:action>
             <:empty>
               <div class="py-6 text-center text-sm text-stone-500">
-                No API keys yet. Create one using the button above.
+                Aún no hay claves API. Crea una usando el botón de arriba.
               </div>
             </:empty>
           </.table>
@@ -114,8 +114,8 @@ defmodule CraftplanWeb.SettingsLive.ApiKeysComponent do
         :if={@show_create_modal}
         id="create-api-key-modal"
         show
-        title="Create API Key"
-        description="Name your key and select which resources it can access"
+        title="Crear clave API"
+        description="Nombra tu clave y selecciona a qué recursos puede acceder"
         on_cancel={JS.push("hide_create_modal", target: @myself)}
       >
         <.simple_form
@@ -125,12 +125,12 @@ defmodule CraftplanWeb.SettingsLive.ApiKeysComponent do
           phx-change="validate_key"
           phx-submit="create_key"
         >
-          <.input field={@form[:name]} type="text" label="Key name" placeholder="e.g. Shopify sync" />
+          <.input field={@form[:name]} type="text" label="Nombre de la clave" placeholder="ej. Sincronización con Shopify" />
 
           <div class="mt-4">
-            <label class="text-sm font-medium text-stone-700">Resource permissions</label>
+            <label class="text-sm font-medium text-stone-700">Permisos de recursos</label>
             <p class="mb-3 text-xs text-stone-500">
-              Select read and/or write access for each resource.
+              Selecciona acceso de lectura y/o escritura para cada recurso.
             </p>
 
             <div class="max-h-72 space-y-1 overflow-y-auto rounded border border-stone-200 p-3">
@@ -144,7 +144,7 @@ defmodule CraftplanWeb.SettingsLive.ApiKeysComponent do
                       value="true"
                       checked={scope_checked?(@scope_selections, resource, "read")}
                       class="rounded border-stone-300"
-                    /> Read
+                    /> Lectura
                   </label>
                   <label class="flex items-center gap-1 text-xs text-stone-600">
                     <input
@@ -153,7 +153,7 @@ defmodule CraftplanWeb.SettingsLive.ApiKeysComponent do
                       value="true"
                       checked={scope_checked?(@scope_selections, resource, "write")}
                       class="rounded border-stone-300"
-                    /> Write
+                    /> Escritura
                   </label>
                 </div>
               </div>
@@ -161,7 +161,7 @@ defmodule CraftplanWeb.SettingsLive.ApiKeysComponent do
           </div>
 
           <:actions>
-            <.button variant={:primary} phx-disable-with="Creating...">Create Key</.button>
+            <.button variant={:primary} phx-disable-with="Creando...">Crear clave</.button>
           </:actions>
         </.simple_form>
       </.modal>
@@ -222,7 +222,7 @@ defmodule CraftplanWeb.SettingsLive.ApiKeysComponent do
          |> assign(:show_create_modal, false)
          |> assign(:raw_key, raw_key)
          |> assign(:scope_selections, %{})
-         |> put_flash(:info, "API key created")}
+         |> put_flash(:info, "Clave API creada")}
 
       {:error, form} ->
         {:noreply, assign(socket, :form, form)}
@@ -239,7 +239,7 @@ defmodule CraftplanWeb.SettingsLive.ApiKeysComponent do
     {:noreply,
      socket
      |> assign(:api_keys, api_keys)
-     |> put_flash(:info, "API key revoked")}
+     |> put_flash(:info, "Clave API revocada")}
   end
 
   defp load_api_keys(user) do
@@ -257,22 +257,35 @@ defmodule CraftplanWeb.SettingsLive.ApiKeysComponent do
 
   defp all_resources, do: @all_resources
 
-  defp format_resource_label(resource) do
-    resource
-    |> String.replace("_", " ")
-    |> String.capitalize()
-  end
+  @resource_labels %{
+    "products" => "Productos",
+    "boms" => "Listas de materiales",
+    "bom_components" => "Componentes de listas de materiales",
+    "orders" => "Pedidos",
+    "order_items" => "Artículos de pedidos",
+    "production_batches" => "Lotes de producción",
+    "materials" => "Materiales",
+    "lots" => "Lotes de inventario",
+    "movements" => "Movimientos de inventario",
+    "suppliers" => "Proveedores",
+    "purchase_orders" => "Órdenes de compra",
+    "customers" => "Clientes",
+    "settings" => "Configuración"
+  }
+
+  defp format_resource_label(resource), do: Map.get(@resource_labels, resource, resource)
 
   defp format_scopes_summary(scopes) when is_map(scopes) do
     count = map_size(scopes)
 
     case count do
-      0 -> "No access"
-      n -> "#{n} resource#{if n > 1, do: "s"}"
+      0 -> "Sin acceso"
+      1 -> "1 recurso"
+      n -> "#{n} recursos"
     end
   end
 
-  defp format_scopes_summary(_), do: "No access"
+  defp format_scopes_summary(_), do: "Sin acceso"
 
   defp scope_checked?(selections, resource, permission) do
     get_in(selections, [resource, permission]) == true

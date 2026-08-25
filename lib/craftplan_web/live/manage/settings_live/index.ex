@@ -89,9 +89,9 @@ defmodule CraftplanWeb.SettingsLive.Index do
 
       <div :if={@live_action == :csv} class="space-y-6">
         <.header>
-          Import data into Craftplan
+          Importar datos a Craftplan
           <:subtitle>
-            Bring in your existing records. Each import walks you through column mapping so nothing gets lost.
+            Trae tus registros existentes. Cada importación te guía a través del mapeo de columnas para que no se pierda nada.
           </:subtitle>
         </.header>
         <div class="flex flex-col gap-6 lg:flex-row">
@@ -117,7 +117,7 @@ defmodule CraftplanWeb.SettingsLive.Index do
                     </div>
                     <p class="mt-1 text-sm text-stone-600">{entity.description}</p>
                     <p class="mt-2 text-xs text-stone-500">
-                      Includes: {entity.includes}
+                      Incluye: {entity.includes}
                     </p>
                   </div>
                 </div>
@@ -125,15 +125,15 @@ defmodule CraftplanWeb.SettingsLive.Index do
             </div>
 
             <p class="mt-6 text-xs text-stone-500">
-              Need a template first? Click an import to download the matching CSV header layout.
+              ¿Necesitas una plantilla primero? Haz clic en una importación para descargar el diseño de encabezados CSV correspondiente.
             </p>
           </section>
 
           <aside class="space-y-6 lg:w-96">
             <section class="rounded-md border border-gray-200 bg-white p-6">
-              <h3 class="text-base font-semibold text-stone-900">Export data</h3>
+              <h3 class="text-base font-semibold text-stone-900">Exportar datos</h3>
               <p class="mt-1 text-sm text-stone-600">
-                Generate a CSV extract for your reporting and accounting workflows.
+                Genera un extracto CSV para tus flujos de trabajo de informes y contabilidad.
               </p>
 
               <.form for={@csv_export_form} id="csv-export-form" phx-submit="csv_export">
@@ -141,11 +141,11 @@ defmodule CraftplanWeb.SettingsLive.Index do
                   <.input
                     type="select"
                     name="entity"
-                    label="Entity to export"
+                    label="Entidad a exportar"
                     options={[
-                      {"Orders", "orders"},
-                      {"Customers", "customers"},
-                      {"Inventory movements", "movements"}
+                      {"Pedidos", "orders"},
+                      {"Clientes", "customers"},
+                      {"Movimientos de inventario", "movements"}
                     ]}
                     value="orders"
                     required
@@ -153,16 +153,16 @@ defmodule CraftplanWeb.SettingsLive.Index do
                 </div>
                 <div class="mt-6 flex gap-2">
                   <.button id="csv-export-submit" variant={:primary} class="flex-1 justify-center">
-                    Export CSV
+                    Exportar CSV
                   </.button>
                 </div>
               </.form>
             </section>
 
             <section class="border-primary-200 bg-primary-50 text-primary-800 rounded-md border border-dashed p-6 text-sm">
-              <h4 class="text-primary-900 font-semibold">Tip</h4>
+              <h4 class="text-primary-900 font-semibold">Consejo</h4>
               <p class="mt-2">
-                Keep a snapshot of your data by exporting on a schedule. Imports are idempotent—reimporting an updated CSV lets you keep Craftplan and your spreadsheets in sync.
+                Mantén una instantánea de tus datos exportando según un cronograma. Las importaciones son idempotentes: volver a importar un CSV actualizado te permite mantener Craftplan y tus hojas de cálculo sincronizados.
               </p>
             </section>
           </aside>
@@ -229,59 +229,59 @@ defmodule CraftplanWeb.SettingsLive.Index do
   end
 
   defp apply_action(socket, :index, _params) do
-    assign(socket, :page_title, "Settings")
+    assign(socket, :page_title, "Configuración")
   end
 
   defp apply_action(socket, :general, _params) do
-    assign(socket, :page_title, "General Settings")
+    assign(socket, :page_title, "Configuración general")
   end
 
   defp apply_action(socket, :allergens, _params) do
-    assign(socket, :page_title, "Allergens Settings")
+    assign(socket, :page_title, "Configuración de alérgenos")
   end
 
   defp apply_action(socket, :nutritional_facts, _params) do
-    assign(socket, :page_title, "Nutritional Facts Settings")
+    assign(socket, :page_title, "Configuración de datos nutricionales")
   end
 
   defp apply_action(socket, :csv, _params) do
-    assign(socket, :page_title, "Import & Export")
+    assign(socket, :page_title, "Importar y exportar")
   end
 
   defp apply_action(socket, :api_keys, _params) do
-    assign(socket, :page_title, "API Keys")
+    assign(socket, :page_title, "Claves API")
   end
 
   defp apply_action(socket, :calendar_feed, _params) do
-    assign(socket, :page_title, "Calendar Feed")
+    assign(socket, :page_title, "Feed de calendario")
   end
 
   defp apply_action(socket, :members, _params) do
-    assign(socket, :page_title, "Members")
+    assign(socket, :page_title, "Miembros")
   end
 
   def csv_import_entities do
     [
       %{
         value: "products",
-        label: "Products",
+        label: "Productos",
         icon: "hero-cube-solid",
-        description: "Import product SKUs, base pricing, and default production info.",
-        includes: "Names, SKUs, pricing, packaging, allergens"
+        description: "Importa SKUs de productos, precios base e información de producción predeterminada.",
+        includes: "Nombres, SKUs, precios, empaque, alérgenos"
       },
       %{
         value: "materials",
-        label: "Materials",
+        label: "Materiales",
         icon: "hero-archive-box-solid",
-        description: "Bulk load raw materials so recipes and inventory stay accurate.",
-        includes: "Names, suppliers, units, cost, allergen tags"
+        description: "Carga masiva de materias primas para mantener recetas e inventario precisos.",
+        includes: "Nombres, proveedores, unidades, costo, etiquetas de alérgenos"
       },
       %{
         value: "customers",
-        label: "Customers",
+        label: "Clientes",
         icon: "hero-user-group-solid",
-        description: "Bring in customer records to reuse for orders and invoices.",
-        includes: "Names, company, contact details, delivery notes"
+        description: "Trae registros de clientes para reutilizar en pedidos y facturas.",
+        includes: "Nombres, empresa, datos de contacto, notas de entrega"
       }
     ]
   end

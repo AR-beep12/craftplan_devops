@@ -87,7 +87,7 @@ defmodule CraftplanWeb.Navigation do
   end
 
   def crumb_order_items(%{reference: reference}) do
-    %{label: "Items", path: ~p"/manage/orders/#{reference}/items"}
+    %{label: "Artículos", path: ~p"/manage/orders/#{reference}/items"}
   end
 
   def crumb_material(%{name: name, sku: sku}) do
@@ -95,11 +95,11 @@ defmodule CraftplanWeb.Navigation do
   end
 
   def crumb_material_allergens(material) do
-    %{label: "Allergens", path: ~p"/manage/inventory/#{material.sku}/allergens"}
+    %{label: "Alérgenos", path: ~p"/manage/inventory/#{material.sku}/allergens"}
   end
 
   def crumb_material_nutrition(material) do
-    %{label: "Nutrition", path: ~p"/manage/inventory/#{material.sku}/nutritional_facts"}
+    %{label: "Nutrición", path: ~p"/manage/inventory/#{material.sku}/nutritional_facts"}
   end
 
   def crumb_material_stock(material) do
@@ -115,11 +115,11 @@ defmodule CraftplanWeb.Navigation do
   end
 
   def crumb_purchase_order_items(%{reference: reference}) do
-    %{label: "Items", path: ~p"/manage/purchasing/#{reference}/items"}
+    %{label: "Artículos", path: ~p"/manage/purchasing/#{reference}/items"}
   end
 
   def crumb_purchase_order_add_item(%{reference: reference}) do
-    %{label: "Add Item", path: ~p"/manage/purchasing/#{reference}/add_item"}
+    %{label: "Agregar artículo", path: ~p"/manage/purchasing/#{reference}/add_item"}
   end
 
   def crumb_supplier(%{name: name, id: id}) do
@@ -131,34 +131,34 @@ defmodule CraftplanWeb.Navigation do
   end
 
   def crumb_customer_orders(customer) do
-    %{label: "Orders", path: ~p"/manage/customers/#{customer.reference}/orders"}
+    %{label: "Pedidos", path: ~p"/manage/customers/#{customer.reference}/orders"}
   end
 
   def crumb_customer_statistics(customer) do
-    %{label: "Statistics", path: ~p"/manage/customers/#{customer.reference}/statistics"}
+    %{label: "Estadísticas", path: ~p"/manage/customers/#{customer.reference}/statistics"}
   end
 
   defp sections do
     %{
       orders: %{
-        label: "Orders",
+        label: "Pedidos",
         path: "/manage/orders",
         pages: %{
-          new: %{label: "New Order", path: "/manage/orders/new"},
+          new: %{label: "Nuevo pedido", path: "/manage/orders/new"},
           order: &__MODULE__.crumb_order/1,
           order_items: &__MODULE__.crumb_order_items/1
         },
         sub_links: [
           %{
             key: :orders_table,
-            label: "Table",
+            label: "Tabla",
             navigate: "/manage/orders?view=table",
             show?: &__MODULE__.orders_nav_visible?/1,
             active?: &__MODULE__.orders_table_active?/1
           },
           %{
             key: :orders_calendar,
-            label: "Calendar",
+            label: "Calendario",
             navigate: "/manage/orders?view=calendar",
             show?: &__MODULE__.orders_nav_visible?/1,
             active?: &__MODULE__.orders_calendar_active?/1
@@ -166,12 +166,12 @@ defmodule CraftplanWeb.Navigation do
         ]
       },
       inventory: %{
-        label: "Inventory",
+        label: "Inventario",
         path: "/manage/inventory",
         pages: %{
-          new_material: %{label: "New Material", path: "/manage/inventory/new"},
-          forecast: %{label: "Usage Forecast", path: "/manage/inventory/forecast"},
-          reorder: %{label: "Reorder Planner", path: "/manage/inventory/forecast/reorder"},
+          new_material: %{label: "Nuevo material", path: "/manage/inventory/new"},
+          forecast: %{label: "Pronóstico de uso", path: "/manage/inventory/forecast"},
+          reorder: %{label: "Planificador de reabastecimiento", path: "/manage/inventory/forecast/reorder"},
           material: &__MODULE__.crumb_material/1,
           material_allergens: &__MODULE__.crumb_material_allergens/1,
           material_nutrition: &__MODULE__.crumb_material_nutrition/1,
@@ -180,17 +180,17 @@ defmodule CraftplanWeb.Navigation do
         sub_links: [
           %{
             key: :materials,
-            label: "Materials",
+            label: "Materiales",
             navigate: "/manage/inventory",
             active?: &__MODULE__.inventory_material_active?/1
           }
         ]
       },
       customers: %{
-        label: "Customers",
+        label: "Clientes",
         path: "/manage/customers",
         pages: %{
-          new_customer: %{label: "New Customer", path: "/manage/customers/new"},
+          new_customer: %{label: "Nuevo cliente", path: "/manage/customers/new"},
           customer: &__MODULE__.crumb_customer/1,
           customer_orders: &__MODULE__.crumb_customer_orders/1,
           customer_statistics: &__MODULE__.crumb_customer_statistics/1
@@ -198,19 +198,19 @@ defmodule CraftplanWeb.Navigation do
         sub_links: []
       },
       settings: %{
-        label: "Settings",
+        label: "Configuración",
         path: "/manage/settings",
         pages: %{
-          general: %{label: "General Settings", path: "/manage/settings/general"},
-          allergens: %{label: "Allergens", path: "/manage/settings/allergens"},
+          general: %{label: "Configuración general", path: "/manage/settings/general"},
+          allergens: %{label: "Alérgenos", path: "/manage/settings/allergens"},
           nutritional_facts: %{
-            label: "Nutritional Facts",
+            label: "Datos nutricionales",
             path: "/manage/settings/nutritional_facts"
           },
-          csv: %{label: "Import & Export", path: "/manage/settings/csv"},
-          api_keys: %{label: "API Keys", path: "/manage/settings/api_keys"},
-          calendar_feed: %{label: "Calendar Feed", path: "/manage/settings/calendar"},
-          members: %{label: "Members", path: "/manage/settings/members"}
+          csv: %{label: "Importar y exportar", path: "/manage/settings/csv"},
+          api_keys: %{label: "Claves API", path: "/manage/settings/api_keys"},
+          calendar_feed: %{label: "Feed de calendario", path: "/manage/settings/calendar"},
+          members: %{label: "Miembros", path: "/manage/settings/members"}
         },
         sub_links: [
           %{
@@ -221,44 +221,44 @@ defmodule CraftplanWeb.Navigation do
           },
           %{
             key: :csv,
-            label: "Import & Export",
+            label: "Importar y exportar",
             navigate: "/manage/settings/csv",
             active?: &__MODULE__.settings_csv_active?/1
           },
           %{
             key: :members,
-            label: "Members",
+            label: "Miembros",
             navigate: "/manage/settings/members",
             active?: &__MODULE__.settings_members_active?/1
           }
         ]
       },
       production: %{
-        label: "Production",
+        label: "Producción",
         path: "/manage/production/schedule",
         pages: %{
-          schedule: %{label: "Schedule", path: "/manage/production/schedule"},
-          make_sheet: %{label: "Make Sheet", path: "/manage/production/make_sheet"},
-          materials: %{label: "Materials", path: "/manage/production/materials"},
-          batches: %{label: "Batches", path: "/manage/production/batches"},
+          schedule: %{label: "Programación", path: "/manage/production/schedule"},
+          make_sheet: %{label: "Hoja de producción", path: "/manage/production/make_sheet"},
+          materials: %{label: "Materiales", path: "/manage/production/materials"},
+          batches: %{label: "Lotes", path: "/manage/production/batches"},
           batch: &__MODULE__.crumb_production_batch/1
         },
         sub_links: [
           %{
             key: :weekly,
-            label: "Weekly",
+            label: "Semanal",
             navigate: "/manage/production/schedule?view=week",
             active?: &__MODULE__.production_weekly_active?/1
           },
           %{
             key: :daily,
-            label: "Daily",
+            label: "Diario",
             navigate: "/manage/production/schedule?view=day",
             active?: &__MODULE__.production_daily_active?/1
           },
           %{
             key: :batches,
-            label: "Batches",
+            label: "Lotes",
             navigate: "/manage/production/batches",
             active?: &__MODULE__.production_batches_active?/1
           }

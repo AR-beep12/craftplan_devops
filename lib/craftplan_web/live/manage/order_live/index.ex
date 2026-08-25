@@ -52,15 +52,15 @@ defmodule CraftplanWeb.OrderLive.Index do
     ~H"""
     <Page.page>
       <.header>
-        Orders
+        Pedidos
       </.header>
 
       <Page.surface>
         <:header>
           <div class="space-y-1">
-            <h2 class="text-sm font-semibold text-stone-900">Filter orders</h2>
+            <h2 class="text-sm font-semibold text-stone-900">Filtrar pedidos</h2>
             <p class="text-sm text-stone-500">
-              Narrow the list by customer, fulfillment status, or delivery window.
+              Reduce la lista por cliente, estado de cumplimiento o ventana de entrega.
             </p>
           </div>
         </:header>
@@ -74,26 +74,26 @@ defmodule CraftplanWeb.OrderLive.Index do
               name="filters[customer_name]"
               id="customer_name"
               value={@filters["customer_name"]}
-              label="Customer name"
+              label="Nombre del cliente"
               placeholder="Luca Georgino"
             />
 
             <div class="min-w-[12rem]">
               <.input
-                label="Status"
+                label="Estado"
                 type="checkdrop"
                 name="filters[status][]"
                 id="status"
                 value={@filters["status"]}
                 multiple={true}
                 options={[
-                  {"Unconfirmed", "unconfirmed"},
-                  {"Confirmed", "confirmed"},
-                  {"In Progress", "in_progress"},
-                  {"Ready", "ready"},
-                  {"Delivered", "delivered"},
-                  {"Completed", "completed"},
-                  {"Cancelled", "cancelled"}
+                  {"Sin confirmar", "unconfirmed"},
+                  {"Confirmado", "confirmed"},
+                  {"En progreso", "in_progress"},
+                  {"Listo", "ready"},
+                  {"Entregado", "delivered"},
+                  {"Completado", "completed"},
+                  {"Cancelado", "cancelled"}
                 ]}
               />
             </div>
@@ -105,12 +105,12 @@ defmodule CraftplanWeb.OrderLive.Index do
                 id="payment_status"
                 value={@filters["payment_status"]}
                 multiple={true}
-                label="Payment status"
+                label="Estado de pago"
                 options={[
-                  {"Paid", "paid"},
-                  {"Pending", "pending"},
-                  {"To be Refunded", "to_be_refunded"},
-                  {"Refunded", "refunded"}
+                  {"Pagado", "paid"},
+                  {"Pendiente", "pending"},
+                  {"Por reembolsar", "to_be_refunded"},
+                  {"Reembolsado", "refunded"}
                 ]}
               />
             </div>
@@ -120,7 +120,7 @@ defmodule CraftplanWeb.OrderLive.Index do
               name="filters[delivery_date_start]"
               id="delivery_date_start"
               value={@filters["delivery_date_start"]}
-              label="Delivery date after"
+              label="Fecha de entrega después de"
             />
 
             <.input
@@ -128,15 +128,15 @@ defmodule CraftplanWeb.OrderLive.Index do
               name="filters[delivery_date_end]"
               id="delivery_date_end"
               value={@filters["delivery_date_end"]}
-              label="Delivery date before"
+              label="Fecha de entrega antes de"
             />
           </Page.form_grid>
         </form>
       </Page.surface>
 
       <Page.section
-        title="Orders overview"
-        description="Toggle between table and calendar formats to manage production promises."
+        title="Resumen de pedidos"
+        description="Alterna entre las vistas de tabla y calendario para gestionar los compromisos de producción."
       >
         <:actions :if={Enum.any?(@nav_sub_links)}>
           <Page.toggle_bar links={@nav_sub_links} />
@@ -150,11 +150,11 @@ defmodule CraftplanWeb.OrderLive.Index do
           >
             <:empty>
               <div class="rounded-md border border-dashed border-stone-200 bg-stone-50 py-10 text-center text-sm text-stone-500">
-                No orders match the current filters.
+                Ningún pedido coincide con los filtros actuales.
               </div>
             </:empty>
 
-            <:col :let={{_id, order}} label="Customer">
+            <:col :let={{_id, order}} label="Cliente">
               <.link
                 class="hover:text-primary-600 hover:underline"
                 navigate={~p"/manage/customers/#{order.customer.reference}"}
@@ -163,21 +163,21 @@ defmodule CraftplanWeb.OrderLive.Index do
               </.link>
             </:col>
 
-            <:col :let={{_id, order}} label="Reference">
+            <:col :let={{_id, order}} label="Referencia">
               <.kbd>{format_reference(order.reference)}</.kbd>
             </:col>
 
-            <:col :let={{_id, order}} label="Delivery date">
+            <:col :let={{_id, order}} label="Fecha de entrega">
               {format_time(order.delivery_date, @time_zone)}
             </:col>
 
-            <:col :let={{_id, order}} label="Total cost">
+            <:col :let={{_id, order}} label="Costo total">
               {format_money(@settings.currency, order.total_cost)}
             </:col>
 
-            <:col :let={{_id, order}} label="Status">
+            <:col :let={{_id, order}} label="Estado">
               <.badge
-                text={order.status}
+                text={order_status_label(order.status)}
                 colors={[
                   {order.status,
                    "#{order_status_color(order.status)} #{order_status_bg(order.status)}"}
@@ -185,8 +185,8 @@ defmodule CraftplanWeb.OrderLive.Index do
               />
             </:col>
 
-            <:col :let={{_id, order}} label="Payment">
-              <.badge text={"#{emoji_for_payment(order.payment_status)} #{order.payment_status}"} />
+            <:col :let={{_id, order}} label="Pago">
+              <.badge text={"#{emoji_for_payment(order.payment_status)} #{payment_status_label(order.payment_status)}"} />
             </:col>
           </.table>
           <div class="mt-4 flex items-center justify-between text-sm text-stone-600">
@@ -197,14 +197,14 @@ defmodule CraftplanWeb.OrderLive.Index do
                 phx-click="prev_page"
                 disabled={@page_offset == 0}
               >
-                Previous
+                Anterior
               </.button>
               <.button
                 variant={:outline}
                 phx-click="next_page"
                 disabled={!@page_more}
               >
-                Next
+                Siguiente
               </.button>
             </div>
           </div>
@@ -247,7 +247,7 @@ defmodule CraftplanWeb.OrderLive.Index do
                 phx-click="today"
                 class="border-y border-gray-300 bg-white px-3 py-1 text-xs font-medium uppercase tracking-wide text-stone-600 transition hover:bg-gray-50 disabled:cursor-default disabled:bg-gray-100 disabled:text-gray-400"
               >
-                Today
+                Hoy
               </button>
               <button
                 type="button"
@@ -330,7 +330,7 @@ defmodule CraftplanWeb.OrderLive.Index do
                             "absolute top-1 right-1 h-2 w-2 rounded-full",
                             order_dot_status_bg(order.status)
                           ]}
-                          title={order.status}
+                          title={order_status_label(order.status)}
                         >
                         </div>
                         <div class="truncate text-xs font-medium" title={order.customer.full_name}>
@@ -392,17 +392,17 @@ defmodule CraftplanWeb.OrderLive.Index do
       <div class="py-6">
         <div>
           <.list>
-            <:item title="Customer">
+            <:item title="Cliente">
               {@selected_order.customer.full_name}
             </:item>
 
-            <:item title="Delivery time">
+            <:item title="Hora de entrega">
               {format_time(@selected_order.delivery_date, @time_zone)}
             </:item>
 
-            <:item title="Status">
+            <:item title="Estado">
               <.badge
-                text={@selected_order.status}
+                text={order_status_label(@selected_order.status)}
                 colors={[
                   {@selected_order.status,
                    "#{order_status_color(@selected_order.status)} #{order_status_bg(@selected_order.status)}"}
@@ -410,8 +410,8 @@ defmodule CraftplanWeb.OrderLive.Index do
               />
             </:item>
 
-            <:item title="Payment Status">
-              <.badge text={"#{emoji_for_payment(@selected_order.payment_status)} #{@selected_order.payment_status}"} />
+            <:item title="Estado de pago">
+              <.badge text={"#{emoji_for_payment(@selected_order.payment_status)} #{payment_status_label(@selected_order.payment_status)}"} />
             </:item>
 
             <:item title="Total">
@@ -427,10 +427,10 @@ defmodule CraftplanWeb.OrderLive.Index do
           class="mr-2"
           phx-click={JS.navigate(~p"/manage/orders/#{@selected_order.reference}")}
         >
-          View Order Details
+          Ver detalles del pedido
         </.button>
         <.button variant={:outline} phx-click="close_event_modal">
-          Close
+          Cerrar
         </.button>
       </div>
     </.modal>
@@ -595,11 +595,11 @@ defmodule CraftplanWeb.OrderLive.Index do
       :ok ->
         {:noreply,
          socket
-         |> put_flash(:info, "Order deleted successfully")
+         |> put_flash(:info, "Pedido eliminado correctamente")
          |> stream_delete(:orders, %{id: id})}
 
       {:error, _error} ->
-        {:noreply, put_flash(socket, :error, "Failed to delete order.")}
+        {:noreply, put_flash(socket, :error, "No se pudo eliminar el pedido.")}
     end
   end
 
@@ -657,10 +657,10 @@ defmodule CraftplanWeb.OrderLive.Index do
     |> stream(:orders, page.results, reset: true)
   end
 
-  defp page_label(_offset, _page_size, 0), do: "No orders"
+  defp page_label(_offset, _page_size, 0), do: "Sin pedidos"
 
   defp page_label(offset, page_size, count) do
-    "Showing #{offset + 1}-#{min(offset + page_size, count)} of #{count}"
+    "Mostrando #{offset + 1}-#{min(offset + page_size, count)} de #{count}"
   end
 
   def calendar_window(days_range) do
@@ -726,13 +726,13 @@ defmodule CraftplanWeb.OrderLive.Index do
 
   defp apply_action(socket, :new, _params) do
     socket
-    |> assign(:page_title, "New Order")
+    |> assign(:page_title, "Nuevo pedido")
     |> assign(:order, nil)
   end
 
   defp apply_action(socket, :index, _params) do
     socket
-    |> assign(:page_title, "Orders")
+    |> assign(:page_title, "Pedidos")
     |> assign(:order, nil)
   end
 

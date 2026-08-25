@@ -10,8 +10,8 @@
     set text(8pt, fill: luma(120))
     grid(
       columns: (1fr, 1fr),
-      align(left, [Invoice #data.reference]),
-      align(right, [Page #counter(page).display("1 of 1", both: true)]),
+      align(left, [Factura #data.reference]),
+      align(right, [Página #counter(page).display("1 de 1", both: true)]),
     )
   },
 )
@@ -23,16 +23,16 @@
   columns: (1fr, 1fr),
   gutter: 1cm,
   [
-    #text(24pt, weight: "bold")[Invoice]
+    #text(24pt, weight: "bold")[Factura]
     #v(0.3cm)
-    #text(10pt)[Reference: *#data.reference*] \
-    #text(10pt)[Issued: #data.issued_date] \
+    #text(10pt)[Referencia: *#data.reference*] \
+    #text(10pt)[Emitido: #data.issued_date] \
     #if data.delivery_date != "" [
-      #text(10pt)[Delivery: #data.delivery_date]
+      #text(10pt)[Entrega: #data.delivery_date]
     ]
   ],
   align(right)[
-    #text(11pt, weight: "bold")[Customer] \
+    #text(11pt, weight: "bold")[Cliente] \
     #text(10pt)[#data.customer_name] \
     #if data.customer_address != "" [
       #text(9pt, fill: luma(80))[#data.customer_address]
@@ -52,7 +52,7 @@
   inset: 8pt,
   align: (left, right, right, right),
   table.header(
-    [*Product*], [*Qty*], [*Unit Price*], [*Line Total*],
+    [*Producto*], [*Cant.*], [*Precio unitario*], [*Total de línea*],
   ),
   ..for item in data.items {
     (
@@ -75,9 +75,9 @@
       inset: 6pt,
       align: (left, right),
       [Subtotal], [#data.subtotal],
-      [Shipping], [#data.shipping_total],
-      [Tax], [#data.tax_total],
-      [Discounts], [#data.discount_total],
+      [Envío], [#data.shipping_total],
+      [Impuesto], [#data.tax_total],
+      [Descuentos], [#data.discount_total],
       table.hline(stroke: 1pt + luma(120)),
       [*Total*], [*#data.total*],
     )

@@ -11,10 +11,11 @@ FROM ${BUILDER_IMAGE} AS builder
 
 ARG NODE_VERSION
 
-RUN apt-get update -y && \
-    apt-get install -y build-essential git curl && \
+RUN for i in 1 2 3; do apt-get update -y && break || sleep 15; done && \
+    for i in 1 2 3; do apt-get install -y build-essential git curl && break || sleep 15; done && \
     curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - && \
-    apt-get install -y nodejs && \
+    for i in 1 2 3; do apt-get install -y nodejs && break || sleep 15; done && \
+    npm install -g esbuild && \
     apt-get clean && rm -f /var/lib/apt/lists/*_*
 
 WORKDIR /app
@@ -49,8 +50,8 @@ RUN mix release
 # === Runtime stage ===
 FROM ${RUNNER_IMAGE}
 
-RUN apt-get update -y && \
-    apt-get install -y libstdc++6 openssl libncurses5 locales ca-certificates && \
+RUN for i in 1 2 3; do apt-get update -y && break || sleep 15; done && \
+    for i in 1 2 3; do apt-get install -y libstdc++6 openssl libncurses5 locales ca-certificates && break || sleep 15; done && \
     apt-get clean && rm -f /var/lib/apt/lists/*_*
 
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
@@ -65,6 +66,7 @@ RUN chown nobody /app
 ENV MIX_ENV=prod
 
 COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/craftplan ./
+RUN find /app/bin -type f -exec sed -i 's/\r$//' {} +
 
 USER nobody
 

@@ -1,10 +1,10 @@
 defmodule CraftplanWeb.PageController do
   use CraftplanWeb, :controller
 
-  def home(conn, _params) do
-    if conn.assigns[:current_user] do
-      redirect(conn, to: ~p"/manage/production/schedule")
-    else
+def home(conn, _params) do
+  if conn.assigns[:current_user] do
+    redirect(conn, to: ~p"/manage/orders")
+  else
       if admin_exists?() do
         release_version =
           case Application.spec(:craftplan, :vsn) do

@@ -140,12 +140,6 @@ defmodule CraftplanWeb.Navigation do
 
   defp sections do
     %{
-      overview: %{
-        label: "Overview",
-        path: "/manage/overview",
-        pages: %{},
-        sub_links: []
-      },
       orders: %{
         label: "Orders",
         path: "/manage/orders",
@@ -189,46 +183,6 @@ defmodule CraftplanWeb.Navigation do
             label: "Materials",
             navigate: "/manage/inventory",
             active?: &__MODULE__.inventory_material_active?/1
-          },
-          %{
-            key: :forecast,
-            label: "Usage Forecast",
-            navigate: "/manage/inventory/forecast",
-            active?: &__MODULE__.inventory_forecast_active?/1
-          },
-          %{
-            key: :reorder,
-            label: "Reorder Planner",
-            navigate: "/manage/inventory/forecast/reorder",
-            active?: &__MODULE__.inventory_reorder_active?/1
-          }
-        ]
-      },
-      purchasing: %{
-        label: "Purchasing",
-        path: "/manage/purchasing",
-        pages: %{
-          purchase_orders: %{label: "Purchase Orders", path: "/manage/purchasing"},
-          new_purchase_order: %{label: "New Purchase Order", path: "/manage/purchasing/new"},
-          purchase_order: &__MODULE__.crumb_purchase_order/1,
-          po_items: &__MODULE__.crumb_purchase_order_items/1,
-          po_add_item: &__MODULE__.crumb_purchase_order_add_item/1,
-          suppliers: %{label: "Suppliers", path: "/manage/purchasing/suppliers"},
-          new_supplier: %{label: "New Supplier", path: "/manage/purchasing/suppliers/new"},
-          supplier: &__MODULE__.crumb_supplier/1
-        },
-        sub_links: [
-          %{
-            key: :purchase_orders,
-            label: "Purchase Orders",
-            navigate: "/manage/purchasing",
-            active?: &__MODULE__.purchasing_orders_active?/1
-          },
-          %{
-            key: :suppliers,
-            label: "Suppliers",
-            navigate: "/manage/purchasing/suppliers",
-            active?: &__MODULE__.purchasing_suppliers_active?/1
           }
         ]
       },
@@ -266,34 +220,10 @@ defmodule CraftplanWeb.Navigation do
             active?: &__MODULE__.settings_general_active?/1
           },
           %{
-            key: :allergens,
-            label: "Allergens",
-            navigate: "/manage/settings/allergens",
-            active?: &__MODULE__.settings_allergens_active?/1
-          },
-          %{
-            key: :nutritional_facts,
-            label: "Nutritional Facts",
-            navigate: "/manage/settings/nutritional_facts",
-            active?: &__MODULE__.settings_nutrition_active?/1
-          },
-          %{
             key: :csv,
             label: "Import & Export",
             navigate: "/manage/settings/csv",
             active?: &__MODULE__.settings_csv_active?/1
-          },
-          %{
-            key: :api_keys,
-            label: "API Keys",
-            navigate: "/manage/settings/api_keys",
-            active?: &__MODULE__.settings_api_keys_active?/1
-          },
-          %{
-            key: :calendar_feed,
-            label: "Calendar Feed",
-            navigate: "/manage/settings/calendar",
-            active?: &__MODULE__.settings_calendar_feed_active?/1
           },
           %{
             key: :members,

@@ -10,8 +10,8 @@
     set text(8pt, fill: luma(120))
     grid(
       columns: (1fr, 1fr),
-      align(left, [Batch #data.batch_code]),
-      align(right, [Page #counter(page).display("1 of 1", both: true)]),
+      align(left, [Lote #data.batch_code]),
+      align(right, [Página #counter(page).display("1 de 1", both: true)]),
     )
   },
 )
@@ -20,7 +20,7 @@
 
 // ── Header ──────────────────────────────────────────────────
 #align(center)[
-  #text(18pt, weight: "bold")[Production Batch Sheet]
+  #text(18pt, weight: "bold")[Hoja de Lote de Producción]
 ]
 
 #v(0.5cm)
@@ -34,10 +34,10 @@
     #text(9pt, fill: luma(100))[SKU: #data.product_sku]
   ],
   align(right)[
-    #text(11pt)[Status: *#data.status*] \
-    #text(10pt)[Planned Qty: *#data.planned_qty*] \
+    #text(11pt)[Estado: *#data.status*] \
+    #text(10pt)[Cant. Planificada: *#data.planned_qty*] \
     #if data.produced_at != "" [
-      #text(9pt, fill: luma(100))[Produced: #data.produced_at]
+      #text(9pt, fill: luma(100))[Producido: #data.produced_at]
     ]
   ],
 )
@@ -46,7 +46,7 @@
 
 // ── Orders ──────────────────────────────────────────────────
 #v(0.4cm)
-#text(12pt, weight: "bold")[Orders]
+#text(12pt, weight: "bold")[Pedidos]
 #v(0.2cm)
 
 #if data.orders.len() > 0 [
@@ -56,7 +56,7 @@
     inset: 6pt,
     align: (left, left, right, left),
     table.header(
-      [*Reference*], [*Customer*], [*Quantity*], [*Delivery Date*],
+      [*Referencia*], [*Cliente*], [*Cantidad*], [*Fecha de Entrega*],
     ),
     ..for order in data.orders {
       (
@@ -68,12 +68,12 @@
     },
   )
 ] else [
-  #text(9pt, fill: luma(120))[No orders allocated to this batch.]
+  #text(9pt, fill: luma(120))[No hay pedidos asignados a este lote.]
 ]
 
 // ── Materials / BOM ─────────────────────────────────────────
 #v(0.4cm)
-#text(12pt, weight: "bold")[Materials (Bill of Materials)]
+#text(12pt, weight: "bold")[Materiales (Lista de Materiales)]
 #v(0.2cm)
 
 #if data.bom_components.len() > 0 [
@@ -83,7 +83,7 @@
     inset: 6pt,
     align: (left, right, right, left, right, right),
     table.header(
-      [*Material*], [*Qty / Unit*], [*Total Req.*], [*Unit*], [*Waste %*], [*Actual Used*],
+      [*Material*], [*Cant. / Unidad*], [*Total Req.*], [*Unidad*], [*% Merma*], [*Uso Real*],
     ),
     ..for comp in data.bom_components {
       (
@@ -97,12 +97,12 @@
     },
   )
 ] else [
-  #text(9pt, fill: luma(120))[No BOM components found.]
+  #text(9pt, fill: luma(120))[No se encontraron componentes de la lista de materiales.]
 ]
 
 // ── Labor Steps ─────────────────────────────────────────────
 #v(0.4cm)
-#text(12pt, weight: "bold")[Labor Steps]
+#text(12pt, weight: "bold")[Pasos de Mano de Obra]
 #v(0.2cm)
 
 #if data.labor_steps.len() > 0 [
@@ -112,7 +112,7 @@
     inset: 6pt,
     align: (center, left, right, right, center),
     table.header(
-      [*\#*], [*Step*], [*Duration (min)*], [*Units / Run*], [*Done*],
+      [*\#*], [*Paso*], [*Duración (min)*], [*Unidades / Corrida*], [*Hecho*],
     ),
     ..for step in data.labor_steps {
       (
@@ -125,13 +125,13 @@
     },
   )
 ] else [
-  #text(9pt, fill: luma(120))[No labor steps defined.]
+  #text(9pt, fill: luma(120))[No se definieron pasos de mano de obra.]
 ]
 
 // ── Lots Consumed (conditional) ─────────────────────────────
 #if data.lots.len() > 0 [
   #v(0.4cm)
-  #text(12pt, weight: "bold")[Lots Consumed]
+  #text(12pt, weight: "bold")[Lotes Consumidos]
   #v(0.2cm)
 
   #table(
@@ -140,7 +140,7 @@
     inset: 6pt,
     align: (left, left, right, left, left),
     table.header(
-      [*Lot Code*], [*Material*], [*Qty Used*], [*Expiry*], [*Supplier*],
+      [*Código de Lote*], [*Material*], [*Cant. Usada*], [*Vencimiento*], [*Proveedor*],
     ),
     ..for lot in data.lots {
       (
@@ -157,7 +157,7 @@
 // ── Cost Summary (conditional — only if batch completed) ────
 #if data.show_costs == "yes" [
   #v(0.4cm)
-  #text(12pt, weight: "bold")[Cost Summary]
+  #text(12pt, weight: "bold")[Resumen de Costos]
   #v(0.2cm)
 
   #table(
@@ -165,12 +165,12 @@
     stroke: 0.4pt + luma(180),
     inset: 6pt,
     align: (left, right),
-    [Material Cost], [#data.costs.material_cost],
-    [Labor Cost], [#data.costs.labor_cost],
-    [Overhead Cost], [#data.costs.overhead_cost],
+    [Costo de Material], [#data.costs.material_cost],
+    [Costo de Mano de Obra], [#data.costs.labor_cost],
+    [Costo General], [#data.costs.overhead_cost],
     table.hline(stroke: 1pt),
-    [*Total Cost*], [*#data.costs.total_cost*],
-    [*Unit Cost*], [*#data.costs.unit_cost*],
+    [*Costo Total*], [*#data.costs.total_cost*],
+    [*Costo Unitario*], [*#data.costs.unit_cost*],
   )
 ]
 
@@ -183,16 +183,16 @@
   columns: (1fr, 1fr),
   gutter: 1cm,
   [
-    #text(9pt, weight: "bold")[Operator] \
+    #text(9pt, weight: "bold")[Operador] \
     #v(0.8cm)
     #line(length: 100%, stroke: 0.4pt + luma(150))
-    #text(8pt, fill: luma(120))[Signature]
+    #text(8pt, fill: luma(120))[Firma]
   ],
   [
     #text(9pt, weight: "bold")[Supervisor] \
     #v(0.8cm)
     #line(length: 100%, stroke: 0.4pt + luma(150))
-    #text(8pt, fill: luma(120))[Signature]
+    #text(8pt, fill: luma(120))[Firma]
   ],
 )
 
@@ -202,7 +202,7 @@
   columns: (1fr, 1fr),
   gutter: 1cm,
   [
-    #text(9pt, weight: "bold")[Date] \
+    #text(9pt, weight: "bold")[Fecha] \
     #v(0.5cm)
     #line(length: 100%, stroke: 0.4pt + luma(150))
   ],
@@ -210,7 +210,7 @@
 )
 
 #v(0.3cm)
-#text(9pt, weight: "bold")[Observations]
+#text(9pt, weight: "bold")[Observaciones]
 #v(0.2cm)
 #rect(
   width: 100%,

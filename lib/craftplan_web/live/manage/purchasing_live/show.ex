@@ -16,10 +16,10 @@ defmodule CraftplanWeb.PurchasingLive.Show do
       {@po.reference}
       <:actions>
         <.link patch={~p"/manage/purchasing/#{@po.reference}/add_item"}>
-          <.button variant={:outline}>Add Item</.button>
+          <.button variant={:outline}>Agregar artículo</.button>
         </.link>
         <.link :if={@po.status != :received} phx-click={JS.push("receive", value: %{id: @po.id})}>
-          <.button variant={:primary}>Mark Received</.button>
+          <.button variant={:primary}>Marcar como recibido</.button>
         </.link>
       </:actions>
     </.header>
@@ -29,21 +29,21 @@ defmodule CraftplanWeb.PurchasingLive.Show do
     <div class="mt-4 space-y-4">
       <.tabs_content :if={@live_action in [:show]}>
         <.list>
-          <:item title="Reference">
+          <:item title="Referencia">
             <.kbd>{@po.reference}</.kbd>
           </:item>
-          <:item title="Supplier">{@po.supplier.name}</:item>
-          <:item title="Status">{@po.status}</:item>
-          <:item title="Ordered At">{format_time(@po.ordered_at, @time_zone)}</:item>
-          <:item title="Received At">{format_time(@po.received_at, @time_zone)}</:item>
+          <:item title="Proveedor">{@po.supplier.name}</:item>
+          <:item title="Estado">{po_status_label(@po.status)}</:item>
+          <:item title="Fecha de pedido">{format_time(@po.ordered_at, @time_zone)}</:item>
+          <:item title="Fecha de recepción">{format_time(@po.received_at, @time_zone)}</:item>
         </.list>
       </.tabs_content>
       <.tabs_content :if={@live_action not in [:show]}>
         <div>
           <.table id="po-items" rows={@po.items}>
             <:col :let={i} label="Material">{i.material.name}</:col>
-            <:col :let={i} label="Quantity">{format_amount(i.material.unit, i.quantity)}</:col>
-            <:col :let={i} label="Unit Price">
+            <:col :let={i} label="Cantidad">{format_amount(i.material.unit, i.quantity)}</:col>
+            <:col :let={i} label="Precio unitario">
               {format_money(@settings.currency, i.unit_price || Decimal.new(0))}
             </:col>
           </.table>
@@ -55,7 +55,7 @@ defmodule CraftplanWeb.PurchasingLive.Show do
       :if={@live_action == :add_item}
       id="po-item-modal"
       show
-      title={"Add Item to #{@po.reference}"}
+      title={"Agregar artículo a #{@po.reference}"}
       on_cancel={
         JS.patch(
           if @live_action in [:items, :add_item],
@@ -95,7 +95,7 @@ defmodule CraftplanWeb.PurchasingLive.Show do
       {:ok, nil} ->
         {:noreply,
          socket
-         |> put_flash(:error, "Purchase order not found")
+         |> put_flash(:error, "Orden de compra no encontrada")
          |> push_navigate(to: ~p"/manage/purchasing")}
 
       {:ok, po} ->
@@ -103,12 +103,12 @@ defmodule CraftplanWeb.PurchasingLive.Show do
 
         tabs_links = [
           %{
-            label: "Overview",
+            label: "Resumen",
             navigate: ~p"/manage/purchasing/#{po.reference}",
             active: live_action == :show
           },
           %{
-            label: "Items",
+            label: "Artículos",
             navigate: ~p"/manage/purchasing/#{po.reference}/items",
             active: live_action in [:items, :add_item]
           }
@@ -124,7 +124,7 @@ defmodule CraftplanWeb.PurchasingLive.Show do
       {:error, _} ->
         {:noreply,
          socket
-         |> put_flash(:error, "Unable to load purchase order")
+         |> put_flash(:error, "No se pudo cargar la orden de compra")
          |> push_navigate(to: ~p"/manage/purchasing")}
     end
   end
@@ -146,7 +146,7 @@ defmodule CraftplanWeb.PurchasingLive.Show do
     {:noreply,
      socket
      |> assign(:po, po)
-     |> put_flash(:info, "Item added to PO")
+     |> put_flash(:info, "Artículo agregado a la orden de compra")
      |> push_event("close-modal", %{id: "po-item-modal"})}
   end
 
@@ -174,4 +174,10 @@ defmodule CraftplanWeb.PurchasingLive.Show do
       Navigation.page(:purchasing, :purchase_orders),
       Navigation.resource(:purchase_order, po)
     ]
+
+  defp po_status_label(:draft), do: "Borrador"
+  defp po_status_label(:ordered), do: "Pedido"
+  defp po_status_label(:received), do: "Recibido"
+  defp po_status_label(status) when is_binary(status), do: status |> String.to_existing_atom() |> po_status_label()
+  defp po_status_label(status), do: to_string(status)
 end

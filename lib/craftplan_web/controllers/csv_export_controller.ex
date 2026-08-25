@@ -21,7 +21,7 @@ defmodule CraftplanWeb.CSVExportController do
 
       :error ->
         conn
-        |> put_flash(:error, "Unknown export entity")
+        |> put_flash(:error, "Entidad de exportación desconocida")
         |> redirect(to: ~p"/manage/settings/csv")
     end
   end

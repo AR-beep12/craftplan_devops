@@ -7,9 +7,9 @@ defmodule CraftplanWeb.AuthController do
 
     message =
       case activity do
-        {:confirm_new_user, :confirm} -> "Your email address has now been confirmed"
-        {:password, :reset} -> "Your password has successfully been reset"
-        _ -> "You are now signed in"
+        {:confirm_new_user, :confirm} -> "Tu dirección de correo electrónico ha sido confirmada"
+        {:password, :reset} -> "Tu contraseña se ha restablecido correctamente"
+        _ -> "Has iniciado sesión"
       end
 
     conn
@@ -31,12 +31,12 @@ defmodule CraftplanWeb.AuthController do
            }
          }} ->
           """
-          You have already signed in another way, but have not confirmed your account.
-          You can confirm your account using the link we sent to you, or by resetting your password.
+          Ya has iniciado sesión de otra forma, pero no has confirmado tu cuenta.
+          Puedes confirmar tu cuenta usando el enlace que te enviamos, o restableciendo tu contraseña.
           """
 
         _ ->
-          "Incorrect email or password"
+          "Correo electrónico o contraseña incorrectos"
       end
 
     conn
@@ -49,7 +49,7 @@ defmodule CraftplanWeb.AuthController do
 
     conn
     |> clear_session(:craftplan)
-    |> put_flash(:info, "You are now signed out")
+    |> put_flash(:info, "Has cerrado sesión")
     |> redirect(to: return_to)
   end
 end

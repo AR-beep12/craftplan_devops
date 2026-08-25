@@ -106,7 +106,7 @@ defmodule CraftplanWeb.Components.CommandPalette do
         phx-click="open"
         phx-target={@myself}
         class="hidden items-center gap-2 rounded-md border border-stone-200 bg-white px-3 py-1.5 text-sm text-stone-500 transition hover:border-stone-300 hover:text-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-400 sm:flex"
-        aria-label="Open command palette"
+        aria-label="Abrir paleta de comandos"
       >
         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
@@ -116,7 +116,7 @@ defmodule CraftplanWeb.Components.CommandPalette do
             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
           />
         </svg>
-        <span class="hidden lg:inline">Search...</span>
+        <span class="hidden lg:inline">Buscar...</span>
         <.kbd class="hidden lg:inline-block">{cmd_key()}K</.kbd>
       </button>
 
@@ -159,7 +159,7 @@ defmodule CraftplanWeb.Components.CommandPalette do
                 name="query"
                 value={@query}
                 phx-debounce="150"
-                placeholder="Search pages, actions, or records..."
+                placeholder="Buscar páginas, acciones o registros..."
                 class="h-12 flex-1 border-0 bg-transparent text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-0"
                 autofocus
                 autocomplete="off"
@@ -171,7 +171,7 @@ defmodule CraftplanWeb.Components.CommandPalette do
             <div class="max-h-[60vh] overflow-y-auto p-2">
               <.result_section
                 :if={@results.pages != []}
-                title="Pages"
+                title="Páginas"
                 items={@results.pages}
                 flat_results={@flat_results}
                 selected_index={@selected_index}
@@ -180,7 +180,7 @@ defmodule CraftplanWeb.Components.CommandPalette do
 
               <.result_section
                 :if={@results.actions != []}
-                title="Actions"
+                title="Acciones"
                 items={@results.actions}
                 flat_results={@flat_results}
                 selected_index={@selected_index}
@@ -189,7 +189,7 @@ defmodule CraftplanWeb.Components.CommandPalette do
 
               <.result_section
                 :if={@results.products != []}
-                title="Products"
+                title="Productos"
                 items={@results.products}
                 flat_results={@flat_results}
                 selected_index={@selected_index}
@@ -198,7 +198,7 @@ defmodule CraftplanWeb.Components.CommandPalette do
 
               <.result_section
                 :if={@results.materials != []}
-                title="Materials"
+                title="Materiales"
                 items={@results.materials}
                 flat_results={@flat_results}
                 selected_index={@selected_index}
@@ -207,7 +207,7 @@ defmodule CraftplanWeb.Components.CommandPalette do
 
               <.result_section
                 :if={@results.orders != []}
-                title="Orders"
+                title="Pedidos"
                 items={@results.orders}
                 flat_results={@flat_results}
                 selected_index={@selected_index}
@@ -216,7 +216,7 @@ defmodule CraftplanWeb.Components.CommandPalette do
 
               <.result_section
                 :if={@results.customers != []}
-                title="Customers"
+                title="Clientes"
                 items={@results.customers}
                 flat_results={@flat_results}
                 selected_index={@selected_index}
@@ -225,7 +225,7 @@ defmodule CraftplanWeb.Components.CommandPalette do
 
               <.result_section
                 :if={@results.suppliers != []}
-                title="Suppliers"
+                title="Proveedores"
                 items={@results.suppliers}
                 flat_results={@flat_results}
                 selected_index={@selected_index}
@@ -234,7 +234,7 @@ defmodule CraftplanWeb.Components.CommandPalette do
 
               <.result_section
                 :if={@results.purchase_orders != []}
-                title="Purchase Orders"
+                title="Órdenes de Compra"
                 items={@results.purchase_orders}
                 flat_results={@flat_results}
                 selected_index={@selected_index}
@@ -243,7 +243,7 @@ defmodule CraftplanWeb.Components.CommandPalette do
 
               <.result_section
                 :if={@results.batches != []}
-                title="Production Batches"
+                title="Lotes de Producción"
                 items={@results.batches}
                 flat_results={@flat_results}
                 selected_index={@selected_index}
@@ -254,7 +254,7 @@ defmodule CraftplanWeb.Components.CommandPalette do
                 :if={empty_results?(@results)}
                 class="py-8 text-center text-sm text-stone-500"
               >
-                No results found for "{@query}"
+                No se encontraron resultados para "{@query}"
               </div>
             </div>
 
@@ -263,16 +263,16 @@ defmodule CraftplanWeb.Components.CommandPalette do
                 <span class="flex items-center gap-1">
                   <.kbd>↑</.kbd>
                   <.kbd>↓</.kbd>
-                  to navigate
+                  para navegar
                 </span>
                 <span class="flex items-center gap-1">
                   <.kbd>↵</.kbd>
-                  to select
+                  para seleccionar
                 </span>
               </div>
               <span class="flex items-center gap-1">
                 <.kbd>esc</.kbd>
-                to close
+                para cerrar
               </span>
             </div>
           </div>

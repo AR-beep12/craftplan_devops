@@ -21,13 +21,14 @@ defmodule CraftplanWeb.InventoryLive.ReorderPlanner do
     ~H"""
     <Page.page>
       <.header>
-        Reorder Planner
+        Planificador de reabastecimiento
         <:subtitle>
-          Track safety stock, reorder points, and suggested purchase quantities without leaving the dashboard.
+          Da seguimiento al stock de seguridad, los puntos de reorden y las cantidades de compra sugeridas sin salir del panel.
         </:subtitle>
+
         <:actions>
           <.link navigate={~p"/manage/inventory/forecast"}>
-            <.button variant={:outline} size={:sm}>View usage forecast</.button>
+            <.button variant={:outline} size={:sm}>Ver pronóstico de uso</.button>
           </.link>
         </:actions>
       </.header>
@@ -37,12 +38,14 @@ defmodule CraftplanWeb.InventoryLive.ReorderPlanner do
           <Page.surface>
             <:header>
               <div>
-                <h3 class="text-sm font-semibold text-stone-900">Planning controls</h3>
+                <h3 class="text-sm font-semibold text-stone-900">Controles de planificación</h3>
+
                 <p class="text-xs text-stone-500">
-                  Adjust service level targets and forecast horizon to refresh the metrics band.
+                  Ajusta los objetivos de nivel de servicio y el horizonte de pronóstico para actualizar la banda de métricas.
                 </p>
               </div>
             </:header>
+
             <:actions>
               <.button
                 type="button"
@@ -50,15 +53,16 @@ defmodule CraftplanWeb.InventoryLive.ReorderPlanner do
                 size={:sm}
                 phx-click="open_forecast_help"
               >
-                How to read the metrics band
+                Cómo leer la banda de métricas
               </.button>
             </:actions>
 
             <div class="flex gap-10 space-y-5 text-sm text-stone-600">
               <fieldset>
                 <legend class="mb-2 text-xs font-semibold tracking-wide text-stone-500">
-                  Service level
+                  Nivel de servicio
                 </legend>
+
                 <div class="flex flex-wrap gap-2">
                   <button
                     :for={level <- @service_level_options}
@@ -76,8 +80,9 @@ defmodule CraftplanWeb.InventoryLive.ReorderPlanner do
 
               <fieldset>
                 <legend class="mb-2 text-xs font-semibold tracking-wide text-stone-500">
-                  Horizon
+                  Horizonte
                 </legend>
+
                 <div class="flex flex-wrap gap-2">
                   <button
                     :for={days <- @horizon_options}
@@ -88,7 +93,7 @@ defmodule CraftplanWeb.InventoryLive.ReorderPlanner do
                     aria-pressed={if(@horizon_days == days, do: "true", else: "false")}
                     class={toggle_button_classes(@horizon_days == days)}
                   >
-                    {days}-day
+                    {days} días
                   </button>
                 </div>
               </fieldset>
@@ -104,24 +109,24 @@ defmodule CraftplanWeb.InventoryLive.ReorderPlanner do
                   <.icon
                     name={if @advanced_open?, do: "hero-chevron-down", else: "hero-chevron-right"}
                     class="h-4 w-4 text-stone-500"
-                  />
-                  <span class="text-xs font-semibold text-stone-900">Advanced settings</span>
-                  <span class="text-xs text-stone-500">(session only)</span>
+                  /> <span class="text-xs font-semibold text-stone-900">Configuración avanzada</span>
+                  <span class="text-xs text-stone-500">(solo esta sesión)</span>
                 </div>
+
                 <button
                   :if={@advanced_open?}
                   type="button"
                   phx-click="reset_advanced"
                   class="text-xs font-medium text-blue-700 hover:text-blue-800 hover:underline"
                 >
-                  Reset to defaults
+                  Restablecer valores predeterminados
                 </button>
               </button>
 
               <div :if={@advanced_open?} class="border-t border-stone-200 py-4">
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-4">
                   <div>
-                    <label class="mb-1 block text-xs font-medium text-stone-600">Lookback days</label>
+                    <label class="mb-1 block text-xs font-medium text-stone-600">Días de historial</label>
                     <input
                       type="number"
                       name="lookback_days"
@@ -133,8 +138,9 @@ defmodule CraftplanWeb.InventoryLive.ReorderPlanner do
                       class="w-full rounded-md border border-stone-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:ring-blue-500"
                     />
                   </div>
+
                   <div>
-                    <label class="mb-1 block text-xs font-medium text-stone-600">Actual weight</label>
+                    <label class="mb-1 block text-xs font-medium text-stone-600">Peso real</label>
                     <input
                       type="number"
                       name="actual_weight"
@@ -147,10 +153,12 @@ defmodule CraftplanWeb.InventoryLive.ReorderPlanner do
                       class="w-full rounded-md border border-stone-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:ring-blue-500"
                     />
                   </div>
+
                   <div>
                     <label class="mb-1 block text-xs font-medium text-stone-600">
-                      Planned weight
+                      Peso planificado
                     </label>
+
                     <input
                       type="number"
                       name="planned_weight"
@@ -163,8 +171,9 @@ defmodule CraftplanWeb.InventoryLive.ReorderPlanner do
                       class="w-full rounded-md border border-stone-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:ring-blue-500"
                     />
                   </div>
+
                   <div>
-                    <label class="mb-1 block text-xs font-medium text-stone-600">Min samples</label>
+                    <label class="mb-1 block text-xs font-medium text-stone-600">Muestras mínimas</label>
                     <input
                       type="number"
                       name="min_samples"
@@ -177,8 +186,9 @@ defmodule CraftplanWeb.InventoryLive.ReorderPlanner do
                     />
                   </div>
                 </div>
+
                 <p class="mt-3 text-xs text-stone-500">
-                  These settings override your organization defaults for this session only. Changes refresh the forecast automatically.
+                  Esta configuración anula los valores predeterminados de tu organización solo durante esta sesión. Los cambios actualizan el pronóstico automáticamente.
                 </p>
               </div>
             </div>
@@ -202,42 +212,54 @@ defmodule CraftplanWeb.InventoryLive.ReorderPlanner do
       <.modal
         :if={@show_forecast_help?}
         id="how-to-read-forecast-owner"
-        title="How to read the metrics band"
-        description="Understand how service level, risk states, and Suggested PO rows connect."
+        title="Cómo leer la banda de métricas"
+        description="Comprende cómo se relacionan el nivel de servicio, los estados de riesgo y las filas de orden de compra sugerida."
         max_width="max-w-2xl"
         show
         on_cancel={JS.push("close_forecast_help")}
       >
         <div class="space-y-5 text-sm text-stone-600">
           <div>
-            <p class="text-sm font-semibold text-stone-700">Service level & horizon</p>
+            <p class="text-sm font-semibold text-stone-700">Nivel de servicio y horizonte</p>
+
             <p class="text-xs text-stone-500">
-              Changing the toggles reruns the calculator with the new buffer target and number of projected days.
-              Higher service levels increase safety stock and ROP; longer horizons include more planned demand.
+              Cambiar los botones vuelve a ejecutar el cálculo con el nuevo objetivo de margen y el nuevo número de días proyectados.
+              Niveles de servicio más altos aumentan el stock de seguridad y el ROP; horizontes más largos incluyen más demanda planificada.
             </p>
           </div>
+
           <div class="space-y-3">
-            <p class="text-sm font-semibold text-stone-700">Risk chips</p>
+            <p class="text-sm font-semibold text-stone-700">Etiquetas de riesgo</p>
+
             <div class="space-y-2 text-xs text-stone-500">
               <div class="flex items-start gap-3">
                 <span class="mt-1 h-3 w-3 rounded-full bg-emerald-200 ring-2 ring-emerald-300" />
                 <div>
-                  <p class="font-medium text-stone-700">Balanced</p>
-                  <p>Projected balances stay healthy across the horizon.</p>
+                  <p class="font-medium text-stone-700">Equilibrado</p>
+
+                  <p>Los balances proyectados se mantienen saludables durante todo el horizonte.</p>
                 </div>
               </div>
+
               <div class="flex items-start gap-3">
                 <span class="mt-1 h-3 w-3 rounded-full bg-amber-200 ring-2 ring-amber-300" />
                 <div>
-                  <p class="font-medium text-stone-700">Watch</p>
-                  <p>Balances drop to zero within the horizon—start planning replenishment.</p>
+                  <p class="font-medium text-stone-700">Atención</p>
+
+                  <p>
+                    Los balances llegan a cero dentro del horizonte; comienza a planificar el reabastecimiento.
+                  </p>
                 </div>
               </div>
+
               <div class="flex items-start gap-3">
                 <span class="mt-1 h-3 w-3 rounded-full bg-rose-200 ring-2 ring-rose-300" />
                 <div>
-                  <p class="font-medium text-rose-600">Shortage</p>
-                  <p>Projected balance goes negative. Use the CTA to open a PO draft.</p>
+                  <p class="font-medium text-rose-600">Escasez</p>
+
+                  <p>
+                    El balance proyectado se vuelve negativo. Usa el botón para abrir un borrador de orden de compra.
+                  </p>
                 </div>
               </div>
             </div>
@@ -246,7 +268,7 @@ defmodule CraftplanWeb.InventoryLive.ReorderPlanner do
 
         <div class="mt-6 flex justify-end">
           <.button type="button" variant={:outline} phx-click="close_forecast_help">
-            Close
+            Cerrar
           </.button>
         </div>
       </.modal>
@@ -456,7 +478,10 @@ defmodule CraftplanWeb.InventoryLive.ReorderPlanner do
      socket
      |> assign(:forecast_rows, [])
      |> assign(:metrics_loaded?, false)
-     |> assign(:forecast_error, "Unable to load forecast metrics right now.")}
+     |> assign(
+       :forecast_error,
+       "No se pudieron cargar las métricas de pronóstico en este momento."
+     )}
   end
 
   defp refresh_metrics(socket, assigns) do
@@ -625,14 +650,14 @@ defmodule CraftplanWeb.InventoryLive.ReorderPlanner do
     ~H"""
     <div id={@id} class="space-y-3">
       <div :if={@loading?} class="rounded-lg border border-dashed border-stone-200 bg-stone-50 p-6">
-        <p class="text-sm font-medium text-stone-600">Loading inventory metrics…</p>
+        <p class="text-sm font-medium text-stone-600">Cargando métricas de inventario…</p>
       </div>
 
       <div
         :if={!@loading? && !@has_rows?}
         class="rounded-lg border border-dashed border-stone-200 bg-stone-50 p-6 text-sm text-stone-600"
       >
-        No forecast rows available for the selected horizon.
+        No hay filas de pronóstico disponibles para el horizonte seleccionado.
       </div>
 
       <.scroll_table
@@ -646,36 +671,48 @@ defmodule CraftplanWeb.InventoryLive.ReorderPlanner do
               <th class="sticky left-0 z-20 w-48 border-r border-stone-200 bg-white p-3 text-left">
                 Material
               </th>
+
               <th class="w-24 border-r border-stone-200 p-3 text-center font-normal">
-                On hand
+                Disponible
               </th>
+
               <th class="w-24 border-r border-stone-200 p-3 text-center font-normal">
-                On order
+                En pedido
               </th>
+
               <th class="w-24 border-r border-stone-200 p-3 text-center font-normal">
-                Avg/day
+                Prom./día
               </th>
+
               <th class="w-28 border-r border-stone-200 p-3 text-center font-normal">
-                Demand var
+                Var. demanda
               </th>
+
               <th class="w-40 border-r border-stone-200 p-3 text-center font-normal">
-                Lead-time demand
+                Demanda en tiempo de espera
               </th>
+
               <th class="w-28 border-r border-stone-200 p-3 text-center font-normal">
-                Safety stock
+                Stock de seguridad
               </th>
+
               <th class="w-24 border-r border-stone-200 p-3 text-center font-normal">ROP</th>
-              <th class="w-40 border-r border-stone-200 p-3 text-center font-normal">Cover</th>
+
+              <th class="w-40 border-r border-stone-200 p-3 text-center font-normal">Cobertura</th>
+
               <th class="w-24 border-r border-stone-200 p-3 text-center font-normal">
-                Stockout
+                Agotamiento
               </th>
+
               <th class="w-24 border-r border-stone-200 p-3 text-center font-normal">
-                Order-by
+                Fecha límite
               </th>
+
               <th class="w-32 border-r border-stone-200 p-3 text-center font-normal">
-                Suggested PO
+                OC sugerida
               </th>
-              <th class="w-32 p-3 text-right font-normal">Action</th>
+
+              <th class="w-32 p-3 text-right font-normal">Acción</th>
             </tr>
           </thead>
 
@@ -686,27 +723,33 @@ defmodule CraftplanWeb.InventoryLive.ReorderPlanner do
               class="border-t border-stone-200"
             >
               <td class="sticky left-0 z-10 border-r border-stone-200 bg-white px-3 py-2 text-left font-medium shadow-sm">
-                {row.material_name || "Unassigned"}
+                {row.material_name || "Sin asignar"}
               </td>
 
               <td class="relative border-t border-r border-t-stone-200 border-r-stone-200 p-3 text-right last:border-r-0">
                 {decimal_display(row.on_hand)}
               </td>
+
               <td class="relative border-t border-r border-t-stone-200 border-r-stone-200 p-3 text-right last:border-r-0">
                 {decimal_display(row.on_order)}
               </td>
+
               <td class="relative border-t border-r border-t-stone-200 border-r-stone-200 p-3 text-right last:border-r-0">
                 {decimal_display(row.avg_daily_use, places: 2)}
               </td>
+
               <td class="relative border-t border-r border-t-stone-200 border-r-stone-200 p-3 text-right last:border-r-0">
                 {decimal_display(row.demand_variability, places: 2)}
               </td>
+
               <td class="relative border-t border-r border-t-stone-200 border-r-stone-200 p-3 text-right last:border-r-0">
                 {decimal_display(row.lead_time_demand, places: 2)}
               </td>
+
               <td class="relative border-t border-r border-t-stone-200 border-r-stone-200 p-3 text-right last:border-r-0">
                 {decimal_display(row.safety_stock)}
               </td>
+
               <td class="relative border-t border-r border-t-stone-200 border-r-stone-200 p-3 text-right last:border-r-0">
                 {decimal_display(row.reorder_point)}
               </td>
@@ -720,6 +763,7 @@ defmodule CraftplanWeb.InventoryLive.ReorderPlanner do
               <td class="relative border-t border-r border-t-stone-200 border-r-stone-200 p-3 text-left text-stone-600 last:border-r-0">
                 {format_short_date(row.stockout_date, missing: "—")}
               </td>
+
               <td class="relative border-t border-r border-t-stone-200 border-r-stone-200 p-3 text-left text-stone-600 last:border-r-0">
                 {format_short_date(row.order_by_date, missing: "—")}
               </td>
@@ -739,7 +783,7 @@ defmodule CraftplanWeb.InventoryLive.ReorderPlanner do
                   phx-target={@phx_target}
                   disabled={cta_disabled?(row, @cta_event)}
                 >
-                  Draft PO
+                  Generar OC
                 </.button>
               </td>
             </tr>
@@ -792,7 +836,7 @@ defmodule CraftplanWeb.InventoryLive.ReorderPlanner do
     value
     |> D.round(1)
     |> D.to_string(:normal)
-    |> Kernel.<>(" days cover")
+    |> Kernel.<>(" días de cobertura")
   end
 
   defp cover_label(value) when is_number(value) do

@@ -406,16 +406,32 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
     ]
   end
 
+  @priority_currencies [:USD, :EUR]
+
   defp currency_options do
-    [{"Dólar estadounidense", :USD}, {"Euro", :EUR}] ++
-      (Craftplan.Types.Currency.values()
-       |> Enum.reject(fn code -> code in [:USD, :EUR] end)
-       |> Enum.map(fn code ->
-         case Money.Currency.currency_for_code(code) do
-           {:ok, currency} -> {currency.name, code}
-           _ -> nil
-         end
-       end)
-       |> Enum.reject(&is_nil/1))
+    priority_options = Enum.map(@priority_currencies, &{currency_display_name(&1), &1})
+
+    rest_options =
+      Craftplan.Types.Currency.values()
+      |> Enum.reject(&(&1 in @priority_currencies))
+      |> Enum.map(&{currency_display_name(&1), &1})
+      |> Enum.reject(fn {name, _code} -> is_nil(name) end)
+      |> Enum.sort_by(fn {name, _code} -> name end)
+
+    priority_options ++ rest_options
   end
+
+  defp currency_display_name(code) do
+    code
+    |> Cldr.Currency.display_name!(backend: Craftplan.Cldr, locale: "es")
+    |> capitalize_first()
+  rescue
+    _ -> code |> to_string() |> String.upcase()
+  end
+
+  # Capitalizes only the first grapheme, since CLDR names may contain
+  # proper nouns mid-string (e.g. "dólar del Caribe Oriental") that
+  # String.capitalize/1 would incorrectly lowercase.
+  defp capitalize_first(<<first::utf8, rest::binary>>), do: String.upcase(<<first::utf8>>) <> rest
+  defp capitalize_first(other), do: other
 end

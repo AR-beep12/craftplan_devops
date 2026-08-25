@@ -21,19 +21,17 @@ defmodule CraftplanWeb.InventoryLive.FormComponentAllergens do
           options={Enum.map(@allergens, fn allergen -> {allergen.name, allergen.id} end)}
           value={@selected_allergen_ids}
         />
-
         <:actions>
           <.button
             variant={:primary}
             disabled={
               MapSet.equal?(MapSet.new(@init_allergen_ids), MapSet.new(@selected_allergen_ids))
             }
-            phx-disable-with="Saving..."
+            phx-disable-with="Guardando..."
           >
-            Save Allergens
+            Guardar alérgenos
           </.button>
         </:actions>
-
         <.input field={@form[:material_id]} type="hidden" value={@material.id} />
       </.simple_form>
     </div>
@@ -89,7 +87,7 @@ defmodule CraftplanWeb.InventoryLive.FormComponentAllergens do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Allergens updated successfully")
+         |> put_flash(:info, "Alérgenos actualizados correctamente")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->

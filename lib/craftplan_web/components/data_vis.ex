@@ -12,7 +12,7 @@ defmodule CraftplanWeb.Components.DataVis do
   attr :id, :string, default: nil
   attr :class, :string, default: nil
   attr :min_width, :string, default: "min-w-[1100px]"
-  attr :aria_label, :string, default: "Scrollable table"
+  attr :aria_label, :string, default: "Tabla desplazable"
   attr :show_edges?, :boolean, default: true
   slot :inner_block, required: true
 
@@ -110,7 +110,7 @@ defmodule CraftplanWeb.Components.DataVis do
               :if={@action != []}
               class="relative border-r border-stone-200 p-0 pr-4 pb-4 last:border-r-0"
             >
-              <span class="sr-only">{gettext("Actions")}</span>
+              <span class="sr-only">{gettext("Acciones")}</span>
             </th>
           </tr>
         </thead>

@@ -6,26 +6,26 @@ defmodule CraftplanWeb.CommandPaletteSearch do
   import Ash.Query
 
   @pages [
-    %{label: "Overview", path: "/manage/overview", icon: :manage},
-    %{label: "Production Schedule", path: "/manage/production/schedule", icon: :production},
-    %{label: "Production Batches", path: "/manage/production/batches", icon: :production},
-    %{label: "Inventory", path: "/manage/inventory", icon: :inventory},
-    %{label: "Forecast", path: "/manage/inventory/forecast", icon: :inventory},
-    %{label: "Purchasing", path: "/manage/purchasing", icon: :purchasing},
-    %{label: "Suppliers", path: "/manage/purchasing/suppliers", icon: :purchasing},
-    %{label: "Products", path: "/manage/products", icon: :products},
-    %{label: "Orders", path: "/manage/orders", icon: :orders},
-    %{label: "Customers", path: "/manage/customers", icon: :customers},
-    %{label: "Settings", path: "/manage/settings", icon: :settings}
+    %{label: "Resumen", path: "/manage/overview", icon: :manage},
+    %{label: "Programación de producción", path: "/manage/production/schedule", icon: :production},
+    %{label: "Lotes de producción", path: "/manage/production/batches", icon: :production},
+    %{label: "Inventario", path: "/manage/inventory", icon: :inventory},
+    %{label: "Pronóstico de uso", path: "/manage/inventory/forecast", icon: :inventory},
+    %{label: "Compras", path: "/manage/purchasing", icon: :purchasing},
+    %{label: "Proveedores", path: "/manage/purchasing/suppliers", icon: :purchasing},
+    %{label: "Productos", path: "/manage/products", icon: :products},
+    %{label: "Pedidos", path: "/manage/orders", icon: :orders},
+    %{label: "Clientes", path: "/manage/customers", icon: :customers},
+    %{label: "Configuración", path: "/manage/settings", icon: :settings}
   ]
 
   @actions [
-    %{label: "New Order", path: "/manage/orders/new", icon: :orders},
-    %{label: "New Product", path: "/manage/products/new", icon: :products},
-    %{label: "New Material", path: "/manage/inventory/new", icon: :inventory},
-    %{label: "New Customer", path: "/manage/customers/new", icon: :customers},
-    %{label: "New Purchase Order", path: "/manage/purchasing/new", icon: :purchasing},
-    %{label: "New Supplier", path: "/manage/purchasing/suppliers/new", icon: :purchasing}
+    %{label: "Nuevo pedido", path: "/manage/orders/new", icon: :orders},
+    %{label: "Nuevo producto", path: "/manage/products/new", icon: :products},
+    %{label: "Nuevo material", path: "/manage/inventory/new", icon: :inventory},
+    %{label: "Nuevo cliente", path: "/manage/customers/new", icon: :customers},
+    %{label: "Nueva orden de compra", path: "/manage/purchasing/new", icon: :purchasing},
+    %{label: "Nuevo proveedor", path: "/manage/purchasing/suppliers/new", icon: :purchasing}
   ]
 
   @doc """
@@ -228,6 +228,13 @@ defmodule CraftplanWeb.CommandPaletteSearch do
   end
 
   defp format_status(nil), do: nil
+  defp format_status(:draft), do: "borrador"
+  defp format_status(:ordered), do: "pedido"
+  defp format_status(:received), do: "recibido"
+  defp format_status(:open), do: "abierto"
+  defp format_status(:in_progress), do: "en progreso"
+  defp format_status(:completed), do: "completado"
+  defp format_status(:canceled), do: "cancelado"
 
   defp format_status(status) when is_atom(status), do: status |> Atom.to_string() |> String.replace("_", " ")
 

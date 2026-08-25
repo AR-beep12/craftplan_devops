@@ -40,8 +40,9 @@ defmodule CraftplanWeb.InventoryLive.FormComponentMovement do
                 @mode != :add && "bg-white text-stone-600 hover:bg-stone-50"
               ]}
             >
-              Add
+              Agregar
             </button>
+
             <button
               type="button"
               phx-click="set_mode"
@@ -53,7 +54,7 @@ defmodule CraftplanWeb.InventoryLive.FormComponentMovement do
                 @mode != :subtract && "bg-white text-stone-600 hover:bg-stone-50"
               ]}
             >
-              Subtract
+              Restar
             </button>
           </div>
         </div>
@@ -63,17 +64,14 @@ defmodule CraftplanWeb.InventoryLive.FormComponentMovement do
           type="number"
           min="0"
           step="any"
-          label={if @mode == :add, do: "Quantity to add", else: "Quantity to subtract"}
+          label={if @mode == :add, do: "Cantidad a agregar", else: "Cantidad a restar"}
           inline_label={@material.unit}
           id="movement-quantity"
-        />
-
-        <.input field={@form[:reason]} type="textarea" label="Notes" class="mt-3" />
+        /> <.input field={@form[:reason]} type="textarea" label="Notas" class="mt-3" />
         <.input field={@form[:material_id]} type="hidden" value={@material.id} />
-
         <div class="mt-4 rounded-md border border-stone-200 bg-stone-50 p-3 text-sm text-stone-700">
           <%= if @calculated_new_total do %>
-            <span class="font-medium">New stock will be: </span>
+            <span class="font-medium">El nuevo stock será: </span>
             <span class={[
               "font-bold",
               negative?(@calculated_new_total) && "text-red-600",
@@ -82,12 +80,12 @@ defmodule CraftplanWeb.InventoryLive.FormComponentMovement do
               {format_preview(@material.unit, @calculated_new_total)}
             </span>
           <% else %>
-            Enter a quantity to see the new stock level
+            Ingresa una cantidad para ver el nuevo nivel de stock
           <% end %>
         </div>
 
         <:actions>
-          <.button variant={:primary} phx-disable-with="Saving...">Save</.button>
+          <.button variant={:primary} phx-disable-with="Guardando...">Guardar</.button>
         </:actions>
       </.simple_form>
     </div>
@@ -127,7 +125,7 @@ defmodule CraftplanWeb.InventoryLive.FormComponentMovement do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Stock adjustment recorded")
+         |> put_flash(:info, "Ajuste de stock registrado")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->

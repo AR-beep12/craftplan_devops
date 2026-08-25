@@ -132,7 +132,7 @@ defmodule CraftplanWeb.Components.Core do
                 type="button"
                 phx-click={JS.exec("data-cancel", to: "##{@id}")}
                 class="absolute top-4 right-4 rounded-sm p-1 opacity-70 ring-offset-white transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2 print:hidden"
-                aria-label={gettext("close")}
+                aria-label={gettext("cerrar")}
               >
                 <.icon name="hero-x-mark-solid" class="h-5 w-5" />
               </button>
@@ -219,7 +219,7 @@ defmodule CraftplanWeb.Components.Core do
       <button
         type="button"
         class="group absolute top-1 right-2 p-1 opacity-40 transition-all group-hover:opacity-100"
-        aria-label={gettext("close")}
+        aria-label={gettext("cerrar")}
       >
         <.icon name="hero-x-mark-solid" class="h-4 w-4" />
       </button>
@@ -240,29 +240,29 @@ defmodule CraftplanWeb.Components.Core do
   def flash_group(assigns) do
     ~H"""
     <div id={@id}>
-      <.flash kind={:info} title={gettext("Success!")} flash={@flash} />
-      <.flash kind={:error} title={gettext("Error!")} flash={@flash} />
+      <.flash kind={:info} title={gettext("¡Éxito!")} flash={@flash} />
+      <.flash kind={:error} title={gettext("¡Error!")} flash={@flash} />
       <.flash
         id="client-error"
         kind={:error}
-        title={gettext("We can't find the internet")}
+        title={gettext("No hay conexión a internet")}
         phx-disconnected={show(".phx-client-error #client-error")}
         phx-connected={hide("#client-error")}
         hidden
       >
-        {gettext("Attempting to reconnect")}
+        {gettext("Intentando reconectar")}
         <.icon name="hero-arrow-path" class="ml-1 h-3 w-3 animate-spin" />
       </.flash>
 
       <.flash
         id="server-error"
         kind={:error}
-        title={gettext("Something went wrong!")}
+        title={gettext("¡Algo salió mal!")}
         phx-disconnected={show(".phx-server-error #server-error")}
         phx-connected={hide("#server-error")}
         hidden
       >
-        {gettext("Hang in there while we get back on track")}
+        {gettext("Espera mientras restablecemos la conexión")}
         <.icon name="hero-arrow-path" class="ml-1 h-3 w-3 animate-spin" />
       </.flash>
     </div>

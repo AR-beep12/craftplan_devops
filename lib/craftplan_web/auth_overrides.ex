@@ -35,7 +35,7 @@ defmodule CraftplanWeb.AuthOverrides do
 
     set :form_class, nil
     set :spacer_class, "py-1"
-    set :disable_button_text, "Changing password ..."
+    set :disable_button_text, "Cambiando contraseña..."
   end
 
   override AshAuthentication.Phoenix.Components.SignIn do
@@ -72,7 +72,7 @@ defmodule CraftplanWeb.AuthOverrides do
     set :text_inner_class,
         "px-2 bg-white text-stone-400 font-medium dark:bg-stone-50 dark:text-neutral-900"
 
-    set :text, "or"
+    set :text, "o"
   end
 
   override AshAuthentication.Phoenix.Components.MagicLink do
@@ -84,18 +84,18 @@ defmodule CraftplanWeb.AuthOverrides do
     set :form_class, nil
 
     set :request_flash_text,
-        "If this user exists in our database you will contacted with a sign-in link shortly."
+        "Si este usuario existe en nuestra base de datos, te contactaremos con un enlace de inicio de sesión en breve."
 
-    set :disable_button_text, "Requesting ..."
+    set :disable_button_text, "Solicitando..."
   end
 
   override AshAuthentication.Phoenix.Components.Password do
     set :root_class, "mt-4 mb-4"
     set :interstitial_class, "flex flex-row justify-between content-between text-sm font-medium"
     set :toggler_class, "flex-none text-stone-500 hover:text-stone-600 px-2 first:pl-0 last:pr-0"
-    set :sign_in_toggle_text, "Already have an account?"
-    set :register_toggle_text, "Need an account?"
-    set :reset_toggle_text, "Forgot your password?"
+    set :sign_in_toggle_text, "¿Ya tienes una cuenta?"
+    set :register_toggle_text, "¿Necesitas una cuenta?"
+    set :reset_toggle_text, "¿Olvidaste tu contraseña?"
     set :show_first, :sign_in
     set :hide_class, "hidden"
   end
@@ -108,7 +108,7 @@ defmodule CraftplanWeb.AuthOverrides do
 
     set :form_class, nil
     set :slot_class, "my-4"
-    set :disable_button_text, "Signing in ..."
+    set :disable_button_text, "Iniciando sesión..."
   end
 
   override AshAuthentication.Phoenix.Components.Password.RegisterForm do
@@ -119,7 +119,7 @@ defmodule CraftplanWeb.AuthOverrides do
 
     set :form_class, nil
     set :slot_class, "my-4"
-    set :disable_button_text, "Registering ..."
+    set :disable_button_text, "Registrando..."
   end
 
   override AshAuthentication.Phoenix.Components.Password.ResetForm do
@@ -132,9 +132,9 @@ defmodule CraftplanWeb.AuthOverrides do
     set :slot_class, "my-4"
 
     set :reset_flash_text,
-        "If this user exists in our system, you will be contacted with reset instructions shortly."
+        "Si este usuario existe en nuestro sistema, te contactaremos con instrucciones para restablecer tu contraseña en breve."
 
-    set :disable_button_text, "Requesting ..."
+    set :disable_button_text, "Solicitando..."
   end
 
   override AshAuthentication.Phoenix.Components.Password.Input do
@@ -160,9 +160,9 @@ defmodule CraftplanWeb.AuthOverrides do
     hover:bg-stone-200 hover:text-gray-800 h-9 px-4 py-2
     """
 
-    set :password_input_label, "Password"
-    set :password_confirmation_input_label, "Password Confirmation"
-    set :identity_input_label, "Email"
+    set :password_input_label, "Contraseña"
+    set :password_confirmation_input_label, "Confirmación de contraseña"
+    set :identity_input_label, "Correo electrónico"
     set :identity_input_placeholder, nil
     set :error_ul, "text-red-400 font-light my-3 italic text-sm"
     set :error_li, nil

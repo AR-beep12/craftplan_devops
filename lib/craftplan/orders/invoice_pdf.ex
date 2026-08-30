@@ -26,7 +26,7 @@ defmodule Craftplan.Orders.InvoicePdf do
           :discount_total,
           :total,
           :delivery_date,
-          customer: [:full_name, shipping_address: [:full_address]],
+          customer: [:full_name],
           items: [:cost, :unit_price, product: [:name]]
         ],
         actor: actor
@@ -47,7 +47,6 @@ defmodule Craftplan.Orders.InvoicePdf do
       "issued_date" => format_date(Date.utc_today()),
       "delivery_date" => format_datetime(order.delivery_date),
       "customer_name" => (customer && customer.full_name) || "",
-      "customer_address" => (customer && customer.shipping_address && customer.shipping_address.full_address) || "",
       "items" => build_items(order.items, currency),
       "subtotal" => format_money(currency, order.subtotal),
       "shipping_total" => format_money(currency, order.shipping_total),

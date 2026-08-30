@@ -30,16 +30,13 @@ defmodule CraftplanWeb.CustomerLive.Index do
         </div>
       </:empty>
       <:col :let={{_id, customer}} label="Nombre">{customer.full_name}</:col>
-      <:col :let={{_id, customer}} label="Referencia">
+      <:col :let={{_id, customer}} label="ID">
         <.kbd>
           {format_reference(customer.reference)}
         </.kbd>
       </:col>
       <:col :let={{_id, customer}} label="Correo electrónico">{customer.email}</:col>
       <:col :let={{_id, customer}} label="Teléfono">{customer.phone}</:col>
-      <:col :let={{_id, customer}} label="Tipo">
-        <.badge text={customer_type_label(customer.type)} />
-      </:col>
     </.table>
 
     <.modal
@@ -72,7 +69,7 @@ defmodule CraftplanWeb.CustomerLive.Index do
        :customers,
        Craftplan.CRM.list_customers!(
          actor: socket.assigns[:current_user],
-         load: [:billing_address, :shipping_address, :full_name]
+         load: [:full_name]
        )
      )
      |> assign_new(:current_user, fn -> nil end)}
@@ -90,10 +87,7 @@ defmodule CraftplanWeb.CustomerLive.Index do
     |> assign(:page_title, "Editar cliente")
     |> assign(
       :customer,
-      Craftplan.CRM.get_customer_by_id!(id,
-        actor: socket.assigns.current_user,
-        load: [:billing_address, :shipping_address]
-      )
+      Craftplan.CRM.get_customer_by_id!(id, actor: socket.assigns.current_user)
     )
   end
 
@@ -102,10 +96,7 @@ defmodule CraftplanWeb.CustomerLive.Index do
     |> assign(:page_title, "Editar cliente")
     |> assign(
       :customer,
-      Craftplan.CRM.get_customer_by_reference!(reference,
-        actor: socket.assigns.current_user,
-        load: [:billing_address, :shipping_address]
-      )
+      Craftplan.CRM.get_customer_by_reference!(reference, actor: socket.assigns.current_user)
     )
   end
 
@@ -131,6 +122,7 @@ defmodule CraftplanWeb.CustomerLive.Index do
 
   @impl true
   def handle_info({CraftplanWeb.CustomerLive.FormComponent, {:saved, customer}}, socket) do
+    customer = Ash.load!(customer, [:full_name], actor: socket.assigns.current_user)
     {:noreply, stream_insert(socket, :customers, customer)}
   end
 
@@ -149,9 +141,4 @@ defmodule CraftplanWeb.CustomerLive.Index do
         {:noreply, put_flash(socket, :error, "No se pudo eliminar el cliente.")}
     end
   end
-
-  defp customer_type_label(:individual), do: "Individual"
-  defp customer_type_label(:company), do: "Empresa"
-  defp customer_type_label(type) when is_binary(type), do: type |> String.to_existing_atom() |> customer_type_label()
-  defp customer_type_label(type), do: to_string(type)
 end

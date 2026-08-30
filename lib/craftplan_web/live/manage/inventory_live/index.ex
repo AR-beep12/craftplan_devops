@@ -28,9 +28,9 @@ defmodule CraftplanWeb.InventoryLive.Index do
     ~H"""
     <Page.page>
       <.header>
-        Pronóstico de uso
+        Inventario
         <:subtitle>
-          Revisa el pronóstico de uso de los materiales y ajusta los niveles de stock según corresponda.
+          Revisa el uso de los materiales y ajusta los niveles de stock según corresponda.
         </:subtitle>
 
         <:actions :if={@live_action in [:index, :forecast]}>

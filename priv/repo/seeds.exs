@@ -318,9 +318,7 @@ if System.get_env("SEED_DATA") == "true" or (Code.ensure_loaded?(Mix) and Mix.en
       first_name: first_name,
       last_name: last_name,
       email: email,
-      phone: phone,
-      billing_address: address_map,
-      shipping_address: address_map
+      phone: phone
     })
   end
 

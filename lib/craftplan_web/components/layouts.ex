@@ -535,6 +535,13 @@ defmodule CraftplanWeb.Layouts do
         prefix: "/manage/orders"
       },
       %{
+        label: "Productos",
+        navigate: ~p"/manage/products",
+        icon: :products,
+        nav_section: :products,
+        prefix: "/manage/products"
+      },
+      %{
         label: "Inventario",
         navigate: ~p"/manage/inventory",
         icon: :inventory,

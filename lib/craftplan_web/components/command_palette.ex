@@ -188,6 +188,15 @@ defmodule CraftplanWeb.Components.CommandPalette do
               />
 
               <.result_section
+                :if={@results.products != []}
+                title="Productos"
+                items={@results.products}
+                flat_results={@flat_results}
+                selected_index={@selected_index}
+                myself={@myself}
+              />
+
+              <.result_section
                 :if={@results.materials != []}
                 title="Materiales"
                 items={@results.materials}
@@ -394,6 +403,7 @@ defmodule CraftplanWeb.Components.CommandPalette do
   defp empty_results?(results) do
     results.pages == [] and
       results.actions == [] and
+      results.products == [] and
       results.materials == [] and
       results.orders == [] and
       results.customers == []

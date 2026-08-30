@@ -170,11 +170,7 @@ defmodule CraftplanWeb.Navigation do
         path: "/manage/inventory",
         pages: %{
           new_material: %{label: "Nuevo material", path: "/manage/inventory/new"},
-          forecast: %{label: "Pronóstico de uso", path: "/manage/inventory/forecast"},
-          reorder: %{label: "Planificador de reabastecimiento", path: "/manage/inventory/forecast/reorder"},
           material: &__MODULE__.crumb_material/1,
-          material_allergens: &__MODULE__.crumb_material_allergens/1,
-          material_nutrition: &__MODULE__.crumb_material_nutrition/1,
           material_stock: &__MODULE__.crumb_material_stock/1
         },
         sub_links: [

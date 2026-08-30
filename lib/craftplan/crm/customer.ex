@@ -7,8 +7,6 @@ defmodule Craftplan.CRM.Customer do
     authorizers: [Ash.Policy.Authorizer],
     extensions: [AshJsonApi.Resource, AshGraphql.Resource]
 
-  alias Craftplan.CRM.Address
-
   require Ash.Resource.Preparation.Builtins
 
   json_api do
@@ -126,12 +124,6 @@ defmodule Craftplan.CRM.Customer do
                   allow_empty?: false
     end
 
-    attribute :type, :atom do
-      allow_nil? false
-      public? true
-      constraints one_of: [:individual, :company]
-    end
-
     attribute :first_name, :string do
       allow_nil? false
       public? true
@@ -154,14 +146,6 @@ defmodule Craftplan.CRM.Customer do
       allow_nil? true
       public? true
       constraints max_length: 15
-    end
-
-    attribute :billing_address, Address do
-      public? true
-    end
-
-    attribute :shipping_address, Address do
-      public? true
     end
 
     timestamps()

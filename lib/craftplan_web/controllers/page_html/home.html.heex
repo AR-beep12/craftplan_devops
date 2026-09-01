@@ -1,20 +1,43 @@
-<section class="flex min-h-screen items-center justify-center bg-stone-50 px-6 py-12 text-stone-800">
-  <div class="flex flex-col items-center gap-8 text-center">
-    <div class="flex flex-row items-center gap-2 text-center">
-      <img src="/images/Hali-logo.svg" alt="Hali Logo" class="h-8 w-auto" />
-      <p class="text-lg tracking-tight text-stone-600">
-        <span>Craftplan</span>
-        · <span class="text-base italic text-stone-400">{@release_version}</span>
-      </p>
+<div class="min-h-screen bg-stone-50 text-stone-800">
+  <div class="mx-auto flex min-h-screen max-w-2xl flex-col items-center justify-center gap-10 px-6 py-16 text-center">
+    <div class="flex flex-col items-center gap-5">
+      <img src="/images/Hali-logo.svg" alt="Hali" class="h-12 w-auto" />
+      <div class="space-y-2">
+        <h1 class="text-2xl font-semibold tracking-tight text-stone-900 sm:text-3xl">
+          Bienvenida a tu espacio de trabajo
+        </h1>
+        <p class="text-base text-stone-600">
+          Pedidos, inventario y producción, todo en un solo lugar.
+        </p>
+      </div>
     </div>
 
-    <.link href={~p"/sign-in"} class="w-full sm:w-auto">
-      <.button variant={:default} size={:lg} class="group w-full justify-center sm:min-w-[14rem]">
-        <span class="mr-2 text-blue-500 transition-all group-hover:translate-x-1 group-hover:transform">
-          →
-        </span>
-        <span>Iniciar sesión en el espacio de trabajo</span>
+    <.link href={if @current_user, do: ~p"/manage/dashboard", else: ~p"/sign-in"}>
+      <.button
+        variant={:primary}
+        size={:lg}
+        class="group w-full justify-center gap-2 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md sm:w-auto sm:min-w-[14rem]"
+      >
+        <span>{if @current_user, do: "Ir a gestión", else: "Iniciar sesión"}</span>
+        <span class="transition-transform duration-150 group-hover:translate-x-1">→</span>
       </.button>
     </.link>
+
+    <div class="grid w-full grid-cols-2 gap-4 text-left sm:grid-cols-4">
+      <div
+        :for={mod <- landing_modules()}
+        class="group rounded-lg border border-stone-200 bg-white p-4 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-primary-200 hover:shadow-md"
+      >
+        <div class="mb-2 inline-flex h-9 w-9 items-center justify-center rounded-md bg-primary-50 text-primary-600 transition-transform duration-150 group-hover:scale-105">
+          <.icon name={mod.icon} class="h-5 w-5" />
+        </div>
+        <p class="text-sm font-semibold text-stone-900">{mod.label}</p>
+        <p class="mt-1 text-xs text-stone-500">{mod.description}</p>
+      </div>
+    </div>
+
+    <p class="text-xs text-stone-400">
+      Craftplan · {@release_version}
+    </p>
   </div>
-</section>
+</div>

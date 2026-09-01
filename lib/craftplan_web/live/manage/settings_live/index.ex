@@ -158,13 +158,6 @@ defmodule CraftplanWeb.SettingsLive.Index do
                 </div>
               </.form>
             </section>
-
-            <section class="border-primary-200 bg-primary-50 text-primary-800 rounded-md border border-dashed p-6 text-sm">
-              <h4 class="text-primary-900 font-semibold">Consejo</h4>
-              <p class="mt-2">
-                Mantén una instantánea de tus datos exportando según un cronograma. Las importaciones son idempotentes: volver a importar un CSV actualizado te permite mantener Craftplan y tus hojas de cálculo sincronizados.
-              </p>
-            </section>
           </aside>
         </div>
 

@@ -77,7 +77,7 @@ defmodule CraftplanWeb.Layouts do
           aria-label="Navegación principal"
         >
           <div class="flex h-16 items-center justify-between border-b border-stone-200 px-4">
-            <.logo_link />
+            <.logo_link current_user={@current_user} />
             <button
               type="button"
               class="rounded-md border border-stone-200 bg-white p-2 text-stone-600 transition hover:text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-400"
@@ -106,7 +106,7 @@ defmodule CraftplanWeb.Layouts do
           aria-label="Navegación principal"
         >
           <div class="min-h-14 flex items-center border-b border-stone-200 px-6">
-            <.logo_link />
+            <.logo_link current_user={@current_user} />
           </div>
 
           <.sidebar_content
@@ -170,7 +170,7 @@ defmodule CraftplanWeb.Layouts do
                   >
                     <.link
                       :if={not @is_manage?}
-                      navigate={~p"/manage/orders"}
+                      navigate={~p"/manage/dashboard"}
                       class="flex items-center gap-2 px-4 py-2 text-sm text-stone-600 transition hover:bg-stone-50 hover:text-stone-900"
                       role="menuitem"
                     >
@@ -340,6 +340,15 @@ defmodule CraftplanWeb.Layouts do
             stroke-linejoin="round"
             stroke-width="2"
             d="M4 6h16M4 10h16M4 14h16M4 18h16"
+          />
+        </svg>
+      <% :dashboard -> %>
+        <svg class={@classes} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 4h7v7H4V4zm9 0h7v7h-7V4zM4 13h7v7H4v-7zm9 0h7v7h-7v-7z"
           />
         </svg>
       <% :purchasing -> %>
@@ -544,6 +553,13 @@ defmodule CraftplanWeb.Layouts do
   defp manage_links do
     [
       %{
+        label: "Dashboard",
+        navigate: ~p"/manage/dashboard",
+        icon: :dashboard,
+        nav_section: :dashboard,
+        prefix: "/manage/dashboard"
+      },
+      %{
         label: "Pedidos",
         navigate: ~p"/manage/orders",
         icon: :orders,
@@ -666,9 +682,14 @@ defmodule CraftplanWeb.Layouts do
     end)
   end
 
+  attr :current_user, :any, default: nil
+
   defp logo_link(assigns) do
     ~H"""
-    <.link navigate={~p"/"} class="flex items-center gap-2">
+    <.link
+      navigate={if @current_user, do: ~p"/manage/dashboard", else: ~p"/"}
+      class="flex items-center gap-2"
+    >
       <img src={~p"/images/Hali-logo.svg"} class="h-7 w-auto" alt="Craftplan" />
       <span class="text-base font-semibold tracking-wide text-stone-800">
         Craftplan

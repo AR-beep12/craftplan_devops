@@ -12,7 +12,7 @@ config :craftplan, Craftplan.Repo,
   # Watch static and templates for browser reloading.
   password: "postgres",
   hostname: "localhost",
-  port: 5433,
+  port: 5432,
   database: "craftplan_dev",
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   stacktrace: true,

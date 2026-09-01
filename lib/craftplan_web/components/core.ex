@@ -110,7 +110,6 @@ defmodule CraftplanWeb.Components.Core do
               id={"#{@id}-container"}
               phx-window-keydown={JS.exec("data-cancel", to: "##{@id}")}
               phx-key="escape"
-              phx-click-away={JS.exec("data-cancel", to: "##{@id}")}
               class={[
                 if(@fullscreen,
                   do:

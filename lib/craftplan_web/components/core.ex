@@ -313,9 +313,9 @@ defmodule CraftplanWeb.Components.Core do
     """
   end
 
-  defp button_variant_classes(:primary), do: "bg-indigo-600 text-white border border-indigo-600 shadow-xs
-       hover:bg-indigo-500 active:bg-indigo-700
-       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:ring-offset-2
+  defp button_variant_classes(:primary), do: "bg-primary-600 text-white border border-primary-600 shadow-xs
+       hover:bg-primary-500 active:bg-primary-700
+       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2
        disabled:opacity-50 disabled:pointer-events-none"
 
   defp button_variant_classes(:default),

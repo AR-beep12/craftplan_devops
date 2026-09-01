@@ -18,7 +18,8 @@ defmodule CraftplanWeb.Navigation do
   alias Phoenix.LiveView.Socket
 
   @type section ::
-          :orders
+          :dashboard
+          | :orders
           | :inventory
           | :purchasing
           | :customers

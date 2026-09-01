@@ -16,6 +16,7 @@ defmodule CraftplanWeb.LiveNav do
 
     section =
       cond do
+        String.starts_with?(path, "/manage/dashboard") -> :dashboard
         String.starts_with?(path, "/manage/overview") -> :overview
         String.starts_with?(path, "/manage/production") -> :production
         String.starts_with?(path, "/manage/inventory") -> :inventory

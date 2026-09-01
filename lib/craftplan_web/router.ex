@@ -130,6 +130,9 @@ defmodule CraftplanWeb.Router do
         CraftplanWeb.LiveCommandPalette,
         {CraftplanWeb.LiveUserAuth, :live_staff_required}
       ] do
+      # Dashboard
+      live "/manage/dashboard", DashboardLive, :index
+
       # Products
       live "/manage/products", ProductLive.Index, :index
       live "/manage/products/new", ProductLive.Index, :new

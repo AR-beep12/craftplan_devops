@@ -7,12 +7,6 @@ defmodule Craftplan.Orders.ProductionBatch do
     authorizers: [Ash.Policy.Authorizer],
     extensions: [AshJsonApi.Resource, AshGraphql.Resource]
 
-  import Ash.Expr
-
-  alias Craftplan.Orders.Changes.BatchOpenInit
-
-  require Ash.Query
-
   json_api do
     type "production-batch"
 

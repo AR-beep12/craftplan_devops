@@ -90,20 +90,24 @@ defmodule CraftplanWeb.Navigation do
     %{label: "Artículos", path: ~p"/manage/orders/#{reference}/items"}
   end
 
-  def crumb_material(%{name: name, sku: sku}) do
-    %{label: name, path: ~p"/manage/inventory/#{sku}"}
+  def crumb_material(%{name: name} = material) do
+    id = Map.get(material, :id) || Map.get(material, :sku)
+    %{label: name, path: ~p"/manage/inventory/#{id}"}
   end
 
   def crumb_material_allergens(material) do
-    %{label: "Alérgenos", path: ~p"/manage/inventory/#{material.sku}/allergens"}
+    id = Map.get(material, :id) || Map.get(material, :sku)
+    %{label: "Alérgenos", path: ~p"/manage/inventory/#{id}/allergens"}
   end
 
   def crumb_material_nutrition(material) do
-    %{label: "Nutrición", path: ~p"/manage/inventory/#{material.sku}/nutritional_facts"}
+    id = Map.get(material, :id) || Map.get(material, :sku)
+    %{label: "Nutrición", path: ~p"/manage/inventory/#{id}/nutritional_facts"}
   end
 
   def crumb_material_stock(material) do
-    %{label: "Stock", path: ~p"/manage/inventory/#{material.sku}/stock"}
+    id = Map.get(material, :id) || Map.get(material, :sku)
+    %{label: "Stock", path: ~p"/manage/inventory/#{id}/stock"}
   end
 
   def crumb_production_batch(%{batch_code: batch_code}) do

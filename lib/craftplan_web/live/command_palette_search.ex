@@ -12,14 +12,14 @@ defmodule CraftplanWeb.CommandPaletteSearch do
     %{label: "Clientes", path: "/manage/customers", icon: :customers},
     %{label: "Configuración", path: "/manage/settings", icon: :settings}
   ]
-  
+
   @actions [
     %{label: "Nuevo pedido", path: "/manage/orders/new", icon: :orders},
     %{label: "Nuevo producto", path: "/manage/products/new", icon: :products},
     %{label: "Nuevo material", path: "/manage/inventory/new", icon: :inventory},
-    %{label: "Nuevo cliente", path: "/manage/customers/new", icon: :customers},
+    %{label: "Nuevo cliente", path: "/manage/customers/new", icon: :customers}
   ]
-  
+
   @doc """
   Searches all categories and returns grouped results.
   """
@@ -94,14 +94,14 @@ defmodule CraftplanWeb.CommandPaletteSearch do
     pattern = "%#{query}%"
 
     Craftplan.Inventory.Material
-    |> filter(ilike(name, ^pattern) or ilike(sku, ^pattern))
+    |> filter(ilike(name, ^pattern))
     |> limit(5)
     |> Ash.read!(actor: actor)
     |> Enum.map(fn m ->
       %{
         label: m.name,
-        sublabel: m.sku,
-        path: "/manage/inventory/#{m.sku}",
+        sublabel: m.color || m.extra_description || "",
+        path: "/manage/inventory/#{m.id}",
         icon: :inventory
       }
     end)

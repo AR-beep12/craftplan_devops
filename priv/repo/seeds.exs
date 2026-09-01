@@ -153,14 +153,13 @@ if System.get_env("SEED_DATA") == "true" or (Code.ensure_loaded?(Mix) and Mix.en
     user
   end
 
-  seed_material = fn name, sku, unit, price, min, max ->
+  seed_material = fn name, unit, color, quantity, extra_description ->
     Ash.Seed.seed!(Inventory.Material, %{
       name: name,
-      sku: sku,
       unit: unit,
-      price: Decimal.new(price),
-      minimum_stock: Decimal.new(min),
-      maximum_stock: Decimal.new(max)
+      color: color,
+      quantity: quantity && Decimal.new(quantity),
+      extra_description: extra_description
     })
   end
 
@@ -372,24 +371,24 @@ if System.get_env("SEED_DATA") == "true" or (Code.ensure_loaded?(Mix) and Mix.en
 
   # -- 3.5 Materials
   materials = %{
-    flour: seed_material.("All Purpose Flour", "FLOUR-001", :gram, "0.002", "5000", "20000"),
-    whole_wheat: seed_material.("Whole Wheat Flour", "FLOUR-002", :gram, "0.003", "3000", "15000"),
-    rye_flour: seed_material.("Rye Flour", "FLOUR-003", :gram, "0.004", "2000", "8000"),
-    gluten_free_mix: seed_material.("Gluten-Free Flour Mix", "GF-001", :gram, "0.005", "1000", "7000"),
-    oats: seed_material.("Rolled Oats", "OATS-001", :gram, "0.0025", "2000", "10000"),
-    almonds: seed_material.("Whole Almonds", "NUTS-001", :gram, "0.02", "2000", "10000"),
-    walnuts: seed_material.("Walnuts", "NUTS-002", :gram, "0.025", "1500", "8000"),
-    eggs: seed_material.("Fresh Eggs", "EGG-001", :piece, "0.15", "100", "500"),
-    milk: seed_material.("Whole Milk", "MILK-001", :milliliter, "0.003", "2000", "10000"),
-    butter: seed_material.("Butter", "DAIRY-001", :gram, "0.01", "1000", "5000"),
-    cream_cheese: seed_material.("Cream Cheese", "DAIRY-002", :gram, "0.015", "500", "3000"),
-    sugar: seed_material.("White Sugar", "SUGAR-001", :gram, "0.003", "3000", "15000"),
-    brown_sugar: seed_material.("Brown Sugar", "SUGAR-002", :gram, "0.004", "2000", "10000"),
-    chocolate: seed_material.("Dark Chocolate", "CHOC-001", :gram, "0.02", "2000", "8000"),
-    vanilla: seed_material.("Vanilla Extract", "FLAV-001", :milliliter, "0.15", "500", "2000"),
-    cinnamon: seed_material.("Ground Cinnamon", "SPICE-001", :gram, "0.006", "300", "1500"),
-    yeast: seed_material.("Active Dry Yeast", "YEAST-001", :gram, "0.05", "500", "2000"),
-    salt: seed_material.("Sea Salt", "SALT-001", :gram, "0.001", "1000", "5000")
+    flour: seed_material.("All Purpose Flour", :gram, "beige", "5000", "All Purpose Flour - demo"),
+    whole_wheat: seed_material.("Whole Wheat Flour", :gram, "beige", "3000", "Whole Wheat Flour - demo"),
+    rye_flour: seed_material.("Rye Flour", :gram, "beige", "2000", "Rye Flour - demo"),
+    gluten_free_mix: seed_material.("Gluten-Free Flour Mix", :gram, "beige", "1000", "Gluten-Free Flour Mix - demo"),
+    oats: seed_material.("Rolled Oats", :gram, "khaki", "2000", "Rolled Oats - demo"),
+    almonds: seed_material.("Whole Almonds", :gram, "tan", "2000", "Whole Almonds - demo"),
+    walnuts: seed_material.("Walnuts", :gram, "saddlebrown", "1500", "Walnuts - demo"),
+    eggs: seed_material.("Fresh Eggs", :piece, "ivory", "100", "Fresh Eggs - demo"),
+    milk: seed_material.("Whole Milk", :milliliter, "white", "2000", "Whole Milk - demo"),
+    butter: seed_material.("Butter", :gram, "gold", "1000", "Butter - demo"),
+    cream_cheese: seed_material.("Cream Cheese", :gram, "cream", "500", "Cream Cheese - demo"),
+    sugar: seed_material.("White Sugar", :gram, "white", "3000", "White Sugar - demo"),
+    brown_sugar: seed_material.("Brown Sugar", :gram, "white", "2000", "Brown Sugar - demo"),
+    chocolate: seed_material.("Dark Chocolate", :gram, "brown", "2000", "Dark Chocolate - demo"),
+    vanilla: seed_material.("Vanilla Extract", :milliliter, "lemonchiffon", "500", "Vanilla Extract - demo"),
+    cinnamon: seed_material.("Ground Cinnamon", :gram, "cinnamon", "300", "Ground Cinnamon - demo"),
+    yeast: seed_material.("Active Dry Yeast", :gram, "lightyellow", "500", "Active Dry Yeast - demo"),
+    salt: seed_material.("Sea Salt", :gram, "white", "1000", "Sea Salt - demo")
   }
 
   # -- 3.6 Link materials to relevant allergens
@@ -748,9 +747,9 @@ if System.get_env("SEED_DATA") == "true" or (Code.ensure_loaded?(Mix) and Mix.en
 
   # A) New materials to unlock more recipes
   new_materials = %{
-    blueberries: seed_material.("Blueberries", "FRUIT-001", :gram, "0.010", "500", "3000"),
-    sesame_seeds: seed_material.("Sesame Seeds", "SEED-001", :gram, "0.012", "500", "3000"),
-    peanut_butter: seed_material.("Peanut Butter", "PB-001", :gram, "0.015", "500", "3000")
+    blueberries: seed_material.("Blueberries", :gram, "blue", "500", "Blueberries - demo"),
+    sesame_seeds: seed_material.("Sesame Seeds", :gram, "gold", "500", "Sesame Seeds - demo"),
+    peanut_butter: seed_material.("Peanut Butter", :gram, "gold", "500", "Peanut Butter - demo")
   }
 
   materials = Map.merge(materials, new_materials)

@@ -1,12 +1,18 @@
 defmodule Craftplan.CSV.Importers.Materials do
   @moduledoc """
   CSV importer for materials (dry-run + import).
-  Expected headers: name, sku, unit, price.
+  Expected headers: name, unit, color, quantity, extra_description.
   """
 
   alias NimbleCSV.RFC4180, as: CSV
 
-  @type row :: %{name: String.t(), sku: String.t(), unit: atom(), price: Decimal.t()}
+  @type row :: %{
+          name: String.t(),
+          unit: atom(),
+          color: String.t() | nil,
+          quantity: Decimal.t() | nil,
+          extra_description: String.t() | nil
+        }
   @type error :: %{row: non_neg_integer(), message: String.t()}
 
   @spec dry_run(String.t(), keyword) :: {:ok, %{rows: [row()], errors: [error()]}}
@@ -76,12 +82,16 @@ defmodule Craftplan.CSV.Importers.Materials do
           |> Enum.reduce({0, 0, []}, fn {fields, line}, {acc_i, acc_u, acc_e} ->
             case cast_row(fields, header_map) do
               {:ok, row} ->
-                attrs = %{
-                  name: row.name,
-                  sku: row.sku,
-                  unit: row.unit,
-                  price: row.price
-                }
+                attrs =
+                  %{
+                    name: row.name,
+                    unit: row.unit,
+                    color: row.color,
+                    quantity: row.quantity,
+                    extra_description: row.extra_description
+                  }
+                  |> Enum.reject(fn {_k, v} -> is_nil(v) end)
+                  |> Map.new()
 
                 case upsert_material(attrs, actor) do
                   {:ok, :inserted} ->
@@ -105,8 +115,8 @@ defmodule Craftplan.CSV.Importers.Materials do
 
   defp upsert_material(attrs, actor) do
     attrs
-    |> Map.fetch!(:sku)
-    |> Craftplan.Inventory.get_material_by_sku(actor: actor)
+    |> Map.fetch!(:name)
+    |> Craftplan.Inventory.get_material_by_name(actor: actor)
     |> do_upsert_material(attrs, actor)
   end
 
@@ -137,7 +147,7 @@ defmodule Craftplan.CSV.Importers.Materials do
   defp apply_mapping(header_map, mapping) when mapping == %{}, do: header_map
 
   defp apply_mapping(header_map, mapping) do
-    Enum.reduce(["name", "sku", "unit", "price"], header_map, fn field, acc ->
+    Enum.reduce(["name", "unit", "color", "quantity", "extra_description"], header_map, fn field, acc ->
       case Map.get(mapping, field) do
         nil ->
           acc
@@ -160,17 +170,31 @@ defmodule Craftplan.CSV.Importers.Materials do
 
   defp cast_row(fields, header_map) do
     name = fields |> fetch_field(header_map, "name") |> to_string() |> String.trim()
-    sku = fields |> fetch_field(header_map, "sku") |> to_string() |> String.trim()
     unit_str = fields |> fetch_field(header_map, "unit") |> to_string() |> String.trim()
-    price_str = fields |> fetch_field(header_map, "price") |> to_string() |> String.trim()
+    color = fields |> fetch_field(header_map, "color") |> to_string() |> String.trim()
+    quantity_str = fields |> fetch_field(header_map, "quantity") |> to_string() |> String.trim()
+    extra_description = fields |> fetch_field(header_map, "extra_description") |> to_string() |> String.trim()
 
+    # Legacy support: sku/price may still appear in old CSVs but are ignored
     with :ok <- present?(name, "name"),
-         :ok <- present?(sku, "sku"),
          {:ok, unit} <- parse_unit(unit_str),
-         {:ok, price} <- parse_decimal(price_str) do
-      {:ok, %{name: name, sku: sku, unit: unit, price: price}}
+         {:ok, quantity} <- parse_optional_decimal(quantity_str) do
+      {:ok,
+       %{
+         name: name,
+         unit: unit,
+         color: present_or_nil(color),
+         quantity: quantity,
+         extra_description: present_or_nil(extra_description)
+       }}
     end
   end
+
+  defp present_or_nil(""), do: nil
+  defp present_or_nil(val), do: val
+
+  defp parse_optional_decimal(""), do: {:ok, nil}
+  defp parse_optional_decimal(str), do: parse_decimal(str)
 
   defp present?("", field), do: {:error, "Missing #{field}"}
   defp present?(_val, _field), do: :ok

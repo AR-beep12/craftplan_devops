@@ -129,7 +129,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                           <%= if component_type == :material do %>
                             <.link
                               :if={material}
-                              navigate={~p"/manage/inventory/#{material.sku}"}
+                              navigate={~p"/manage/inventory/#{material.id}"}
                               class="hover:text-blue-800 hover:underline"
                             >
                               {material.name}
@@ -595,11 +595,11 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                     </div>
 
                     <div class="relative border-r border-b border-stone-200 p-0 pl-4">
-                      <div class="font-mono block py-3 text-xs text-stone-600">{material.sku}</div>
+                      <div class="block py-3 text-xs text-stone-600">{material.color || "—"}</div>
                     </div>
                     <div class="relative border-b border-stone-200 p-0 pl-4">
                       <div class="block py-3 text-sm text-stone-800">
-                        {format_money(@settings.currency, material.price || D.new(0))} por {material.unit}
+                        {material.quantity && Decimal.to_string(material.quantity) || "0"}
                       </div>
                     </div>
                   </button>
@@ -1062,7 +1062,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                         (comp_form.data.material && comp_form.data.material.id)))
 
               material = Map.get(socket.assigns.materials_map, material_id)
-              price = (material && (material.price || D.new(0))) || D.new(0)
+              price = (material && (Map.get(material, :price) || D.new(0))) || D.new(0)
               D.mult(price, normalize_decimal(qty))
           end
 
@@ -1303,8 +1303,9 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
     else
       Enum.filter(materials, fn m ->
         name = String.downcase(m.name || "")
-        sku = String.downcase(m.sku || "")
-        String.contains?(name, q) or String.contains?(sku, q)
+        color = String.downcase(m.color || "")
+        desc = String.downcase(m.extra_description || "")
+        String.contains?(name, q) or String.contains?(color, q) or String.contains?(desc, q)
       end)
     end
   end
@@ -1419,7 +1420,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
   end
 
   defp format_material_cost(currency, material, quantity) do
-    price = material.price || D.new(0)
+    price = Map.get(material || %{}, :price, D.new(0)) || D.new(0)
     qty = normalize_decimal(quantity)
 
     format_money(currency, D.mult(price, qty))

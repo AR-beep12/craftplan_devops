@@ -73,7 +73,7 @@ defmodule CraftplanWeb.Layouts do
 
         <aside
           id="mobile-sidebar-panel"
-          class="fixed inset-y-0 left-0 z-50 w-72 -translate-x-full transform bg-stone-50 shadow-lg transition-transform duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-400"
+          class="fixed inset-y-0 left-0 z-50 w-72 -translate-x-full transform bg-gradient-to-b from-primary-50/50 via-stone-50 to-stone-50 shadow-lg transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400"
           aria-label="Navegación principal"
         >
           <div class="flex h-16 items-center justify-between border-b border-stone-200 px-4">
@@ -102,7 +102,7 @@ defmodule CraftplanWeb.Layouts do
 
       <div class="flex min-h-screen bg-stone-50 text-stone-800">
         <aside
-          class="bg-stone-50/90 hidden border-r border-stone-200 backdrop-blur md:fixed md:inset-y-0 md:flex md:w-72 md:flex-col"
+          class="hidden border-r border-stone-200 bg-gradient-to-b from-primary-50/40 via-stone-50/90 to-stone-50/90 backdrop-blur md:fixed md:inset-y-0 md:flex md:w-72 md:flex-col"
           aria-label="Navegación principal"
         >
           <div class="min-h-14 flex items-center border-b border-stone-200 px-6">
@@ -234,10 +234,19 @@ defmodule CraftplanWeb.Layouts do
               class={nav_link_classes(link.active)}
               data-active={link.active}
             >
-              <.nav_icon name={link.icon} />
+              <.nav_icon
+                name={link.icon}
+                class={
+                  "transition-transform duration-150 group-hover:translate-x-0.5" <>
+                    if(link.active, do: " text-primary-600", else: "")
+                }
+              />
               <span>{link.label}</span>
             </.link>
-            <div :if={link.active and @nav_sub_links != []} class="mt-2 space-y-2">
+            <div
+              :if={link.active and @nav_sub_links != []}
+              class="sidebar-reveal mt-2 space-y-2"
+            >
               <p
                 :if={@nav_sub_label}
                 class="px-3 text-xs font-medium uppercase tracking-wide text-stone-400"
@@ -253,7 +262,11 @@ defmodule CraftplanWeb.Layouts do
                     role={if(@sub_nav_role, do: "tab", else: nil)}
                   >
                     <span class="flex items-center gap-2">
-                      <.nav_icon :if={sub[:icon]} name={sub.icon} class="h-3.5 w-3.5 text-stone-500" />
+                      <.nav_icon
+                        :if={sub[:icon]}
+                        name={sub.icon}
+                        class={"h-3.5 w-3.5 " <> if(sub.active, do: "text-primary-600", else: "text-stone-500")}
+                      />
                       <span>{sub.label}</span>
                     </span>
                     <span :if={sub[:description]} class="block text-xs text-stone-400">
@@ -269,15 +282,18 @@ defmodule CraftplanWeb.Layouts do
 
       <div
         :if={!@is_manage?}
-        class="bg-stone-100/60 mt-6 rounded-lg border border-stone-200 p-4 text-sm text-stone-600"
+        class="mt-6 rounded-lg border border-primary-100 bg-primary-50/40 p-4 text-sm text-stone-600"
       >
         <div :if={@current_user} class="space-y-3">
           <.link
             navigate={~p"/manage/orders"}
-            class="flex items-center justify-between rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium text-stone-600 transition hover:border-stone-300 hover:text-stone-900"
+            class="group flex items-center justify-between rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium text-stone-600 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-primary-200 hover:text-primary-700 hover:shadow-md"
           >
             <span>Ir a gestión</span>
-            <.nav_icon name={:chevron_right} />
+            <.nav_icon
+              name={:chevron_right}
+              class="transition-transform duration-200 group-hover:translate-x-0.5"
+            />
           </.link>
         </div>
 
@@ -285,7 +301,7 @@ defmodule CraftplanWeb.Layouts do
           <p>¿Listo para gestionar tu flujo de producción?</p>
           <.link
             href={~p"/sign-in"}
-            class="inline-flex items-center gap-2 rounded-md bg-black px-3 py-2 text-sm font-medium text-white transition hover:bg-stone-900"
+            class="inline-flex items-center gap-2 rounded-md bg-primary-600 px-3 py-2 text-sm font-medium text-white shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-500 hover:shadow-md"
           >
             <.nav_icon name={:login} class="text-white" /> Iniciar sesión
           </.link>
@@ -494,19 +510,19 @@ defmodule CraftplanWeb.Layouts do
   end
 
   defp nav_link_classes(true) do
-    "group flex items-center gap-3 rounded-md border border-transparent bg-stone-200/70 px-3 py-2 text-sm font-medium text-stone-900 transition hover:bg-stone-200"
+    "group flex items-center gap-3 rounded-md border border-transparent bg-primary-50 px-3 py-2 text-sm font-medium text-primary-700 transition-colors duration-200 hover:bg-primary-100"
   end
 
   defp nav_link_classes(false) do
-    "group flex items-center gap-3 rounded-md border border-transparent px-3 py-2 text-sm font-medium text-stone-600 transition hover:bg-stone-200/50 hover:text-stone-900"
+    "group flex items-center gap-3 rounded-md border border-transparent px-3 py-2 text-sm font-medium text-stone-600 transition-colors duration-200 hover:bg-primary-50/60 hover:text-primary-700"
   end
 
   defp sub_nav_link_classes(true) do
-    "flex w-full items-start justify-between gap-2 rounded-md border border-transparent bg-stone-200/70 px-3 py-1.5 text-sm font-medium text-stone-900 transition hover:bg-stone-200"
+    "flex w-full items-start justify-between gap-2 rounded-md border border-transparent bg-primary-50 px-3 py-1.5 text-sm font-medium text-primary-700 transition-colors duration-200 hover:bg-primary-100"
   end
 
   defp sub_nav_link_classes(false) do
-    "flex w-full items-start justify-between gap-2 rounded-md border border-transparent px-3 py-1.5 text-sm text-stone-600 transition hover:bg-stone-200/50 hover:text-stone-900"
+    "flex w-full items-start justify-between gap-2 rounded-md border border-transparent px-3 py-1.5 text-sm text-stone-600 transition-colors duration-200 hover:bg-primary-50/60 hover:text-primary-700"
   end
 
   defp show_sidebar(js \\ %JS{}) do

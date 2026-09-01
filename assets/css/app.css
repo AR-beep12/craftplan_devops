@@ -1,8 +1,8 @@
-@variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:where(.dark, .dark *));
 
-@variant phx-click-loading (.phx-click-loading&, .phx-click-loading &);
-@variant phx-submit-loading (.phx-submit-loading&, .phx-submit-loading &);
-@variant phx-change-loading (.phx-change-loading&, .phx-change-loading &);
+@custom-variant phx-click-loading (.phx-click-loading&, .phx-click-loading &);
+@custom-variant phx-submit-loading (.phx-submit-loading&, .phx-submit-loading &);
+@custom-variant phx-change-loading (.phx-change-loading&, .phx-change-loading &);
 
 @import "tailwindcss";
 
@@ -10,11 +10,44 @@
 @plugin "./tailwind_heroicons.js";
 
 @theme {
-    --color-brand: "#FD4F00";
+    /* Derived from the Hali logo mark (#D6529C, oklch 63.4% 0.1825 348.8) */
+    --color-brand: oklch(63.4% 0.1825 348.8);
+
+    --color-primary-50: oklch(97.5% 0.014 348.8);
+    --color-primary-100: oklch(94.5% 0.028 348.8);
+    --color-primary-200: oklch(88.5% 0.052 348.8);
+    --color-primary-300: oklch(80.5% 0.085 348.8);
+    --color-primary-400: oklch(71.0% 0.13 348.8);
+    --color-primary-500: oklch(63.4% 0.1825 348.8);
+    --color-primary-600: oklch(56.0% 0.185 348.8);
+    --color-primary-700: oklch(47.0% 0.165 348.8);
+    --color-primary-800: oklch(39.0% 0.135 348.8);
+    --color-primary-900: oklch(32.0% 0.105 348.8);
+    --color-primary-950: oklch(22.0% 0.075 348.8);
+
+    --ease-confident: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 button {
     cursor: pointer;
+}
+
+/* Sidebar sub-nav reveal: the one authored motion moment when a section
+   expands to show its sub-links. Keyframe (not transition) so it plays
+   on mount, since Phoenix's :if fully inserts the node. */
+@keyframes sidebar-reveal {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.sidebar-reveal {
+    animation: sidebar-reveal 240ms var(--ease-confident);
 }
 
 /* Kanban Drag and Drop Styles */

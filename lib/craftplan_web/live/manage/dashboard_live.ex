@@ -20,15 +20,15 @@ defmodule CraftplanWeb.DashboardLive do
         load: [customer: [:full_name]]
       )
 
-    low_stock_materials = load_low_stock_materials(actor)
+    out_of_stock_materials = load_out_of_stock_materials(actor)
 
     socket =
       socket
       |> assign(:page_title, "Dashboard")
       |> assign(:upcoming_orders, pending_page.results)
       |> assign(:pending_orders_count, pending_page.count)
-      |> assign(:low_stock_materials, Enum.take(low_stock_materials, 5))
-      |> assign(:low_stock_count, length(low_stock_materials))
+      |> assign(:out_of_stock_materials, Enum.take(out_of_stock_materials, 5))
+      |> assign(:out_of_stock_count, length(out_of_stock_materials))
 
     {:ok, socket}
   end
@@ -67,9 +67,9 @@ defmodule CraftplanWeb.DashboardLive do
           </div>
           <div>
             <p class="text-xs font-medium uppercase tracking-wide text-stone-500">
-              Materiales con stock bajo
+              Materiales sin stock
             </p>
-            <p class="text-2xl font-semibold text-stone-900">{@low_stock_count}</p>
+            <p class="text-2xl font-semibold text-stone-900">{@out_of_stock_count}</p>
           </div>
         </div>
       </div>
@@ -110,28 +110,25 @@ defmodule CraftplanWeb.DashboardLive do
           <Page.surface>
             <:header>
               <div>
-                <h3 class="text-sm font-semibold text-stone-900">Stock bajo</h3>
-                <p class="text-xs text-stone-500">Materiales en o por debajo de su mínimo.</p>
+                <h3 class="text-sm font-semibold text-stone-900">Sin stock</h3>
+                <p class="text-xs text-stone-500">Materiales que necesitás reponer.</p>
               </div>
             </:header>
             <.table
-              id="dashboard-low-stock"
-              rows={@low_stock_materials}
+              id="dashboard-out-of-stock"
+              rows={@out_of_stock_materials}
               variant={:compact}
               zebra
               no_margin
-              row_click={fn row -> JS.navigate("/manage/inventory/#{row.sku}") end}
+              row_click={fn row -> JS.navigate("/manage/inventory/#{row.id}") end}
             >
               <:col :let={row} label="Material">{row.name}</:col>
               <:col :let={row} label="Actual" align={:right}>
                 {format_amount(row.unit, row.current_stock)}
               </:col>
-              <:col :let={row} label="Mínimo" align={:right}>
-                {format_amount(row.unit, row.minimum_stock)}
-              </:col>
               <:empty>
                 <div class="rounded-md border border-dashed border-stone-200 bg-stone-50 py-6 text-center text-sm text-stone-500">
-                  Todos los materiales están en buen nivel.
+                  Todos los materiales tienen stock disponible.
                 </div>
               </:empty>
             </.table>
@@ -142,12 +139,11 @@ defmodule CraftplanWeb.DashboardLive do
     """
   end
 
-  defp load_low_stock_materials(actor) do
+  defp load_out_of_stock_materials(actor) do
     actor
     |> then(&Inventory.list_materials!(actor: &1, load: [:current_stock]))
     |> Enum.filter(fn material ->
-      not is_nil(material.minimum_stock) and
-        Decimal.compare(material.current_stock, material.minimum_stock) != :gt
+      is_nil(material.current_stock) or Decimal.compare(material.current_stock, Decimal.new(0)) != :gt
     end)
     |> Enum.sort_by(& &1.name)
   end

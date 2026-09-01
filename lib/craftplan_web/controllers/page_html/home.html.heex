@@ -12,20 +12,23 @@
       </div>
     </div>
 
-    <.link
-      href={if @current_user, do: ~p"/manage/dashboard", else: ~p"/sign-in"}
-      class="group inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-rose-600 px-5 text-base font-medium text-white shadow-xs transition hover:bg-rose-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/50 focus-visible:ring-offset-2 sm:w-auto sm:min-w-[14rem]"
-    >
-      <span>{if @current_user, do: "Ir a gestión", else: "Iniciar sesión"}</span>
-      <span class="transition-transform group-hover:translate-x-1">→</span>
+    <.link href={if @current_user, do: ~p"/manage/dashboard", else: ~p"/sign-in"}>
+      <.button
+        variant={:primary}
+        size={:lg}
+        class="group w-full justify-center gap-2 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md sm:w-auto sm:min-w-[14rem]"
+      >
+        <span>{if @current_user, do: "Ir a gestión", else: "Iniciar sesión"}</span>
+        <span class="transition-transform duration-150 group-hover:translate-x-1">→</span>
+      </.button>
     </.link>
 
     <div class="grid w-full grid-cols-2 gap-4 text-left sm:grid-cols-4">
       <div
         :for={mod <- landing_modules()}
-        class="rounded-lg border border-stone-200 bg-white p-4"
+        class="group rounded-lg border border-stone-200 bg-white p-4 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-primary-200 hover:shadow-md"
       >
-        <div class="mb-2 inline-flex h-9 w-9 items-center justify-center rounded-md bg-rose-50 text-rose-600">
+        <div class="mb-2 inline-flex h-9 w-9 items-center justify-center rounded-md bg-primary-50 text-primary-600 transition-transform duration-150 group-hover:scale-105">
           <.icon name={mod.icon} class="h-5 w-5" />
         </div>
         <p class="text-sm font-semibold text-stone-900">{mod.label}</p>

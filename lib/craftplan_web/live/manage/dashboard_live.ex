@@ -50,17 +50,27 @@ defmodule CraftplanWeb.DashboardLive do
       </.header>
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div class="rounded-lg border border-stone-200 bg-white p-4">
-          <p class="text-xs font-medium uppercase tracking-wide text-stone-500">
-            Pedidos pendientes
-          </p>
-          <p class="mt-1 text-2xl font-semibold text-stone-900">{@pending_orders_count}</p>
+        <div class="flex items-center gap-4 rounded-lg border border-stone-200 bg-white p-4 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-primary-200 hover:shadow-md">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary-50 text-primary-600">
+            <.icon name="hero-shopping-bag-solid" class="h-5 w-5" />
+          </div>
+          <div>
+            <p class="text-xs font-medium uppercase tracking-wide text-stone-500">
+              Pedidos pendientes
+            </p>
+            <p class="text-2xl font-semibold text-stone-900">{@pending_orders_count}</p>
+          </div>
         </div>
-        <div class="rounded-lg border border-stone-200 bg-white p-4">
-          <p class="text-xs font-medium uppercase tracking-wide text-stone-500">
-            Materiales con stock bajo
-          </p>
-          <p class="mt-1 text-2xl font-semibold text-stone-900">{@low_stock_count}</p>
+        <div class="flex items-center gap-4 rounded-lg border border-stone-200 bg-white p-4 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-primary-200 hover:shadow-md">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary-50 text-primary-600">
+            <.icon name="hero-archive-box-solid" class="h-5 w-5" />
+          </div>
+          <div>
+            <p class="text-xs font-medium uppercase tracking-wide text-stone-500">
+              Materiales con stock bajo
+            </p>
+            <p class="text-2xl font-semibold text-stone-900">{@low_stock_count}</p>
+          </div>
         </div>
       </div>
 

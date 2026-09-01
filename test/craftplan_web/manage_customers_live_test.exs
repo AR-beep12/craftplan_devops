@@ -12,12 +12,9 @@ defmodule CraftplanWeb.ManageCustomersLiveTest do
 
     Customer
     |> Ash.Changeset.for_create(:create, %{
-      type: :individual,
       first_name: first,
       last_name: last,
-      email: email,
-      billing_address: %{street: "1 St", city: "X", country: "Y"},
-      shipping_address: %{street: "1 St", city: "X", country: "Y"}
+      email: email
     })
     |> Ash.create!()
   end
@@ -53,25 +50,18 @@ defmodule CraftplanWeb.ManageCustomersLiveTest do
     end
 
     @tag role: :staff
-    test "renders details tab when billing_address is nil (imported customer)", %{conn: conn} do
-      # Bottle-imported customers have a shipping_address but no billing_address.
+    test "renders details tab when customer has no address (imported customer)", %{conn: conn} do
       c =
         Customer
         |> Ash.Changeset.for_create(:create, %{
-          type: :individual,
           first_name: "Imported",
           last_name: "Buyer",
-          email: "imported+#{System.unique_integer([:positive])}@local",
-          shipping_address: %{street: "1 St", city: "DC", country: "US"}
+          email: "imported+#{System.unique_integer([:positive])}@local"
         })
         |> Ash.create!()
 
-      assert is_nil(c.billing_address)
-
       {:ok, view, _html} = live(conn, ~p"/manage/customers/#{c.reference}")
       assert render(view) =~ "Imported"
-      assert render(view) =~ "Billing Address"
-      assert render(view) =~ "Shipping Address"
     end
 
     @tag role: :staff

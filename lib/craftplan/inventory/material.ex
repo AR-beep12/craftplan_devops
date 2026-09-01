@@ -47,11 +47,10 @@ defmodule Craftplan.Inventory.Material do
       :destroy,
       create: [
         :name,
-        :sku,
         :unit,
-        :price,
-        :minimum_stock,
-        :maximum_stock
+        :color,
+        :quantity,
+        :extra_description
       ]
     ]
 
@@ -61,11 +60,10 @@ defmodule Craftplan.Inventory.Material do
 
       accept [
         :name,
-        :sku,
         :unit,
-        :price,
-        :minimum_stock,
-        :maximum_stock
+        :color,
+        :quantity,
+        :extra_description
       ]
 
       change Craftplan.Inventory.Changes.RefreshAffectedBomRollups
@@ -133,32 +131,25 @@ defmodule Craftplan.Inventory.Material do
                   match: ~r/^[\p{L}\p{N}\w\s\-\.&・（）「」]+$/u
     end
 
-    attribute :sku, :string do
-      public? true
-      allow_nil? false
-
-      constraints min_length: 2,
-                  max_length: 50
-    end
-
     attribute :unit, :unit do
       public? true
-      allow_nil? false
+      allow_nil? true
+      default :piece
     end
 
-    attribute :price, :decimal do
+    attribute :color, :string do
       public? true
-      allow_nil? false
+      constraints max_length: 50
     end
 
-    attribute :minimum_stock, :decimal do
-      public? true
-      constraints min: 0
-    end
-
-    attribute :maximum_stock, :decimal do
+    attribute :quantity, :decimal do
       public? true
       constraints min: 0
+    end
+
+    attribute :extra_description, :string do
+      public? true
+      constraints max_length: 500
     end
 
     timestamps()
@@ -177,10 +168,5 @@ defmodule Craftplan.Inventory.Material do
 
   aggregates do
     sum :current_stock, :movements, :quantity
-  end
-
-  identities do
-    identity :name, [:name]
-    identity :sku, [:sku]
   end
 end

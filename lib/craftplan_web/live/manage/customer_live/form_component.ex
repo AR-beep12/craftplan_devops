@@ -14,13 +14,6 @@ defmodule CraftplanWeb.CustomerLive.FormComponent do
         phx-submit="save"
       >
         <div class="mt-4 space-y-8 bg-white">
-          <.input
-            field={@form[:type]}
-            type="radiogroup"
-            options={[{"Individual", :individual}, {"Empresa", :company}]}
-            value={@form[:type].value || :individual}
-          />
-
           <div class="space-y-4">
             <div class="flex flex-row space-x-4">
               <.input field={@form[:first_name]} type="text" label="Nombre" />
@@ -28,37 +21,6 @@ defmodule CraftplanWeb.CustomerLive.FormComponent do
             </div>
             <.input field={@form[:email]} type="email" label="Correo electrónico" />
             <.input field={@form[:phone]} type="tel" label="Teléfono" />
-          </div>
-
-          <div class="flex flex-col space-y-4">
-            <div class="space-y-4">
-              <label class="text-sm font-semibold leading-6 text-zinc-800">
-                Dirección de facturación
-              </label>
-              <.inputs_for :let={f_addr} field={@form[:billing_address]}>
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <.input field={f_addr[:street]} type="text" label="Calle" />
-                  <.input field={f_addr[:city]} type="text" label="Ciudad" />
-                  <.input field={f_addr[:state]} type="text" label="Estado/Provincia" />
-                  <.input field={f_addr[:zip]} type="text" label="Código postal" />
-                  <.input field={f_addr[:country]} type="text" label="País" />
-                </div>
-              </.inputs_for>
-            </div>
-            <div class="space-y-4">
-              <label class="text-sm font-semibold leading-6 text-zinc-800">
-                Dirección de envío
-              </label>
-              <.inputs_for :let={f_addr} field={@form[:shipping_address]}>
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <.input field={f_addr[:street]} type="text" label="Calle" />
-                  <.input field={f_addr[:city]} type="text" label="Ciudad" />
-                  <.input field={f_addr[:state]} type="text" label="Estado/Provincia" />
-                  <.input field={f_addr[:zip]} type="text" label="Código postal" />
-                  <.input field={f_addr[:country]} type="text" label="País" />
-                </div>
-              </.inputs_for>
-            </div>
           </div>
         </div>
 
@@ -104,36 +66,12 @@ defmodule CraftplanWeb.CustomerLive.FormComponent do
       if customer do
         AshPhoenix.Form.for_update(customer, :update,
           as: "customer",
-          actor: socket.assigns.current_user,
-          forms: [
-            billing_address: [
-              data: customer.billing_address || %{},
-              create_action: :create,
-              update_action: :update
-            ],
-            shipping_address: [
-              data: customer.shipping_address || %{},
-              create_action: :create,
-              update_action: :update
-            ]
-          ]
+          actor: socket.assigns.current_user
         )
       else
         AshPhoenix.Form.for_create(Craftplan.CRM.Customer, :create,
           as: "customer",
-          actor: socket.assigns.current_user,
-          forms: [
-            billing_address: [
-              data: %{},
-              create_action: :create,
-              update_action: :update
-            ],
-            shipping_address: [
-              data: %{},
-              create_action: :create,
-              update_action: :update
-            ]
-          ]
+          actor: socket.assigns.current_user
         )
       end
 

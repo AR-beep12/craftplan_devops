@@ -7,17 +7,19 @@ defmodule CraftplanWeb.CommandPaletteSearch do
 
   @pages [
     %{label: "Pedidos", path: "/manage/orders", icon: :orders},
+    %{label: "Productos", path: "/manage/products", icon: :products},
     %{label: "Inventario", path: "/manage/inventory", icon: :inventory},
     %{label: "Clientes", path: "/manage/customers", icon: :customers},
     %{label: "Configuración", path: "/manage/settings", icon: :settings}
   ]
-  
+
   @actions [
     %{label: "Nuevo pedido", path: "/manage/orders/new", icon: :orders},
+    %{label: "Nuevo producto", path: "/manage/products/new", icon: :products},
     %{label: "Nuevo material", path: "/manage/inventory/new", icon: :inventory},
-    %{label: "Nuevo cliente", path: "/manage/customers/new", icon: :customers},
+    %{label: "Nuevo cliente", path: "/manage/customers/new", icon: :customers}
   ]
-  
+
   @doc """
   Searches all categories and returns grouped results.
   """
@@ -28,6 +30,7 @@ defmodule CraftplanWeb.CommandPaletteSearch do
       %{
         pages: @pages,
         actions: @actions,
+        products: [],
         materials: [],
         orders: [],
         customers: []
@@ -36,6 +39,7 @@ defmodule CraftplanWeb.CommandPaletteSearch do
       %{
         pages: search_static(@pages, query),
         actions: search_static(@actions, query),
+        products: search_products(query, actor),
         materials: search_materials(query, actor),
         orders: search_orders(query, actor),
         customers: search_customers(query, actor)
@@ -50,6 +54,7 @@ defmodule CraftplanWeb.CommandPaletteSearch do
     List.flatten([
       Enum.map(results.pages, &Map.put(&1, :category, :pages)),
       Enum.map(results.actions, &Map.put(&1, :category, :actions)),
+      Enum.map(results.products, &Map.put(&1, :category, :products)),
       Enum.map(results.materials, &Map.put(&1, :category, :materials)),
       Enum.map(results.orders, &Map.put(&1, :category, :orders)),
       Enum.map(results.customers, &Map.put(&1, :category, :customers))
@@ -66,18 +71,37 @@ defmodule CraftplanWeb.CommandPaletteSearch do
     |> Enum.take(5)
   end
 
+  defp search_products(query, actor) do
+    pattern = "%#{query}%"
+
+    Craftplan.Catalog.Product
+    |> filter(ilike(name, ^pattern) or ilike(sku, ^pattern))
+    |> limit(5)
+    |> Ash.read!(actor: actor)
+    |> Enum.map(fn p ->
+      %{
+        label: p.name,
+        sublabel: p.sku,
+        path: "/manage/products/#{p.sku}",
+        icon: :products
+      }
+    end)
+  rescue
+    _ -> []
+  end
+
   defp search_materials(query, actor) do
     pattern = "%#{query}%"
 
     Craftplan.Inventory.Material
-    |> filter(ilike(name, ^pattern) or ilike(sku, ^pattern))
+    |> filter(ilike(name, ^pattern))
     |> limit(5)
     |> Ash.read!(actor: actor)
     |> Enum.map(fn m ->
       %{
         label: m.name,
-        sublabel: m.sku,
-        path: "/manage/inventory/#{m.sku}",
+        sublabel: m.color || m.extra_description || "",
+        path: "/manage/inventory/#{m.id}",
         icon: :inventory
       }
     end)

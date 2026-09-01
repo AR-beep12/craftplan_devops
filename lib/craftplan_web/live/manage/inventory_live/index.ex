@@ -28,9 +28,9 @@ defmodule CraftplanWeb.InventoryLive.Index do
     ~H"""
     <Page.page>
       <.header>
-        Pronóstico de uso
+        Inventario
         <:subtitle>
-          Revisa el pronóstico de uso de los materiales y ajusta los niveles de stock según corresponda.
+          Revisa el uso de los materiales y ajusta los niveles de stock según corresponda.
         </:subtitle>
 
         <:actions :if={@live_action in [:index, :forecast]}>
@@ -40,214 +40,159 @@ defmodule CraftplanWeb.InventoryLive.Index do
         </:actions>
       </.header>
 
-      <Page.section>
-        <Page.two_column :if={@live_action == :index}>
-          <:left>
+
+        <Page.surface>
+          <.table
+            id="materials"
+            rows={@streams.materials}
+            row_id={fn {dom_id, _} -> dom_id end}
+            row_click={fn {_, material} -> JS.navigate(~p"/manage/inventory/#{material.id}") end}
+          >
+            <:col :let={{_, material}} label="">
+              <span
+                :if={out_of_stock?(material.current_stock)}
+                class="inline-flex items-center justify-center"
+                title="Out of stock"
+              >
+                <.icon name="hero-exclamation-triangle" class="h-5 w-5 text-rose-500" />
+              </span>
+            </:col>
+
+            <:col :let={{_, material}} label="Material">{material.name}</:col>
+
+            <:col :let={{_, material}} label="ID">
+              <.kbd>{String.slice(material.id, 0, 8)}</.kbd>
+            </:col>
+
+            <:col :let={{_, material}} label="Color">
+              {material.color || "—"}
+            </:col>
+
+            <:col :let={{_, material}} label="Cantidad">
+              {format_quantity(material.current_stock)}
+            </:col>
+
+            <:col :let={{_, material}} label="Descripción">
+              <span class="max-w-[20ch] block truncate" title={material.extra_description}>
+                {material.extra_description || "—"}
+              </span>
+            </:col>
+
+            <:action :let={{_, material}}>
+              <div class="sr-only">
+                <.link navigate={~p"/manage/inventory/#{material.id}"}>Ver</.link>
+              </div>
+            </:action>
+
+            <:action :let={{_, material}}>
+              <.link
+                phx-click={
+                  JS.push("delete", value: %{id: material.id}) |> hide("##{material.id}")
+                }
+                data-confirm="¿Estás seguro?"
+              >
+                <.button size={:sm} variant={:danger}>
+                  Eliminar
+                </.button>
+              </.link>
+            </:action>
+          </.table>
+          <div :if={@materials_empty?} class="rounded-md border border-dashed border-stone-200 bg-stone-50 py-10 text-center text-sm text-stone-500">
+            No se encontraron materiales. Agrega tu primer ingrediente para comenzar a registrar el stock.
+          </div>
+        </Page.surface>
+
+
+      <Page.section :if={@live_action == :forecast}>
+        <Page.surface padding="p-5">
+          <:header>
+            <div>
+              <h3 class="text-sm font-semibold text-stone-900">
+                Cómo leer el pronóstico de uso
+              </h3>
+
+              <p class="text-xs text-stone-500">
+                Estos consejos te ayudan a interpretar las etiquetas de requerimiento y la columna de balance final.
+              </p>
+            </div>
+          </:header>
+
+          <div class="space-y-4 text-sm text-stone-600">
+            <div>
+              <p class="text-sm font-semibold text-stone-700">Necesidad vs. balance proyectado</p>
+
+              <p class="text-xs text-stone-500">
+                Cada etiqueta muestra el balance restante después del requerimiento de ese día. Haz clic en una
+                etiqueta para ver los pedidos/productos que generan la demanda.
+              </p>
+            </div>
+
+            <div class="space-y-3">
+              <p class="text-sm font-semibold text-stone-700">Estados de color</p>
+
+              <div class="space-y-2 text-xs text-stone-500">
+                <div class="flex items-start gap-3">
+                  <span class="mt-1 h-3 w-3 rounded-full bg-emerald-200 ring-2 ring-emerald-300" />
+                  <div>
+                    <p class="font-medium text-stone-700">Equilibrado</p>
+
+                    <p>
+                      El balance proyectado se mantiene por encima del requerimiento; no se necesita ninguna acción.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="flex items-start gap-3">
+                  <span class="mt-1 h-3 w-3 rounded-full bg-amber-200 ring-2 ring-amber-300" />
+                  <div>
+                    <p class="font-medium text-stone-700">Atención</p>
+
+                    <p>
+                      El requerimiento consume todo el balance. Confirma el momento de reabastecimiento.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="flex items-start gap-3">
+                  <span class="mt-1 h-3 w-3 rounded-full bg-rose-200 ring-2 ring-rose-300" />
+                  <div>
+                    <p class="font-medium text-rose-600">Escasez</p>
+
+                    <p>
+                      El requerimiento excede el stock disponible. Inicia una transferencia u orden de compra.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <p class="text-sm font-semibold text-stone-700">Columna de balance final</p>
+
+              <p class="text-xs text-stone-500">
+                La última columna suma el requerimiento total de cada material en la ventana actual para que
+                puedas compararlo rápidamente con el inventario disponible.
+              </p>
+            </div>
+          </div>
+        </Page.surface>
+      </Page.section>
+
+      <Page.section :if={@live_action == :forecast}>
+        <div class="space-y-4">
+          <div id="controls">
             <Page.surface>
               <:header>
                 <div>
-                  <h3 class="text-sm font-semibold text-stone-900">Catálogo de materiales</h3>
-
-                  <p class="text-xs text-stone-500">
-                    Explora SKUs, stock disponible y precios.
-                  </p>
-                </div>
-              </:header>
-
-              <.table
-                id="materials"
-                rows={@streams.materials}
-                row_id={fn {dom_id, _} -> dom_id end}
-                row_click={fn {_, material} -> JS.navigate(~p"/manage/inventory/#{material.sku}") end}
-              >
-                <:empty>
-                  <div class="rounded-md border border-dashed border-stone-200 bg-stone-50 py-10 text-center text-sm text-stone-500">
-                    No se encontraron materiales. Agrega tu primer ingrediente para comenzar a registrar el stock.
-                  </div>
-                </:empty>
-
-                <:col :let={{_, material}} label="Material">{material.name}</:col>
-
-                <:col :let={{_, material}} label="SKU">
-                  <.kbd>
-                    {material.sku}
-                  </.kbd>
-                </:col>
-
-                <:col :let={{_, material}} label="Stock actual">
-                  {format_amount(material.unit, material.current_stock)}
-                </:col>
-
-                <:col :let={{_, material}} label="Precio">
-                  {format_money(@settings.currency, material.price)} por {material.unit}
-                </:col>
-
-                <:action :let={{_, material}}>
-                  <div class="sr-only">
-                    <.link navigate={~p"/manage/inventory/#{material.sku}"}>Ver</.link>
-                  </div>
-                </:action>
-
-                <:action :let={{_, material}}>
-                  <.link
-                    phx-click={
-                      JS.push("delete", value: %{id: material.id}) |> hide("##{material.sku}")
-                    }
-                    data-confirm="¿Estás seguro?"
-                  >
-                    <.button size={:sm} variant={:danger}>
-                      Eliminar
-                    </.button>
-                  </.link>
-                </:action>
-              </.table>
-            </Page.surface>
-          </:left>
-
-          <:right>
-            <Page.surface padding="p-5">
-              <:header>
-                <div>
-                  <h3 class="text-sm font-semibold text-stone-900">Acciones rápidas</h3>
-
-                  <p class="text-xs text-stone-500">
-                    Mantén el inventario actualizado a medida que cambia la producción.
-                  </p>
-                </div>
-              </:header>
-
-              <div class="space-y-3 text-sm text-stone-600">
-                <p>
-                  Usa estos atajos para mantenerte alineado con la demanda.
-                </p>
-
-                <div class="space-y-2">
-                  <.link
-                    patch={~p"/manage/inventory/forecast"}
-                    class="text-primary-600 inline-flex items-center gap-2 transition hover:text-primary-700 hover:underline"
-                  >
-                    <.icon name="hero-chart-bar-square" class="h-4 w-4" /> Abrir pronóstico de uso
-                  </.link>
-
-                  <.link
-                    navigate={~p"/manage/inventory/forecast/reorder"}
-                    class="text-primary-600 inline-flex items-center gap-2 transition hover:text-primary-700 hover:underline"
-                  >
-                    <.icon name="hero-clipboard-document-check" class="h-4 w-4" />
-                    Abrir planificador de reabastecimiento
-                  </.link>
-
-                  <.link
-                    patch={~p"/manage/overview"}
-                    class="text-primary-600 inline-flex items-center gap-2 transition hover:text-primary-700 hover:underline"
-                  >
-                    <.icon name="hero-arrow-path" class="h-4 w-4" /> Revisar compromisos de producción
-                  </.link>
-
-                  <.link
-                    patch={~p"/manage/settings/csv"}
-                    class="text-primary-600 inline-flex items-center gap-2 transition hover:text-primary-700 hover:underline"
-                  >
-                    <.icon name="hero-arrow-down-tray" class="h-4 w-4" /> Importar materiales vía CSV
-                  </.link>
-                </div>
-              </div>
-            </Page.surface>
-
-            <Page.surface :if={@live_action == :forecast} padding="p-5">
-              <:header>
-                <div>
                   <h3 class="text-sm font-semibold text-stone-900">
-                    Cómo leer el pronóstico de uso
+                    Pronóstico de uso
                   </h3>
 
                   <p class="text-xs text-stone-500">
-                    Estos consejos te ayudan a interpretar las etiquetas de requerimiento y la columna de balance final.
+                    Requerimientos de materiales día a día frente al stock para el horizonte seleccionado.
                   </p>
                 </div>
               </:header>
-
-              <div class="space-y-4 text-sm text-stone-600">
-                <div>
-                  <p class="text-sm font-semibold text-stone-700">Necesidad vs. balance proyectado</p>
-
-                  <p class="text-xs text-stone-500">
-                    Cada etiqueta muestra el balance restante después del requerimiento de ese día. Haz clic en una
-                    etiqueta para ver los pedidos/productos que generan la demanda.
-                  </p>
-                </div>
-
-                <div class="space-y-3">
-                  <p class="text-sm font-semibold text-stone-700">Estados de color</p>
-
-                  <div class="space-y-2 text-xs text-stone-500">
-                    <div class="flex items-start gap-3">
-                      <span class="mt-1 h-3 w-3 rounded-full bg-emerald-200 ring-2 ring-emerald-300" />
-                      <div>
-                        <p class="font-medium text-stone-700">Equilibrado</p>
-
-                        <p>
-                          El balance proyectado se mantiene por encima del requerimiento; no se necesita ninguna acción.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div class="flex items-start gap-3">
-                      <span class="mt-1 h-3 w-3 rounded-full bg-amber-200 ring-2 ring-amber-300" />
-                      <div>
-                        <p class="font-medium text-stone-700">Atención</p>
-
-                        <p>
-                          El requerimiento consume todo el balance. Confirma el momento de reabastecimiento.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div class="flex items-start gap-3">
-                      <span class="mt-1 h-3 w-3 rounded-full bg-rose-200 ring-2 ring-rose-300" />
-                      <div>
-                        <p class="font-medium text-rose-600">Escasez</p>
-
-                        <p>
-                          El requerimiento excede el stock disponible. Inicia una transferencia u orden de compra.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <p class="text-sm font-semibold text-stone-700">Columna de balance final</p>
-
-                  <p class="text-xs text-stone-500">
-                    La última columna suma el requerimiento total de cada material en la ventana actual para que
-                    puedas compararlo rápidamente con el inventario disponible.
-                  </p>
-                </div>
-              </div>
-            </Page.surface>
-          </:right>
-        </Page.two_column>
-
-        <div
-          :if={@live_action == :forecast}
-          class="gap-6"
-          right_class="space-y-4 lg:w-80 xl:w-96"
-        >
-          <div class="space-y-4">
-            <div id="controls">
-              <Page.surface>
-                <:header>
-                  <div>
-                    <h3 class="text-sm font-semibold text-stone-900">
-                      Pronóstico de uso
-                    </h3>
-
-                    <p class="text-xs text-stone-500">
-                      Requerimientos de materiales día a día frente al stock para el horizonte seleccionado.
-                    </p>
-                  </div>
-                </:header>
 
                 <:actions>
                   <div class="flex items-center overflow-hidden rounded-md border border-stone-300">
@@ -314,19 +259,10 @@ defmodule CraftplanWeb.InventoryLive.Index do
 
                       <th
                         :for={{day, _index} <- Enum.with_index(@days_range)}
-                        class={
-                          [
-                            "w-1/5 border-r border-stone-200 p-3 font-normal last:border-r-0",
-                            is_today?(day) && "bg-indigo-50"
-                          ]
-                          |> Enum.reject(&is_nil/1)
-                        }
+                        class={["w-1/5 border-r border-stone-200 p-3 font-normal last:border-r-0", is_today?(day) && "bg-indigo-50"] |> Enum.reject(&is_nil/1)}
                       >
                         <div class="flex items-center justify-center">
-                          <div class={[
-                            "inline-flex items-center justify-center space-x-1 rounded px-2",
-                            is_today?(day) && "bg-indigo-500 text-white"
-                          ]}>
+                          <div class={["inline-flex items-center justify-center space-x-1 rounded px-2", is_today?(day) && "bg-indigo-500 text-white"]}>
                             <div>{format_day_name(day)}</div>
 
                             <div>{format_short_date(day, @time_zone)}</div>
@@ -366,10 +302,7 @@ defmodule CraftplanWeb.InventoryLive.Index do
                             phx-click="view_material_details"
                             phx-value-date={Date.to_iso8601(day)}
                             phx-value-material={material.id}
-                            class={[
-                              "inline-flex w-full items-center gap-1 px-2 py-0.5 text-xs font-medium transition focus-visible:ring-primary-400 focus-visible:outline-none focus-visible:ring-2",
-                              forecast_status_chip(status)
-                            ]}
+                            class={["inline-flex w-full items-center gap-1 px-2 py-0.5 text-xs font-medium transition focus-visible:ring-primary-400 focus-visible:outline-none focus-visible:ring-2", forecast_status_chip(status)]}
                           >
                             <div class="grid-row-2 grid">
                               <div class="grid-row-2 grid">
@@ -378,10 +311,7 @@ defmodule CraftplanWeb.InventoryLive.Index do
                             </div>
                           </button>
 
-                          <div class={[
-                            "min-w-[11rem] max-w-[14rem] text-[11px] pointer-events-none absolute top-0 left-0 z-10 z-30 hidden -translate-y-full flex-col gap-1 rounded-md border bg-white p-3 shadow-lg ring-1 group-focus-within:flex group-hover:flex",
-                            forecast_popover_class(status)
-                          ]}>
+                          <div class={["min-w-[11rem] max-w-[14rem] text-[11px] pointer-events-none absolute top-0 left-0 z-10 z-30 hidden -translate-y-full flex-col gap-1 rounded-md border bg-white p-3 shadow-lg ring-1 group-focus-within:flex group-hover:flex", forecast_popover_class(status)]}>
                             <p class="text-stone-600">
                               Balance proyectado
                               <span class="font-bold">
@@ -403,14 +333,9 @@ defmodule CraftplanWeb.InventoryLive.Index do
                         </div>
                       </td>
 
-                      <td class={[
-                        "border-t border-t-stone-200 p-2 text-right",
-                        forecast_status_chip(
-                          if Decimal.gt?(0, material_data.final_balance),
-                            do: :shortage,
-                            else: :balanced
-                        )
-                      ]}>
+                      <td class={["border-t border-t-stone-200 p-2 text-right", forecast_status_chip(if Decimal.gt?(0, material_data.final_balance),
+      do: :shortage,
+      else: :balanced)]}>
                         {format_amount(material.unit, material_data.final_balance)}
                       </td>
                     </tr>
@@ -419,7 +344,6 @@ defmodule CraftplanWeb.InventoryLive.Index do
               </.scroll_table>
             </Page.surface>
           </div>
-        </div>
       </Page.section>
 
       <.modal
@@ -495,7 +419,7 @@ defmodule CraftplanWeb.InventoryLive.Index do
         <footer class="mt-6 flex items-center justify-end gap-3">
           <.button variant={:outline} phx-click="close_material_modal">Cerrar</.button>
           <.link
-            patch={~p"/manage/inventory/#{@selected_material.sku}/adjust"}
+            patch={~p"/manage/inventory/#{@selected_material.id}/adjust"}
             phx-click={JS.push_focus()}
           >
             <.button variant={:primary}>Ajustar stock</.button>
@@ -523,6 +447,7 @@ defmodule CraftplanWeb.InventoryLive.Index do
       |> assign(:material_details, nil)
       |> assign(:material_day_quantity, nil)
       |> assign(:material_day_balance, nil)
+      |> assign(:materials_empty?, true)
 
     {:ok, socket}
   end
@@ -550,11 +475,13 @@ defmodule CraftplanWeb.InventoryLive.Index do
         stream?: true,
         load: [:current_stock]
       )
+      |> Enum.to_list()
 
     socket
     |> stream(:materials, materials, reset: true)
     |> assign(:page_title, "Inventario")
     |> assign(:material, nil)
+    |> assign(:materials_empty?, Enum.empty?(materials))
   end
 
   defp apply_action(socket, :forecast, _params) do
@@ -670,17 +597,60 @@ defmodule CraftplanWeb.InventoryLive.Index do
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    case id
-         |> Inventory.get_material_by_id!(actor: socket.assigns.current_user)
-         |> Inventory.destroy_material(actor: socket.assigns.current_user) do
-      :ok ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Material eliminado correctamente")
-         |> stream_delete(:materials, %{id: id})}
+    material =
+      Inventory.get_material_by_id!(id,
+        actor: socket.assigns.current_user,
+        load: [:current_stock, :movements, :material_allergens, :material_nutritional_facts]
+      )
 
-      {:error, _error} ->
-        {:noreply, put_flash(socket, :error, "No se pudo eliminar el material.")}
+    # Bloquear eliminación si aún tiene stock
+    if material.current_stock && Decimal.compare(material.current_stock, Decimal.new(0)) != :eq do
+      {:noreply,
+       put_flash(
+         socket,
+         :error,
+         "No se puede eliminar: aún tiene stock (#{format_quantity(material.current_stock)}). Ajusta a 0 con Ajustar stock primero."
+       )}
+    else
+      # Limpiar relaciones que bloquean FK (movimientos, alérgenos, nutrición) antes de borrar
+      Enum.each(material.movements, fn m ->
+        Ash.destroy(m, actor: socket.assigns.current_user)
+      end)
+
+      Enum.each(material.material_allergens, fn ma ->
+        Ash.destroy(ma, actor: socket.assigns.current_user)
+      end)
+
+      Enum.each(material.material_nutritional_facts, fn mf ->
+        Ash.destroy(mf, actor: socket.assigns.current_user)
+      end)
+
+      case Inventory.destroy_material(material, actor: socket.assigns.current_user) do
+        :ok ->
+          socket = stream_delete(socket, :materials, %{id: id})
+
+          remaining =
+            Inventory.list_materials!(
+              actor: socket.assigns.current_user,
+              load: [:current_stock]
+            )
+            |> Enum.to_list()
+
+          {:noreply,
+           socket
+           |> put_flash(:info, "Material eliminado correctamente")
+           |> assign(:materials_empty?, Enum.empty?(remaining))}
+
+        {:error, error} ->
+          # Si aún falla (ej. usado en BOMs o pedidos), mostrar detalle
+          msg =
+            case error do
+              %{errors: [%{message: msg} | _]} when is_binary(msg) -> msg
+              _ -> "No se pudo eliminar: está usado en recetas o pedidos."
+            end
+
+          {:noreply, put_flash(socket, :error, msg)}
+      end
     end
   end
 
@@ -688,7 +658,10 @@ defmodule CraftplanWeb.InventoryLive.Index do
   def handle_info({:saved, material}, socket) do
     material = Ash.load!(material, :current_stock, actor: socket.assigns.current_user)
 
-    {:noreply, stream_insert(socket, :materials, material)}
+    {:noreply,
+     socket
+     |> stream_insert(:materials, material)
+     |> assign(:materials_empty?, false)}
   end
 
   defp forecast_status(day_quantity, balance) do
@@ -748,4 +721,14 @@ defmodule CraftplanWeb.InventoryLive.Index do
   defp prepare_materials_requirements(socket, days_range) do
     InventoryForecasting.prepare_materials_requirements(days_range, socket.assigns.current_user)
   end
+
+  defp out_of_stock?(nil), do: true
+  defp out_of_stock?(%Decimal{} = qty), do: Decimal.compare(qty, Decimal.new(0)) == :eq
+  defp out_of_stock?(qty) when is_number(qty), do: qty == 0
+  defp out_of_stock?(_), do: false
+
+  defp format_quantity(nil), do: "0"
+  defp format_quantity(%Decimal{} = qty), do: qty |> Decimal.normalize() |> Decimal.to_string(:normal)
+  defp format_quantity(qty) when is_number(qty), do: to_string(qty)
+  defp format_quantity(qty), do: to_string(qty)
 end

@@ -19,7 +19,7 @@ defmodule Craftplan.Inventory do
 
     resource Craftplan.Inventory.Material do
       define :get_material_by_id, action: :read, get_by: [:id]
-      define :get_material_by_sku, action: :read, get_by: [:sku]
+      define :get_material_by_name, action: :read, get_by: [:name]
       define :list_materials, action: :list
       define :list_materials_with_keyset, action: :keyset
       define :update_nutritional_facts, action: :update_nutritional_facts

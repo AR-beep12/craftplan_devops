@@ -29,7 +29,7 @@ defmodule CraftplanWeb.OrderLive.Show do
       :unit_cost,
       product: [:name, :sku]
     ],
-    customer: [:full_name, shipping_address: [:full_address]]
+    customer: [:full_name]
   ]
 
   @impl true
@@ -78,13 +78,6 @@ defmodule CraftplanWeb.OrderLive.Show do
             >
               {@order.customer.full_name}
             </.link>
-          </:item>
-          <:item title="Dirección de envío">
-            {if @order.customer.shipping_address do
-              @order.customer.shipping_address.full_address
-            else
-              "N/D"
-            end}
           </:item>
 
           <:item title="Total">

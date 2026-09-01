@@ -8,7 +8,6 @@ defmodule CraftplanWeb.ManageCustomersInteractionsLiveTest do
   defp create_customer! do
     Customer
     |> Ash.Changeset.for_create(:create, %{
-      type: :individual,
       first_name: "Ada",
       last_name: "Lovelace",
       email: "ada+#{System.unique_integer()}@local"
@@ -32,25 +31,10 @@ defmodule CraftplanWeb.ManageCustomersInteractionsLiveTest do
 
     params = %{
       "customer" => %{
-        "type" => "individual",
         "first_name" => "Test",
         "last_name" => "Customer#{unique}",
         "email" => email,
-        "phone" => "+1234567890",
-        "billing_address" => %{
-          "street" => "123 Main St",
-          "city" => "Springfield",
-          "state" => "IL",
-          "zip" => "62701",
-          "country" => "US"
-        },
-        "shipping_address" => %{
-          "street" => "456 Oak Ave",
-          "city" => "Shelbyville",
-          "state" => "IL",
-          "zip" => "62565",
-          "country" => "US"
-        }
+        "phone" => "+1234567890"
       }
     }
 

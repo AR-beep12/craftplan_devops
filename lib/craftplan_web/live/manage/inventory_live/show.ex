@@ -16,11 +16,11 @@ defmodule CraftplanWeb.InventoryLive.Show do
     <.header>
       {@material.name}
       <:actions>
-        <.link patch={~p"/manage/inventory/#{@material.sku}/edit"} phx-click={JS.push_focus()}>
+        <.link patch={~p"/manage/inventory/#{@material.id}/edit"} phx-click={JS.push_focus()}>
           <.button>Editar</.button>
         </.link>
 
-        <.link patch={~p"/manage/inventory/#{@material.sku}/adjust"} phx-click={JS.push_focus()}>
+        <.link patch={~p"/manage/inventory/#{@material.id}/adjust"} phx-click={JS.push_focus()}>
           <.button variant={:primary}>Ajustar stock</.button>
         </.link>
       </:actions>
@@ -31,42 +31,16 @@ defmodule CraftplanWeb.InventoryLive.Show do
         <.list>
           <:item title="Nombre">{@material.name}</:item>
 
-          <:item title="SKU">
-            <.kbd>
-              {@material.sku}
-            </.kbd>
+          <:item title="Color">
+            {@material.color || "—"}
           </:item>
 
-          <:item title="Precio">
-            {format_money(@settings.currency, @material.price)}
+          <:item title="Descripción">
+            {@material.extra_description || "—"}
           </:item>
 
-          <:item title="Alérgenos">
-            <div class="flex-inline items-center space-x-1">
-              <.badge :for={allergen <- Enum.map(@material.allergens, & &1.name)} text={allergen} />
-              <span :if={Enum.empty?(@material.allergens)}>Ninguno</span>
-            </div>
-          </:item>
-
-          <:item title="Nutrición">
-            <div class="flex-inline items-center space-x-1">
-              <.badge
-                :for={fact <- @material.material_nutritional_facts}
-                text={"#{fact.nutritional_fact.name}: #{fact.amount} #{fact.unit} por #{fact.basis_quantity || 100} #{fact.basis_unit || @material.unit}"}
-              /> <span :if={Enum.empty?(@material.material_nutritional_facts)}>Ninguno</span>
-            </div>
-          </:item>
-
-          <:item title="Stock actual">
-            {format_amount(@material.unit, @material.current_stock)}
-          </:item>
-
-          <:item title="Stock mínimo">
-            {format_amount(@material.unit, @material.minimum_stock)}
-          </:item>
-
-          <:item title="Stock máximo">
-            {format_amount(@material.unit, @material.maximum_stock)}
+          <:item title="Cantidad">
+            {format_quantity(@material.current_stock)}
           </:item>
         </.list>
 
@@ -95,6 +69,8 @@ defmodule CraftplanWeb.InventoryLive.Show do
         </div>
       </.tabs_content>
 
+      <%!-- Alérgenos y Nutrición desactivados temporalmente --%>
+      <%!--
       <.tabs_content :if={@live_action == :allergens}>
         <.live_component
           module={CraftplanWeb.InventoryLive.FormComponentAllergens}
@@ -102,7 +78,7 @@ defmodule CraftplanWeb.InventoryLive.Show do
           material={@material}
           current_user={@current_user}
           settings={@settings}
-          patch={~p"/manage/inventory/#{@material.sku}/allergens"}
+          patch={~p"/manage/inventory/#{@material.id}/allergens"}
           allergens={@allergens_available}
         />
       </.tabs_content>
@@ -114,10 +90,11 @@ defmodule CraftplanWeb.InventoryLive.Show do
           material={@material}
           current_user={@current_user}
           settings={@settings}
-          patch={~p"/manage/inventory/#{@material.sku}/nutritional_facts"}
+          patch={~p"/manage/inventory/#{@material.id}/nutritional_facts"}
           nutritional_facts={@nutritional_facts_available}
         />
       </.tabs_content>
+      --%>
 
       <.tabs_content :if={@live_action == :stock}>
         <div>
@@ -149,7 +126,7 @@ defmodule CraftplanWeb.InventoryLive.Show do
       id="material-modal"
       title={@page_title}
       show
-      on_cancel={JS.patch(~p"/manage/inventory/#{@material.sku}")}
+      on_cancel={JS.patch(~p"/manage/inventory/#{@material.id}")}
     >
       <.live_component
         module={CraftplanWeb.InventoryLive.FormComponentMaterial}
@@ -159,7 +136,7 @@ defmodule CraftplanWeb.InventoryLive.Show do
         current_user={@current_user}
         material={@material}
         settings={@settings}
-        patch={~p"/manage/inventory/#{@material.sku}/details"}
+        patch={~p"/manage/inventory/#{@material.id}/details"}
       />
     </.modal>
 
@@ -168,7 +145,7 @@ defmodule CraftplanWeb.InventoryLive.Show do
       title={"Ajustar stock de #{@material.name}"}
       id="material-movement-modal"
       show
-      on_cancel={JS.patch(~p"/manage/inventory/#{@material.sku}")}
+      on_cancel={JS.patch(~p"/manage/inventory/#{@material.id}")}
     >
       <.live_component
         module={CraftplanWeb.InventoryLive.FormComponentMovement}
@@ -176,7 +153,7 @@ defmodule CraftplanWeb.InventoryLive.Show do
         material={@material}
         current_user={@current_user}
         settings={@settings}
-        patch={~p"/manage/inventory/#{@material.sku}/stock"}
+        patch={~p"/manage/inventory/#{@material.id}/stock"}
       />
     </.modal>
     """
@@ -197,19 +174,9 @@ defmodule CraftplanWeb.InventoryLive.Show do
   end
 
   @impl true
-  def handle_params(%{"sku" => sku}, _, socket) do
-    material =
-      Inventory.get_material_by_sku!(sku,
-        actor: socket.assigns[:current_user],
-        load: [
-          :current_stock,
-          :movements,
-          :allergens,
-          :material_allergens,
-          :nutritional_facts,
-          material_nutritional_facts: [:nutritional_fact]
-        ]
-      )
+  def handle_params(params, _, socket) do
+    id = params["id"] || params["sku"]
+    material = fetch_material(id, socket.assigns[:current_user])
 
     open_po_items =
       Inventory.list_open_po_items_for_material!(
@@ -222,22 +189,23 @@ defmodule CraftplanWeb.InventoryLive.Show do
     tabs_links = [
       %{
         label: "Detalles",
-        navigate: ~p"/manage/inventory/#{material.sku}/details",
+        navigate: ~p"/manage/inventory/#{material.id}/details",
         active: live_action in [:details, :show]
       },
-      %{
-        label: "Alérgenos",
-        navigate: ~p"/manage/inventory/#{material.sku}/allergens",
-        active: live_action == :allergens
-      },
-      %{
-        label: "Nutrición",
-        navigate: ~p"/manage/inventory/#{material.sku}/nutritional_facts",
-        active: live_action == :nutritional_facts
-      },
+      # Alérgenos y Nutrición desactivados - descomenta para reactivar
+      # %{
+      #   label: "Alérgenos",
+      #   navigate: ~p"/manage/inventory/#{material.id}/allergens",
+      #   active: live_action == :allergens
+      # },
+      # %{
+      #   label: "Nutrición",
+      #   navigate: ~p"/manage/inventory/#{material.id}/nutritional_facts",
+      #   active: live_action == :nutritional_facts
+      # },
       %{
         label: "Stock",
-        navigate: ~p"/manage/inventory/#{material.sku}/stock",
+        navigate: ~p"/manage/inventory/#{material.id}/stock",
         active: live_action == :stock
       }
     ]
@@ -367,4 +335,23 @@ defmodule CraftplanWeb.InventoryLive.Show do
   end
 
   defp material_trail(material, _), do: [Navigation.root(:inventory), Navigation.resource(:material, material)]
+
+  defp fetch_material(id, actor) do
+    Inventory.get_material_by_id!(id,
+      actor: actor,
+      load: [
+        :current_stock,
+        :movements,
+        :allergens,
+        :material_allergens,
+        :nutritional_facts,
+        material_nutritional_facts: [:nutritional_fact]
+      ]
+    )
+  end
+
+  defp format_quantity(nil), do: "0"
+  defp format_quantity(%Decimal{} = qty), do: qty |> Decimal.normalize() |> Decimal.to_string(:normal)
+  defp format_quantity(qty) when is_number(qty), do: to_string(qty)
+  defp format_quantity(qty), do: to_string(qty)
 end

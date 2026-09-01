@@ -24,16 +24,9 @@ defmodule CraftplanWeb.CustomerLive.Show do
         <div class="mt-8 space-y-8">
           <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
             <.list>
-              <:item title="Tipo"><.badge text={customer_type_label(@customer.type)} /></:item>
               <:item title="Nombre">{@customer.full_name}</:item>
               <:item title="Correo electrónico">{@customer.email}</:item>
               <:item title="Teléfono">{@customer.phone}</:item>
-              <:item title="Dirección de facturación">
-                {@customer.billing_address && @customer.billing_address.full_address}
-              </:item>
-              <:item title="Dirección de envío">
-                {@customer.shipping_address && @customer.shipping_address.full_address}
-              </:item>
             </.list>
           </div>
         </div>
@@ -110,9 +103,7 @@ defmodule CraftplanWeb.CustomerLive.Show do
           :full_name,
           :total_orders_value,
           :total_orders,
-          orders: [:total_cost, :total_items],
-          billing_address: [:full_address],
-          shipping_address: [:full_address]
+          orders: [:total_cost, :total_items]
         ]
       )
 
@@ -167,12 +158,4 @@ defmodule CraftplanWeb.CustomerLive.Show do
   end
 
   defp customer_trail(customer, _), do: [Navigation.root(:customers), Navigation.resource(:customer, customer)]
-
-  defp customer_type_label(:individual), do: "Individual"
-  defp customer_type_label(:company), do: "Empresa"
-
-  defp customer_type_label(type) when is_binary(type),
-    do: type |> String.to_existing_atom() |> customer_type_label()
-
-  defp customer_type_label(type), do: to_string(type)
 end

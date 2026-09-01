@@ -3,7 +3,7 @@ defmodule Craftplan.CSV.Exporters.Customers do
 
   alias NimbleCSV.RFC4180, as: CSV
 
-  @headers ["reference", "type", "first_name", "last_name", "email", "phone"]
+  @headers ["reference", "first_name", "last_name", "email", "phone"]
 
   def export(actor) do
     customers = Craftplan.CRM.list_customers!(%{}, actor: actor)
@@ -12,7 +12,6 @@ defmodule Craftplan.CSV.Exporters.Customers do
       Enum.map(customers, fn c ->
         [
           c.reference || "",
-          to_string(c.type || ""),
           c.first_name || "",
           c.last_name || "",
           c.email || "",

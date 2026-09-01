@@ -34,17 +34,23 @@ defmodule Craftplan.Test.Factory do
     params =
       %{
         name: Map.get(attrs, :name, "Test Material"),
-        sku: Map.get(attrs, :sku, unique_code("MAT")),
-        unit: Map.get(attrs, :unit, :gram),
-        price: Map.get(attrs, :price, Decimal.new("1.00")),
-        minimum_stock: Map.get(attrs, :minimum_stock, Decimal.new(0)),
-        maximum_stock: Map.get(attrs, :maximum_stock, Decimal.new(0))
+        unit: Map.get(attrs, :unit, :piece),
+        color: Map.get(attrs, :color, "rojo"),
+        quantity: Map.get(attrs, :quantity, Decimal.new("10")),
+        extra_description: Map.get(attrs, :extra_description, "desc extra #{System.unique_integer([:positive])}")
       }
+      |> maybe_put(:sku, Map.get(attrs, :sku))
+      |> maybe_put(:price, Map.get(attrs, :price))
+      |> maybe_put(:minimum_stock, Map.get(attrs, :minimum_stock))
+      |> maybe_put(:maximum_stock, Map.get(attrs, :maximum_stock))
 
     Material
     |> Ash.Changeset.for_create(:create, params)
     |> Ash.create!(actor: actor)
   end
+
+  defp maybe_put(map, _key, nil), do: map
+  defp maybe_put(map, key, value), do: Map.put(map, key, value)
 
   def add_allergen!(material, name \\ "Gluten", actor \\ staff_actor()) do
     allergen =

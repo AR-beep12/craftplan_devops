@@ -146,13 +146,13 @@ defmodule CraftplanWeb.Router do
       live "/manage/inventory/forecast", InventoryLive.Index, :forecast
       live "/manage/inventory/forecast/reorder", InventoryLive.ReorderPlanner, :reorder
       live "/manage/inventory/new", InventoryLive.Index, :new
-      live "/manage/inventory/:sku", InventoryLive.Show, :show
-      live "/manage/inventory/:sku/details", InventoryLive.Show, :details
-      live "/manage/inventory/:sku/allergens", InventoryLive.Show, :allergens
-      live "/manage/inventory/:sku/nutritional_facts", InventoryLive.Show, :nutritional_facts
-      live "/manage/inventory/:sku/stock", InventoryLive.Show, :stock
-      live "/manage/inventory/:sku/edit", InventoryLive.Show, :edit
-      live "/manage/inventory/:sku/adjust", InventoryLive.Show, :adjust
+      live "/manage/inventory/:id", InventoryLive.Show, :show
+      live "/manage/inventory/:id/details", InventoryLive.Show, :details
+      live "/manage/inventory/:id/allergens", InventoryLive.Show, :allergens
+      live "/manage/inventory/:id/nutritional_facts", InventoryLive.Show, :nutritional_facts
+      live "/manage/inventory/:id/stock", InventoryLive.Show, :stock
+      live "/manage/inventory/:id/edit", InventoryLive.Show, :edit
+      live "/manage/inventory/:id/adjust", InventoryLive.Show, :adjust
 
       # Orders
       live "/manage/orders", OrderLive.Index, :index

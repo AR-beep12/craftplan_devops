@@ -7,7 +7,6 @@ defmodule Craftplan.CSV.Importers.Customers do
   alias NimbleCSV.RFC4180, as: CSV
 
   @type row :: %{
-          type: :individual | :business,
           first_name: String.t(),
           last_name: String.t(),
           email: String.t()
@@ -82,7 +81,6 @@ defmodule Craftplan.CSV.Importers.Customers do
             case cast_row(fields, header_map) do
               {:ok, row} ->
                 attrs = %{
-                  type: row.type,
                   first_name: row.first_name,
                   last_name: row.last_name,
                   email: row.email
@@ -142,7 +140,7 @@ defmodule Craftplan.CSV.Importers.Customers do
   defp apply_mapping(header_map, mapping) when mapping == %{}, do: header_map
 
   defp apply_mapping(header_map, mapping) do
-    Enum.reduce(["type", "first_name", "last_name", "email"], header_map, fn field, acc ->
+    Enum.reduce(["first_name", "last_name", "email"], header_map, fn field, acc ->
       case Map.get(mapping, field) do
         nil ->
           acc
@@ -164,25 +162,14 @@ defmodule Craftplan.CSV.Importers.Customers do
   end
 
   defp cast_row(fields, header_map) do
-    type_str = fields |> fetch_field(header_map, "type") |> to_string() |> String.trim()
     first_name = fields |> fetch_field(header_map, "first_name") |> to_string() |> String.trim()
     last_name = fields |> fetch_field(header_map, "last_name") |> to_string() |> String.trim()
     email = fields |> fetch_field(header_map, "email") |> to_string() |> String.trim()
 
-    with {:ok, type} <- parse_type(type_str),
-         :ok <- present?(first_name, "first_name"),
+    with :ok <- present?(first_name, "first_name"),
          :ok <- present?(last_name, "last_name"),
          {:ok, email} <- parse_email(email) do
-      {:ok, %{type: type, first_name: first_name, last_name: last_name, email: email}}
-    end
-  end
-
-  defp parse_type(str) do
-    case String.downcase(str) do
-      "individual" -> {:ok, :individual}
-      "business" -> {:ok, :business}
-      "" -> {:error, "Missing type"}
-      other -> {:error, "Invalid type: #{other}"}
+      {:ok, %{first_name: first_name, last_name: last_name, email: email}}
     end
   end
 

@@ -20,9 +20,6 @@ defmodule CraftplanWeb.OrderLive.Invoice do
         <div class="text-right text-sm">
           <div class="font-medium">Cliente</div>
           <div>{@order.customer.full_name}</div>
-          <div>
-            {@order.customer.shipping_address && @order.customer.shipping_address.full_address}
-          </div>
         </div>
       </div>
 
@@ -67,7 +64,7 @@ defmodule CraftplanWeb.OrderLive.Invoice do
           :tax_total,
           :discount_total,
           :total,
-          customer: [:full_name, shipping_address: [:full_address]],
+          customer: [:full_name],
           items: [:cost, :unit_price, product: [:name]]
         ],
         actor: socket.assigns[:current_user]

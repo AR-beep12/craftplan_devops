@@ -2,6 +2,7 @@ defmodule CraftplanWeb.CustomerLive.Index do
   @moduledoc false
   use CraftplanWeb, :live_view
 
+  alias CraftplanWeb.Components.Page
   alias CraftplanWeb.Navigation
 
   @impl true
@@ -17,30 +18,27 @@ defmodule CraftplanWeb.CustomerLive.Index do
       </:actions>
     </.header>
 
-    <.table
-      id="customers"
-      rows={@streams.customers}
-      row_click={fn {_id, customer} -> JS.navigate(~p"/manage/customers/#{customer.reference}") end}
-    >
-      <:empty>
-        <div class="block py-4 pr-6">
-          <span class={["relative"]}>
-            No se encontraron clientes
-          </span>
+      <Page.surface>
+        <.table
+          id="customers"
+          rows={@streams.customers}
+          row_click={fn {_id, customer} -> JS.navigate(~p"/manage/customers/#{customer.reference}") end}
+        >
+          <:col :let={{_id, customer}} label="Nombre">{customer.full_name}</:col>
+          <:col :let={{_id, customer}} label="ID">
+            <.kbd>
+              {format_reference(customer.reference)}
+            </.kbd>
+          </:col>
+          <:col :let={{_id, customer}} label="Correo electrónico">{customer.email}</:col>
+          <:col :let={{_id, customer}} label="Teléfono">{customer.phone}</:col>
+        </.table>
+        <div :if={@customers_empty?} class="rounded-md border border-dashed border-stone-200 bg-stone-50 py-10 text-center text-sm text-stone-500">
+          No se encontraron clientes
         </div>
-      </:empty>
-      <:col :let={{_id, customer}} label="Nombre">{customer.full_name}</:col>
-      <:col :let={{_id, customer}} label="Referencia">
-        <.kbd>
-          {format_reference(customer.reference)}
-        </.kbd>
-      </:col>
-      <:col :let={{_id, customer}} label="Correo electrónico">{customer.email}</:col>
-      <:col :let={{_id, customer}} label="Teléfono">{customer.phone}</:col>
-      <:col :let={{_id, customer}} label="Tipo">
-        <.badge text={customer_type_label(customer.type)} />
-      </:col>
-    </.table>
+      </Page.surface>
+
+
 
     <.modal
       :if={@live_action in [:new, :edit]}
@@ -66,15 +64,15 @@ defmodule CraftplanWeb.CustomerLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
+    customers =
+      [actor: socket.assigns[:current_user], load: [:full_name]]
+      |> Craftplan.CRM.list_customers!()
+      |> Enum.to_list()
+
     {:ok,
      socket
-     |> stream(
-       :customers,
-       Craftplan.CRM.list_customers!(
-         actor: socket.assigns[:current_user],
-         load: [:billing_address, :shipping_address, :full_name]
-       )
-     )
+     |> stream(:customers, customers)
+     |> assign(:customers_empty?, Enum.empty?(customers))
      |> assign_new(:current_user, fn -> nil end)}
   end
 
@@ -90,10 +88,7 @@ defmodule CraftplanWeb.CustomerLive.Index do
     |> assign(:page_title, "Editar cliente")
     |> assign(
       :customer,
-      Craftplan.CRM.get_customer_by_id!(id,
-        actor: socket.assigns.current_user,
-        load: [:billing_address, :shipping_address]
-      )
+      Craftplan.CRM.get_customer_by_id!(id, actor: socket.assigns.current_user)
     )
   end
 
@@ -102,10 +97,7 @@ defmodule CraftplanWeb.CustomerLive.Index do
     |> assign(:page_title, "Editar cliente")
     |> assign(
       :customer,
-      Craftplan.CRM.get_customer_by_reference!(reference,
-        actor: socket.assigns.current_user,
-        load: [:billing_address, :shipping_address]
-      )
+      Craftplan.CRM.get_customer_by_reference!(reference, actor: socket.assigns.current_user)
     )
   end
 
@@ -131,7 +123,8 @@ defmodule CraftplanWeb.CustomerLive.Index do
 
   @impl true
   def handle_info({CraftplanWeb.CustomerLive.FormComponent, {:saved, customer}}, socket) do
-    {:noreply, stream_insert(socket, :customers, customer)}
+    customer = Ash.load!(customer, [:full_name], actor: socket.assigns.current_user)
+    {:noreply, socket |> stream_insert(:customers, customer) |> assign(:customers_empty?, false)}
   end
 
   @impl true
@@ -140,18 +133,20 @@ defmodule CraftplanWeb.CustomerLive.Index do
          |> Craftplan.CRM.get_customer_by_id!(actor: socket.assigns.current_user)
          |> Craftplan.CRM.destroy_customer(actor: socket.assigns.current_user) do
       :ok ->
+        socket = stream_delete(socket, :customers, %{id: id})
+
+        remaining =
+          [actor: socket.assigns.current_user, load: [:full_name]]
+          |> Craftplan.CRM.list_customers!()
+          |> Enum.to_list()
+
         {:noreply,
          socket
          |> put_flash(:info, "Cliente eliminado correctamente")
-         |> stream_delete(:customers, %{id: id})}
+         |> assign(:customers_empty?, Enum.empty?(remaining))}
 
       {:error, _error} ->
         {:noreply, put_flash(socket, :error, "No se pudo eliminar el cliente.")}
     end
   end
-
-  defp customer_type_label(:individual), do: "Individual"
-  defp customer_type_label(:company), do: "Empresa"
-  defp customer_type_label(type) when is_binary(type), do: type |> String.to_existing_atom() |> customer_type_label()
-  defp customer_type_label(type), do: to_string(type)
 end

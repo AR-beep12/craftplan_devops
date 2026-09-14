@@ -138,7 +138,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentPhotos do
                         "border-stone-200"
                     ]}>
                       <img
-                        src={Photo.url({photo, @product}, :thumb, signed: true)}
+                        src={CraftplanWeb.PhotoUrl.signed(Photo, :thumb, {photo, @product})}
                         class="h-40 w-full object-cover"
                       />
 

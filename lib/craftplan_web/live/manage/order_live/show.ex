@@ -104,7 +104,7 @@ defmodule CraftplanWeb.OrderLive.Show do
               <div class="flex items-center space-x-2">
                 <img
                   :if={item.product.featured_photo != nil}
-                  src={Photo.url({item.product.featured_photo, item.product}, :thumb, signed: true)}
+                  src={CraftplanWeb.PhotoUrl.signed(Photo, :thumb, {item.product.featured_photo, item.product})}
                   alt={item.product.name}
                   class="h-5 w-5"
                 />
@@ -354,7 +354,11 @@ defmodule CraftplanWeb.OrderLive.Show do
   end
 
   @impl true
-  def handle_event("save_add_to_batch", %{"batch_id" => batch_id, "planned_qty" => planned_qty}, socket) do
+  def handle_event(
+        "save_add_to_batch",
+        %{"batch_id" => batch_id, "planned_qty" => planned_qty},
+        socket
+      ) do
     actor = socket.assigns.current_user
     item = socket.assigns.add_to_batch_item
     qty = Decimal.new(planned_qty)
@@ -406,7 +410,8 @@ defmodule CraftplanWeb.OrderLive.Show do
      |> put_flash(:info, "Asignación agregada")}
   rescue
     e ->
-      {:noreply, put_flash(socket, :error, "No se pudo agregar la asignación: #{Exception.message(e)}")}
+      {:noreply,
+       put_flash(socket, :error, "No se pudo agregar la asignación: #{Exception.message(e)}")}
   end
 
   @impl true
@@ -462,4 +467,3 @@ defmodule CraftplanWeb.OrderLive.Show do
 
   defp order_trail(order, _), do: [Navigation.root(:orders), Navigation.resource(:order, order)]
 end
-

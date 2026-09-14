@@ -8,19 +8,19 @@ defmodule CraftplanWeb.Router do
   # Plugs
   #
   # Content Security Policy compatible with LiveView and topbar
-  @csp Enum.join(
-         [
-           "default-src 'self'",
-           "base-uri 'self'",
-           "frame-ancestors 'self'",
-           "img-src 'self' data: blob:",
-           "style-src 'self' 'unsafe-inline'",
-           "font-src 'self' data:",
-           "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-           "connect-src 'self' ws: wss:"
-         ],
-         "; "
-       )
+@csp Enum.join(
+        [
+          "default-src 'self'",
+          "base-uri 'self'",
+          "frame-ancestors 'self'",
+          "img-src 'self' data: blob: http://minio:9000 http://localhost:9000",
+          "style-src 'self' 'unsafe-inline'",
+          "font-src 'self' data:",
+          "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+          "connect-src 'self' ws: wss:"
+        ],
+        "; "
+      )
 
   def put_session_timezone(conn, _opts) do
     timezone = conn.cookies["timezone"]

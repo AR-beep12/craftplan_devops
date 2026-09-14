@@ -30,7 +30,7 @@ defmodule CraftplanWeb.ProductLive.Index do
         <div class="flex items-center space-x-2">
           <img
             :if={product.featured_photo != nil}
-            src={Photo.url({product.featured_photo, product}, :thumb, signed: true)}
+            src={CraftplanWeb.PhotoUrl.signed(Photo, :thumb, {product.featured_photo, product})}
             alt={product.name}
             class="h-5 w-5"
           />

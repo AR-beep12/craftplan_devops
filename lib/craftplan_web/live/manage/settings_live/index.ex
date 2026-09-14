@@ -35,6 +35,16 @@ defmodule CraftplanWeb.SettingsLive.Index do
         </div>
       </div>
 
+      <div :if={@live_action == :categories}>
+        <div>
+          <.live_component
+            module={CraftplanWeb.SettingsLive.CategoriesComponent}
+            id="categories-component"
+            current_user={@current_user}
+          />
+        </div>
+      </div>
+
       <div :if={@live_action == :allergens}>
         <div>
           <.live_component
@@ -229,6 +239,10 @@ defmodule CraftplanWeb.SettingsLive.Index do
     assign(socket, :page_title, "Configuración general")
   end
 
+  defp apply_action(socket, :categories, _params) do
+    assign(socket, :page_title, "Categorías de productos")
+  end
+
   defp apply_action(socket, :allergens, _params) do
     assign(socket, :page_title, "Configuración de alérgenos")
   end
@@ -280,6 +294,8 @@ defmodule CraftplanWeb.SettingsLive.Index do
   end
 
   defp settings_trail(:general), do: [Navigation.root(:settings), Navigation.page(:settings, :general)]
+
+  defp settings_trail(:categories), do: [Navigation.root(:settings), Navigation.page(:settings, :categories)]
 
   defp settings_trail(:allergens), do: [Navigation.root(:settings), Navigation.page(:settings, :allergens)]
 

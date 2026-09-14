@@ -16,7 +16,7 @@ defmodule CraftplanWeb.ProductLive.Show do
     <.header>
       {@product.name}
       <:actions>
-        <.link patch={~p"/manage/products/#{@product.sku}/edit"} phx-click={JS.push_focus()}>
+        <.link patch={~p"/manage/products/#{@product.id}/edit"} phx-click={JS.push_focus()}>
           <.button variant={:primary}>Editar producto</.button>
         </.link>
       </:actions>
@@ -27,130 +27,32 @@ defmodule CraftplanWeb.ProductLive.Show do
     <div class="mt-6 space-y-6">
       <.tabs_content :if={@live_action in [:details, :show]}>
         <.list>
-          <:item title="Estado">
-            <.badge
-              text={product_status_label(@product.status)}
-              colors={[
-                {@product.status,
-                 "#{product_status_color(@product.status)} #{product_status_bg(@product.status)}"}
-              ]}
-            />
+          <:item title="Categoría">
+            {(@product.category && @product.category.name) || "-"}
           </:item>
           <:item title="Disponibilidad">
             <.badge text={selling_availability_label(@product.selling_availability)} />
           </:item>
           <:item title="Nombre">{@product.name}</:item>
-
-          <:item title="SKU">
-            <.kbd>
-              {@product.sku}
-            </.kbd>
-          </:item>
-
-          <:item title="Alérgenos">
-            <div class="flex-inline items-center space-x-1">
-              <.badge :for={allergen <- Enum.map(@product.allergens, & &1.name)} text={allergen} />
-              <span :if={Enum.empty?(@product.allergens)}>Ninguno</span>
-            </div>
-          </:item>
-
           <:item title="Precio">
             {format_money(@settings.currency, @product.price)}
           </:item>
-
-          <:item title="Costo de materiales">
-            {format_money(@settings.currency, @product.materials_cost)}
-          </:item>
-
-          <:item title="Ganancia bruta">
-            {format_money(@settings.currency, @product.gross_profit)}
-          </:item>
-
-          <:item title="Porcentaje de margen">
-            {format_percentage(@product.markup_percentage)}%
-          </:item>
-
-          <:item title="Precios sugeridos">
-            <div class="space-y-1">
-              <div>
-                <span class="text-stone-500">Minorista:</span>
-                <span class="ml-2 font-medium">
-                  {format_money(
-                    @settings.currency,
-                    suggested_price(:retail, @product.bom_unit_cost, @settings)
-                  )}
-                </span>
-              </div>
-              <div>
-                <span class="text-stone-500">Mayorista:</span>
-                <span class="ml-2 font-medium">
-                  {format_money(
-                    @settings.currency,
-                    suggested_price(:wholesale, @product.bom_unit_cost, @settings)
-                  )}
-                </span>
-              </div>
-            </div>
-          </:item>
-
-          <:item
-            :if={@product.max_daily_quantity && @product.max_daily_quantity > 0}
-            title="Unidades máximas por día"
-          >
-            {@product.max_daily_quantity}
-          </:item>
-
-          <:item
-            :if={@product.nutrition_output_quantity}
-            title="Producción nutricional"
-          >
-            {format_amount(
-              @product.nutrition_output_unit || :gram,
-              @product.nutrition_output_quantity
-            )}
-          </:item>
         </.list>
-      </.tabs_content>
-
-      <.tabs_content :if={@live_action == :recipe}>
-        <.live_component
-          module={CraftplanWeb.ProductLive.FormComponentRecipe}
-          id="material-form"
-          product={@product}
-          current_user={@current_user}
-          settings={@settings}
-          materials={@materials_available}
-          products={@products_available}
-          selected_version={@selected_bom_version}
-          patch={~p"/manage/products/#{@product.sku}/recipe"}
-          on_cancel={hide_modal("product-material-modal")}
-        />
-      </.tabs_content>
-
-      <.tabs_content :if={@live_action == :nutrition}>
-        <div>
-          <h3 class="my-4 text-lg font-medium">
-            {nutrition_heading(@product.nutritional_facts)}
-          </h3>
-          <p
-            :if={
-              @product.nutritional_facts != [] && !nutrition_declaration?(@product.nutritional_facts)
-            }
-            class="mb-4 text-sm text-stone-500"
-          >
-            La producción final no está definida, por lo que los valores se muestran para una unidad de producto.
-          </p>
+        <div class="mt-8 border-t border-stone-200 pt-6">
+          <.live_component
+            module={CraftplanWeb.ProductLive.FormComponentRecipe}
+            id="material-form-detalles"
+            product={@product}
+            current_user={@current_user}
+            settings={@settings}
+            materials={@materials_available}
+            products={@products_available}
+            selected_version={@selected_bom_version}
+            patch={~p"/manage/products/#{@product.id}/details"}
+            on_cancel={hide_modal("product-material-modal")}
+            compact={true}
+          />
         </div>
-        <.table id="nutritional-facts" rows={@product.nutritional_facts}>
-          <:col :let={fact} label="Nutriente">
-            <span class={if Map.get(fact, :parent_key), do: "pl-4", else: ""}>
-              {nutrient_label(fact)}
-            </span>
-          </:col>
-          <:col :let={fact} label={nutrition_amount_label(@product.nutritional_facts)}>
-            {format_amount(fact.unit, fact.amount)}
-          </:col>
-        </.table>
       </.tabs_content>
 
       <.tabs_content :if={@live_action == :photos}>
@@ -162,7 +64,7 @@ defmodule CraftplanWeb.ProductLive.Show do
           current_user={@current_user}
           product={@product}
           settings={@settings}
-          patch={~p"/manage/products/#{@product.sku}"}
+          patch={~p"/manage/products/#{@product.id}"}
         />
       </.tabs_content>
     </div>
@@ -173,7 +75,7 @@ defmodule CraftplanWeb.ProductLive.Show do
       title={@page_title}
       description="Actualiza la información y los detalles del producto."
       show
-      on_cancel={JS.patch(~p"/manage/products/#{@product.sku}")}
+      on_cancel={JS.patch(~p"/manage/products/#{@product.id}")}
     >
       <.live_component
         module={CraftplanWeb.ProductLive.FormComponent}
@@ -183,7 +85,7 @@ defmodule CraftplanWeb.ProductLive.Show do
         current_user={@current_user}
         product={@product}
         settings={@settings}
-        patch={~p"/manage/products/#{@product.sku}/details"}
+        patch={~p"/manage/products/#{@product.id}/details"}
       />
     </.modal>
     """
@@ -199,9 +101,9 @@ defmodule CraftplanWeb.ProductLive.Show do
   end
 
   @impl true
-  def handle_params(%{"sku" => sku} = params, _, socket) do
+  def handle_params(%{"id" => id} = params, _, socket) do
     product =
-      Catalog.get_product_by_sku!(sku,
+      Catalog.get_product_by_id!(id,
         load: [
           :markup_percentage,
           :gross_profit,
@@ -209,6 +111,7 @@ defmodule CraftplanWeb.ProductLive.Show do
           :allergens,
           :nutritional_facts,
           :bom_unit_cost,
+          :category,
           active_bom: [:rollup, components: [:material, :product], labor_steps: []]
         ]
       )
@@ -230,22 +133,12 @@ defmodule CraftplanWeb.ProductLive.Show do
     tabs_links = [
       %{
         label: "Detalles",
-        navigate: ~p"/manage/products/#{product.sku}/details",
+        navigate: ~p"/manage/products/#{product.id}/details",
         active: live_action in [:details, :show]
       },
       %{
-        label: "Receta",
-        navigate: ~p"/manage/products/#{product.sku}/recipe",
-        active: live_action == :recipe
-      },
-      %{
-        label: "Nutrición",
-        navigate: ~p"/manage/products/#{product.sku}/nutrition",
-        active: live_action == :nutrition
-      },
-      %{
         label: "Fotos",
-        navigate: ~p"/manage/products/#{product.sku}/photos",
+        navigate: ~p"/manage/products/#{product.id}/photos",
         active: live_action == :photos
       }
     ]
@@ -255,7 +148,6 @@ defmodule CraftplanWeb.ProductLive.Show do
       |> assign(:page_title, page_title(live_action))
       |> assign(:product, product)
       |> assign(:selected_bom_version, selected_bom_version)
-      |> assign(:status_form, to_form(%{"status" => product.status}))
       |> assign(:tabs_links, tabs_links)
       |> assign(:breadcrumbs, product_breadcrumbs(product, live_action))
 
@@ -265,13 +157,14 @@ defmodule CraftplanWeb.ProductLive.Show do
   @impl true
   def handle_info({CraftplanWeb.ProductLive.FormComponentPhotos, {:saved, _}}, socket) do
     product =
-      Catalog.get_product_by_sku!(socket.assigns.product.sku,
+      Catalog.get_product_by_id!(socket.assigns.product.id,
         load: [
           :markup_percentage,
           :materials_cost,
           :gross_profit,
           :nutritional_facts,
           :bom_unit_cost,
+          :category,
           active_bom: [components: [:material, :product], labor_steps: []]
         ]
       )
@@ -285,7 +178,7 @@ defmodule CraftplanWeb.ProductLive.Show do
   @impl true
   def handle_info({CraftplanWeb.ProductLive.FormComponentRecipe, {:saved, _}}, socket) do
     product =
-      Catalog.get_product_by_sku!(socket.assigns.product.sku,
+      Catalog.get_product_by_id!(socket.assigns.product.id,
         load: [
           :markup_percentage,
           :materials_cost,
@@ -293,6 +186,7 @@ defmodule CraftplanWeb.ProductLive.Show do
           :nutritional_facts,
           :allergens,
           :bom_unit_cost,
+          :category,
           active_bom: [components: [:material, :product], labor_steps: []]
         ],
         actor: socket.assigns.current_user
@@ -300,21 +194,22 @@ defmodule CraftplanWeb.ProductLive.Show do
 
     {:noreply,
      socket
-     |> put_flash(:info, "Receta actualizada correctamente")
+     |> put_flash(:info, "Material guardado exitosamente")
      |> assign(:product, product)
      |> push_event("close-modal", %{id: "product-material-modal"})}
   end
 
   def handle_info({CraftplanWeb.ProductLive.FormComponent, {:saved, _}}, socket) do
     product =
-      Catalog.get_product_by_sku!(socket.assigns.product.sku,
+      Catalog.get_product_by_id!(socket.assigns.product.id,
         load: [
           :markup_percentage,
           :materials_cost,
           :gross_profit,
           :nutritional_facts,
           :allergens,
-          :bom_unit_cost
+          :bom_unit_cost,
+          :category
         ],
         actor: socket.assigns.current_user
       )
@@ -323,20 +218,6 @@ defmodule CraftplanWeb.ProductLive.Show do
      socket
      |> put_flash(:info, "Producto actualizado correctamente")
      |> assign(:product, product)}
-  end
-
-  @impl true
-  def handle_event("product-status-change", %{"_target" => ["status"], "status" => status}, socket) do
-    case Catalog.update_product(socket.assigns.product, %{status: status}, actor: socket.assigns.current_user) do
-      {:ok, product} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Producto actualizado correctamente")
-         |> assign(:product, product)}
-
-      {:error, _} ->
-        {:noreply, socket}
-    end
   end
 
   defp page_title(:show), do: "Producto"
@@ -351,7 +232,7 @@ defmodule CraftplanWeb.ProductLive.Show do
       %{label: "Productos", path: ~p"/manage/products", current?: false},
       %{
         label: product.name,
-        path: ~p"/manage/products/#{product.sku}",
+        path: ~p"/manage/products/#{product.id}",
         current?: live_action in [:show, :details]
       }
     ]
@@ -360,7 +241,7 @@ defmodule CraftplanWeb.ProductLive.Show do
       :recipe ->
         base ++
           [
-            %{label: "Receta", path: ~p"/manage/products/#{product.sku}/recipe", current?: true}
+            %{label: "Receta", path: ~p"/manage/products/#{product.id}/recipe", current?: true}
           ]
 
       :nutrition ->
@@ -368,7 +249,7 @@ defmodule CraftplanWeb.ProductLive.Show do
           [
             %{
               label: "Nutrición",
-              path: ~p"/manage/products/#{product.sku}/nutrition",
+              path: ~p"/manage/products/#{product.id}/nutrition",
               current?: true
             }
           ]
@@ -376,7 +257,7 @@ defmodule CraftplanWeb.ProductLive.Show do
       :photos ->
         base ++
           [
-            %{label: "Fotos", path: ~p"/manage/products/#{product.sku}/photos", current?: true}
+            %{label: "Fotos", path: ~p"/manage/products/#{product.id}/photos", current?: true}
           ]
 
       _ ->
@@ -460,18 +341,6 @@ defmodule CraftplanWeb.ProductLive.Show do
         unit
     end
   end
-
-  defp product_status_label(:draft), do: "Borrador"
-  defp product_status_label(:testing), do: "En prueba"
-  defp product_status_label(:active), do: "Activo"
-  defp product_status_label(:paused), do: "Pausado"
-  defp product_status_label(:discontinued), do: "Descontinuado"
-  defp product_status_label(:archived), do: "Archivado"
-
-  defp product_status_label(status) when is_binary(status),
-    do: status |> String.to_existing_atom() |> product_status_label()
-
-  defp product_status_label(status), do: to_string(status)
 
   defp selling_availability_label(:available), do: "Disponible"
   defp selling_availability_label(:preorder), do: "Preventa"

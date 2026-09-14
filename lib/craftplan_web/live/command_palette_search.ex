@@ -75,14 +75,14 @@ defmodule CraftplanWeb.CommandPaletteSearch do
     pattern = "%#{query}%"
 
     Craftplan.Catalog.Product
-    |> filter(ilike(name, ^pattern) or ilike(sku, ^pattern))
+    |> filter(ilike(name, ^pattern))
     |> limit(5)
     |> Ash.read!(actor: actor)
     |> Enum.map(fn p ->
       %{
         label: p.name,
-        sublabel: p.sku,
-        path: "/manage/products/#{p.sku}",
+        sublabel: p.category && p.category.name || "",
+        path: "/manage/products/#{p.id}",
         icon: :products
       }
     end)
@@ -153,3 +153,4 @@ defmodule CraftplanWeb.CommandPaletteSearch do
     Calendar.strftime(date, "%b %d, %Y")
   end
 end
+

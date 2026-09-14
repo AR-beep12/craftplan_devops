@@ -106,6 +106,7 @@ defmodule CraftplanWeb.Router do
       # Settings Routes
       live "/manage/settings", SettingsLive.Index, :index
       live "/manage/settings/general", SettingsLive.Index, :general
+      live "/manage/settings/categories", SettingsLive.Index, :categories
       live "/manage/settings/allergens", SettingsLive.Index, :allergens
       live "/manage/settings/nutritional_facts", SettingsLive.Index, :nutritional_facts
       live "/manage/settings/csv", SettingsLive.Index, :csv
@@ -136,13 +137,13 @@ defmodule CraftplanWeb.Router do
       # Products
       live "/manage/products", ProductLive.Index, :index
       live "/manage/products/new", ProductLive.Index, :new
-      live "/manage/products/:sku", ProductLive.Show, :show
-      live "/manage/products/:sku/details", ProductLive.Show, :details
-      live "/manage/products/:sku/recipe", ProductLive.Show, :recipe
-      live "/manage/products/:sku/nutrition", ProductLive.Show, :nutrition
-      live "/manage/products/:sku/photos", ProductLive.Show, :photos
-      live "/manage/products/:sku/edit", ProductLive.Show, :edit
-      live "/manage/products/:sku/label", ProductLive.Label, :label
+      live "/manage/products/:id", ProductLive.Show, :show
+      live "/manage/products/:id/details", ProductLive.Show, :details
+      live "/manage/products/:id/recipe", ProductLive.Show, :recipe
+      live "/manage/products/:id/nutrition", ProductLive.Show, :nutrition
+      live "/manage/products/:id/photos", ProductLive.Show, :photos
+      live "/manage/products/:id/edit", ProductLive.Show, :edit
+      live "/manage/products/:id/label", ProductLive.Label, :label
 
       # Inventory
       live "/manage/inventory", InventoryLive.Index, :index
@@ -260,3 +261,4 @@ defmodule CraftplanWeb.Router do
   # Tighten as needed for your deployment.
   defp put_csp(conn, _opts), do: Plug.Conn.put_resp_header(conn, "content-security-policy", @csp)
 end
+

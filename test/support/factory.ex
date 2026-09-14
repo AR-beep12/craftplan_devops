@@ -18,11 +18,11 @@ defmodule Craftplan.Test.Factory do
   def create_product!(attrs \\ %{}, actor \\ staff_actor()) do
     params =
       %{
-        name: Map.get(attrs, :name, "Test Product"),
-        sku: Map.get(attrs, :sku, unique_code("SKU")),
-        status: Map.get(attrs, :status, :active),
+        name: Map.get(attrs, :name, "Test Product-" <> Ecto.UUID.generate()),
         price: Map.get(attrs, :price, Decimal.new("10.00"))
       }
+      |> maybe_put(:category_id, Map.get(attrs, :category_id))
+      |> maybe_put(:selling_availability, Map.get(attrs, :selling_availability))
 
     Product
     |> Ash.Changeset.for_create(:create, params)
@@ -111,7 +111,7 @@ defmodule Craftplan.Test.Factory do
       |> Ash.Changeset.for_create(:create, params)
       |> Ash.create(actor: actor)
 
-    Ash.reload!(order, load: [items: [product: [:name, :sku]]], actor: actor)
+    Ash.reload!(order, load: [items: [product: [:name]]], actor: actor)
   end
 
   # API Keys

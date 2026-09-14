@@ -44,7 +44,7 @@ defmodule Craftplan.Orders.OrderItem do
     :quantity,
     :planned_qty_sum,
     :completed_qty_sum,
-    product: [:name, :sku],
+    product: [:name],
     order: [:reference, :delivery_date, customer: [:full_name]]
   ]
 
@@ -223,3 +223,4 @@ defmodule Craftplan.Orders.OrderItem do
     sum :completed_qty_sum, :allocations, :completed_qty
   end
 end
+

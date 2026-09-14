@@ -30,7 +30,8 @@ defmodule Craftplan.Orders.Changes.BatchOpenInit do
           {nil, nil, %{}}
       end
 
-    code = Craftplan.Production.Batching.generate_batch_code(product.sku, actor)
+    short = product.id |> to_string() |> String.slice(0, 8)
+    code = Craftplan.Production.Batching.generate_batch_code(short, actor)
 
     changeset
     |> Changeset.force_change_attribute(:batch_code, code)
@@ -43,3 +44,4 @@ defmodule Craftplan.Orders.Changes.BatchOpenInit do
     |> Changeset.force_change_attribute(:status, :open)
   end
 end
+

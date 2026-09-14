@@ -14,8 +14,6 @@ defmodule Craftplan.Catalog.Product.Calculations.NutritionalFacts do
   @impl true
   def load(_query, _opts, _context) do
     [
-      :nutrition_output_quantity,
-      :nutrition_output_unit,
       active_bom: [
         components: [
           :component_type,
@@ -102,25 +100,9 @@ defmodule Craftplan.Catalog.Product.Calculations.NutritionalFacts do
     end)
   end
 
-  defp scale_to_declaration_basis(facts, product) do
-    output_quantity = Map.get(product, :nutrition_output_quantity)
-    output_unit = Map.get(product, :nutrition_output_unit)
-
-    if Nutrition.declaration_output?(output_quantity, output_unit) do
-      scale = D.div(D.new(100), DecimalHelpers.to_decimal(output_quantity))
-
-      Enum.map(facts, fn fact ->
-        %{
-          fact
-          | amount: D.mult(fact.amount, scale),
-            per_quantity: D.new(100),
-            per_unit: output_unit,
-            declaration?: true
-        }
-      end)
-    else
-      facts
-    end
+  defp scale_to_declaration_basis(facts, _product) do
+    # nutrition_output fields were removed with product simplification - always return base facts
+    facts
   end
 
   defp sum_amounts(facts) do

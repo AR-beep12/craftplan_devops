@@ -27,7 +27,7 @@ defmodule CraftplanWeb.OrderLive.Show do
       :labor_cost,
       :overhead_cost,
       :unit_cost,
-      product: [:name, :sku]
+      product: [:name]
     ],
     customer: [:full_name]
   ]
@@ -99,7 +99,7 @@ defmodule CraftplanWeb.OrderLive.Show do
           <:col :let={item} label="Producto">
             <.link
               class="hover:text-blue-800 hover:underline"
-              navigate={~p"/manage/products/#{item.product.sku}"}
+              navigate={~p"/manage/products/#{item.product.id}"}
             >
               <div class="flex items-center space-x-2">
                 <img
@@ -329,7 +329,7 @@ defmodule CraftplanWeb.OrderLive.Show do
     item =
       Orders.get_order_item_by_id!(item_id,
         actor: actor,
-        load: [:quantity, :planned_qty_sum, product: [:name, :sku]]
+        load: [:quantity, :planned_qty_sum, product: [:name]]
       )
 
     open_batches =
@@ -462,3 +462,4 @@ defmodule CraftplanWeb.OrderLive.Show do
 
   defp order_trail(order, _), do: [Navigation.root(:orders), Navigation.resource(:order, order)]
 end
+

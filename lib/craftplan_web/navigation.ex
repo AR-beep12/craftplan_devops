@@ -59,6 +59,7 @@ defmodule CraftplanWeb.Navigation do
   defp settings_active?(:general, socket), do: live_action(socket) in [:index, :general]
   defp settings_active?(slug, socket), do: live_action(socket) == slug
   def settings_general_active?(socket), do: settings_active?(:general, socket)
+  def settings_categories_active?(socket), do: settings_active?(:categories, socket)
   def settings_allergens_active?(socket), do: settings_active?(:allergens, socket)
   def settings_nutrition_active?(socket), do: settings_active?(:nutritional_facts, socket)
   def settings_csv_active?(socket), do: settings_active?(:csv, socket)
@@ -231,6 +232,7 @@ defmodule CraftplanWeb.Navigation do
         path: "/manage/settings",
         pages: %{
           general: %{label: "Configuración general", path: "/manage/settings/general"},
+          categories: %{label: "Categorías", path: "/manage/settings/categories"},
           allergens: %{label: "Alérgenos", path: "/manage/settings/allergens"},
           nutritional_facts: %{
             label: "Datos nutricionales",
@@ -247,6 +249,12 @@ defmodule CraftplanWeb.Navigation do
             label: "General",
             navigate: "/manage/settings/general",
             active?: &__MODULE__.settings_general_active?/1
+          },
+          %{
+            key: :categories,
+            label: "Categorías",
+            navigate: "/manage/settings/categories",
+            active?: &__MODULE__.settings_categories_active?/1
           },
           %{
             key: :csv,

@@ -498,18 +498,14 @@ defmodule CraftplanWeb.ImportModalComponent do
       key: "products",
       label: "Productos",
       importer: Craftplan.CSV.Importers.Products,
-      instructions: ["Requerido: name, sku, price. Opcional: status."],
+      instructions: ["Requerido: name, price."],
       fields: [
         %{name: "name", label: "Nombre", required: true},
-        %{name: "sku", label: "SKU", required: true},
-        %{name: "price", label: "Precio", required: true},
-        %{name: "status", label: "Estado", required: false}
+        %{name: "price", label: "Precio", required: true}
       ],
       default_candidates: %{
         "name" => ["name", "product name"],
-        "sku" => ["sku", "code"],
-        "price" => ["price", "cost", "amount"],
-        "status" => ["status"]
+        "price" => ["price", "cost", "amount"]
       }
     }
   end
@@ -556,3 +552,4 @@ defmodule CraftplanWeb.ImportModalComponent do
     }
   end
 end
+

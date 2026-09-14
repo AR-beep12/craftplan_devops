@@ -51,7 +51,7 @@ RUN mix release
 FROM ${RUNNER_IMAGE}
 
 RUN for i in 1 2 3; do apt-get update -y && break || sleep 15; done && \
-    for i in 1 2 3; do apt-get install -y libstdc++6 openssl libncurses5 locales ca-certificates && break || sleep 15; done && \
+    for i in 1 2 3; do apt-get install -y libstdc++6 openssl libncurses5 locales ca-certificates imagemagick && break || sleep 15; done && \
     apt-get clean && rm -f /var/lib/apt/lists/*_*
 
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen

@@ -47,7 +47,7 @@ services:
     restart: unless-stopped
 
   minio:
-    image: minio/minio:latest
+    image: quay.io/minio/minio:latest
     entrypoint: sh
     command: -c 'mkdir -p /data/craftplan && /usr/bin/minio server /data --console-address ":9001"'
     environment:

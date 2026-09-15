@@ -11,7 +11,7 @@
 
 services:
   craftplan:
-    image: ghcr.io/ar-beep12/craftplan_devops:latest
+    image: ghcr.io/ar-beep12/craftplan_devops:main
     ports:
       - "${PORT:-4000}:${PORT:-4000}"
     env_file: .env

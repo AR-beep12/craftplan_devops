@@ -1,19 +1,17 @@
 # =============================================================================
-# Craftplan — Docker Compose (Build from Source)
+# Craftplan — Docker Compose (Pre-built Image, Production)
 # =============================================================================
-# This file builds the Docker image locally from the Dockerfile.
-# Use this if you are contributing to Craftplan or need a custom build.
-#
-# For production deployments with pre-built images, use docker-compose.yml instead:
-#   curl -O https://raw.githubusercontent.com/puemos/craftplan/main/docker-compose.yml
+# Pulls the image published by the "Docker" GitHub Actions workflow to
+# ghcr.io/ar-beep12/craftplan_devops instead of building locally.
 #
 # Usage:
 #   cp .env.example .env   # fill in secrets
+#   docker compose -f docker-compose.prod.yml pull
 #   docker compose -f docker-compose.prod.yml up -d
 
 services:
   craftplan:
-    build: .
+    image: ghcr.io/ar-beep12/craftplan_devops:latest
     ports:
       - "${PORT:-4000}:${PORT:-4000}"
     env_file: .env

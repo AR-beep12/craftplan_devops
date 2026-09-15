@@ -9,11 +9,7 @@ defmodule Craftplan.Inventory.MaterialNameValidationTest do
     Material
     |> Ash.Changeset.for_create(:create, %{
       name: name,
-      sku: "MAT-#{System.unique_integer([:positive])}",
-      unit: :gram,
-      price: Decimal.new("1.00"),
-      minimum_stock: Decimal.new(0),
-      maximum_stock: Decimal.new(0)
+      unit: :gram
     })
     |> Ash.create(actor: staff())
   end

@@ -16,14 +16,12 @@ defmodule Craftplan.Inventory.LotUnitCostTest do
     s
   end
 
-  defp create_material(sku) do
+  defp create_material(label) do
     {:ok, m} =
       Inventory.Material
       |> Ash.Changeset.for_create(:create, %{
-        name: "Test #{sku}",
-        sku: sku,
-        unit: :gram,
-        price: Decimal.new("1.00")
+        name: "Test #{label}",
+        unit: :gram
       })
       |> Ash.create(actor: staff())
 

@@ -13,11 +13,7 @@ defmodule Craftplan.InventoryForecastingTest do
     Material
     |> Ash.Changeset.for_create(:create, %{
       name: name,
-      sku: name <> "-SKU",
-      price: Decimal.new("1.00"),
-      unit: :gram,
-      minimum_stock: Decimal.new(0),
-      maximum_stock: Decimal.new(0)
+      unit: :gram
     })
     |> Ash.create!(actor: Craftplan.DataCase.staff_actor())
   end

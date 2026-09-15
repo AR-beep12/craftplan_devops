@@ -128,7 +128,7 @@ defmodule CraftplanWeb.CommandPaletteTest do
       {conn, staff} = staff_conn(conn)
 
       # Create a test material
-      material = Factory.create_material!(%{name: "Cocoa Powder", sku: "cocoa-001"}, staff)
+      material = Factory.create_material!(%{name: "Cocoa Powder"}, staff)
 
       {:ok, view, _html} = live(conn, ~p"/manage/overview")
 
@@ -140,7 +140,7 @@ defmodule CraftplanWeb.CommandPaletteTest do
 
       html = render(view)
       assert html =~ "Cocoa Powder"
-      assert html =~ material.sku
+      assert html =~ material.id
     end
 
     test "searches customers by name", %{conn: conn} do

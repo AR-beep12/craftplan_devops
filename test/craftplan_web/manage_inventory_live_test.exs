@@ -20,11 +20,7 @@ defmodule CraftplanWeb.ManageInventoryLiveTest do
       params = %{
         "material" => %{
           "name" => "New Material",
-          "sku" => "mat-" <> Ecto.UUID.generate(),
-          "price" => "2.50",
-          "unit" => "gram",
-          "minimum_stock" => "0",
-          "maximum_stock" => "0"
+          "unit" => "gram"
         }
       }
 
@@ -42,7 +38,7 @@ defmodule CraftplanWeb.ManageInventoryLiveTest do
     test "renders material details tab for staff", %{conn: conn} do
       material = Factory.create_material!()
 
-      {:ok, view, _html} = live(conn, ~p"/manage/inventory/#{material.sku}")
+      {:ok, view, _html} = live(conn, ~p"/manage/inventory/#{material.id}")
       assert has_element?(view, "[role=tablist]")
       assert has_element?(view, "kbd")
     end
@@ -51,7 +47,7 @@ defmodule CraftplanWeb.ManageInventoryLiveTest do
     test "renders allergens tab for staff", %{conn: conn} do
       material = Factory.create_material!()
 
-      {:ok, view, _html} = live(conn, ~p"/manage/inventory/#{material.sku}/allergens")
+      {:ok, view, _html} = live(conn, ~p"/manage/inventory/#{material.id}/allergens")
       assert has_element?(view, "[role=tablist]")
       assert has_element?(view, "#material-allergen-form-2")
     end
@@ -60,7 +56,7 @@ defmodule CraftplanWeb.ManageInventoryLiveTest do
     test "renders nutritional facts tab for staff", %{conn: conn} do
       material = Factory.create_material!()
 
-      {:ok, view, _html} = live(conn, ~p"/manage/inventory/#{material.sku}/nutritional_facts")
+      {:ok, view, _html} = live(conn, ~p"/manage/inventory/#{material.id}/nutritional_facts")
       assert has_element?(view, "[role=tablist]")
       assert has_element?(view, "#material-nutritional-facts-form")
     end
@@ -69,7 +65,7 @@ defmodule CraftplanWeb.ManageInventoryLiveTest do
     test "renders stock tab for staff", %{conn: conn} do
       material = Factory.create_material!()
 
-      {:ok, view, _html} = live(conn, ~p"/manage/inventory/#{material.sku}/stock")
+      {:ok, view, _html} = live(conn, ~p"/manage/inventory/#{material.id}/stock")
       assert has_element?(view, "[role=tablist]")
       assert has_element?(view, "#inventory_movements")
     end
@@ -78,7 +74,7 @@ defmodule CraftplanWeb.ManageInventoryLiveTest do
     test "renders edit modal for staff", %{conn: conn} do
       material = Factory.create_material!()
 
-      {:ok, view, _html} = live(conn, ~p"/manage/inventory/#{material.sku}/edit")
+      {:ok, view, _html} = live(conn, ~p"/manage/inventory/#{material.id}/edit")
       assert has_element?(view, "#material-form")
     end
 
@@ -86,7 +82,7 @@ defmodule CraftplanWeb.ManageInventoryLiveTest do
     test "renders adjust modal for staff", %{conn: conn} do
       material = Factory.create_material!()
 
-      {:ok, view, _html} = live(conn, ~p"/manage/inventory/#{material.sku}/adjust")
+      {:ok, view, _html} = live(conn, ~p"/manage/inventory/#{material.id}/adjust")
       assert has_element?(view, "#movement-form")
     end
   end
@@ -99,11 +95,7 @@ defmodule CraftplanWeb.ManageInventoryLiveTest do
         Craftplan.Inventory.Material
         |> Ash.Changeset.for_create(:create, %{
           name: "Test Stock Material",
-          sku: "MAT-#{System.unique_integer([:positive])}",
-          unit: :gram,
-          price: Decimal.new("1.00"),
-          minimum_stock: Decimal.new(0),
-          maximum_stock: Decimal.new(0)
+          unit: :gram
         })
         |> Ash.create!(actor: actor)
 
@@ -128,7 +120,7 @@ defmodule CraftplanWeb.ManageInventoryLiveTest do
       material = create_material_with_stock!("100")
       actor = Craftplan.DataCase.staff_actor()
 
-      {:ok, view, _html} = live(conn, ~p"/manage/inventory/#{material.sku}/adjust")
+      {:ok, view, _html} = live(conn, ~p"/manage/inventory/#{material.id}/adjust")
 
       view |> element("button[phx-value-mode=subtract]") |> render_click()
 
@@ -136,7 +128,7 @@ defmodule CraftplanWeb.ManageInventoryLiveTest do
       |> form("#movement-form", %{"movement" => %{"quantity" => "30", "reason" => "test sub"}})
       |> render_submit()
 
-      assert_patch(view, ~p"/manage/inventory/#{material.sku}/stock")
+      assert_patch(view, ~p"/manage/inventory/#{material.id}/stock")
 
       reloaded =
         Ash.load!(
@@ -153,13 +145,13 @@ defmodule CraftplanWeb.ManageInventoryLiveTest do
       material = create_material_with_stock!("50")
       actor = Craftplan.DataCase.staff_actor()
 
-      {:ok, view, _html} = live(conn, ~p"/manage/inventory/#{material.sku}/adjust")
+      {:ok, view, _html} = live(conn, ~p"/manage/inventory/#{material.id}/adjust")
 
       view
       |> form("#movement-form", %{"movement" => %{"quantity" => "22.5", "reason" => "decimal"}})
       |> render_submit()
 
-      assert_patch(view, ~p"/manage/inventory/#{material.sku}/stock")
+      assert_patch(view, ~p"/manage/inventory/#{material.id}/stock")
 
       reloaded =
         Ash.load!(
@@ -175,7 +167,7 @@ defmodule CraftplanWeb.ManageInventoryLiveTest do
     test "subtract below zero shows red preview without clamping", %{conn: conn} do
       material = create_material_with_stock!("10")
 
-      {:ok, view, _html} = live(conn, ~p"/manage/inventory/#{material.sku}/adjust")
+      {:ok, view, _html} = live(conn, ~p"/manage/inventory/#{material.id}/adjust")
 
       view |> element("button[phx-value-mode=subtract]") |> render_click()
 

@@ -14,16 +14,14 @@ defmodule Craftplan.Inventory.OpenPOsForMaterialTest do
     s
   end
 
-  defp mk_material(name, sku, unit, price) do
+  defp mk_material(name, unit) do
     actor = Craftplan.DataCase.staff_actor()
 
     {:ok, mat} =
       Inventory.Material
       |> Ash.Changeset.for_create(:create, %{
         name: name,
-        sku: sku,
-        unit: unit,
-        price: Decimal.new(price)
+        unit: unit
       })
       |> Ash.create(actor: actor)
 
@@ -31,7 +29,7 @@ defmodule Craftplan.Inventory.OpenPOsForMaterialTest do
   end
 
   test "lists open PO items for a material and excludes received" do
-    mat = mk_material("Flour", "F-PO", :gram, "0.01")
+    mat = mk_material("Flour", :gram)
     s = mk_supplier("ACME")
 
     actor = Craftplan.DataCase.staff_actor()

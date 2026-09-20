@@ -1,19 +1,6 @@
-# =============================================================================
-# Craftplan — Docker Compose (Build from Source)
-# =============================================================================
-# This file builds the Docker image locally from the Dockerfile.
-# Use this if you are contributing to Craftplan or need a custom build.
-#
-# For production deployments with pre-built images, use docker-compose.yml instead:
-#   curl -O https://raw.githubusercontent.com/puemos/craftplan/main/docker-compose.yml
-#
-# Usage:
-#   cp .env.example .env   # fill in secrets
-#   docker compose -f docker-compose.prod.yml up -d
-
 services:
   craftplan:
-    build: .
+    image: ghcr.io/ar-beep12/craftplan_devops:main
     ports:
       - "${PORT:-4000}:${PORT:-4000}"
     env_file: .env
@@ -50,7 +37,7 @@ services:
     restart: unless-stopped
 
   minio:
-    image: minio/minio:latest
+    image: quay.io/minio/minio:latest
     entrypoint: sh
     command: -c 'mkdir -p /data/craftplan && /usr/bin/minio server /data --console-address ":9001"'
     environment:

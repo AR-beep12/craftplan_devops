@@ -41,6 +41,10 @@ defmodule Craftplan.Orders.Order do
   postgres do
     table "orders_orders"
     repo Craftplan.Repo
+
+    references do
+      reference :customer, on_delete: :delete
+    end
   end
 
   actions do

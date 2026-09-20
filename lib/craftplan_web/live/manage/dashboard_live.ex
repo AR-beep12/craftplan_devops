@@ -44,9 +44,6 @@ defmodule CraftplanWeb.DashboardLive do
     <Page.page>
       <.header>
         Dashboard
-        <:subtitle>
-          Un vistazo rápido a lo que necesita tu atención hoy.
-        </:subtitle>
       </.header>
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">

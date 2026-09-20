@@ -222,9 +222,6 @@ defmodule CraftplanWeb.Layouts do
     ~H"""
     <nav class="h-[calc(100vh-4rem)] flex flex-col justify-between overflow-y-auto px-4 pt-6 pb-6 md:h-full md:pb-8">
       <div>
-        <p class="text-xs font-semibold uppercase tracking-wide text-stone-400">
-          {(@is_manage? && "Gestionar") || "Explorar"}
-        </p>
 
         <% primary_links = if @is_manage?, do: @manage_links, else: @shop_links %>
         <ul class="mt-3 space-y-1">
@@ -608,7 +605,8 @@ defmodule CraftplanWeb.Layouts do
     end)
   end
 
-  defp nav_active?(current_path, nav_section, %{nav_section: section} = link) when not is_nil(section) do
+  defp nav_active?(current_path, nav_section, %{nav_section: section} = link)
+       when not is_nil(section) do
     nav_section == section or String.starts_with?(current_path, Map.get(link, :prefix, ""))
   end
 

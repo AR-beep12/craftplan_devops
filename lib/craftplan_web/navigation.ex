@@ -264,7 +264,7 @@ defmodule CraftplanWeb.Navigation do
           },
           %{
             key: :members,
-            label: "Miembros",
+            label: "Usuarios",
             navigate: "/manage/settings/members",
             active?: &__MODULE__.settings_members_active?/1
           }
@@ -347,7 +347,8 @@ defmodule CraftplanWeb.Navigation do
   @doc """
   Helper to reference a section-specific page crumb.
   """
-  def page(section, slug, data \\ nil) when is_atom(section) and is_atom(slug), do: {section, slug, data}
+  def page(section, slug, data \\ nil) when is_atom(section) and is_atom(slug),
+    do: {section, slug, data}
 
   @doc """
   Helper to reference resource-backed breadcrumb entries (orders, suppliers, etc).
@@ -438,9 +439,11 @@ defmodule CraftplanWeb.Navigation do
 
   defp normalize_token(%{label: _} = crumb), do: {:custom, crumb}
 
-  defp normalize_token({section, slug}) when is_atom(section) and is_atom(slug), do: {:section, section, slug, nil}
+  defp normalize_token({section, slug}) when is_atom(section) and is_atom(slug),
+    do: {:section, section, slug, nil}
 
-  defp normalize_token({section, slug, data}) when is_atom(section) and is_atom(slug), do: {:section, section, slug, data}
+  defp normalize_token({section, slug, data}) when is_atom(section) and is_atom(slug),
+    do: {:section, section, slug, data}
 
   defp normalize_token({resource, data}) when is_atom(resource) do
     case Map.fetch(@resource_sections, resource) do

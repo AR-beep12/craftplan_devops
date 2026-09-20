@@ -51,6 +51,14 @@ defmodule CraftplanWeb.OrderLive.Index do
     <Page.page>
       <.header>
         Pedidos
+
+        <:actions>
+          <div class="flex flex-wrap items-center gap-3">
+            <.link patch={~p"/manage/orders/new"} phx-click={JS.push_focus()}>
+              <.button variant={:primary}>Nuevo pedido</.button>
+            </.link>
+          </div>
+        </:actions>
       </.header>
 
       <Page.surface>
@@ -103,6 +111,9 @@ defmodule CraftplanWeb.OrderLive.Index do
                 value={@filters["delivery_date_start"]}
                 label="Fecha de entrega después de"
               />
+            </div>
+
+            <div class="min-w-[12rem]">
               <.input
                 type="date"
                 name="filters[delivery_date_end]"
@@ -117,7 +128,7 @@ defmodule CraftplanWeb.OrderLive.Index do
 
       <Page.section
         title="Resumen de pedidos"
-        description="Alterna entre las vistas de tabla y calendario para gestionar los compromisos de producción."
+        description="Alterna entre las vistas de tabla y calendario para gestionar los pedidos."
       >
         <:actions :if={Enum.any?(@nav_sub_links)}>
           <Page.toggle_bar links={@nav_sub_links} />
@@ -658,7 +669,8 @@ defmodule CraftplanWeb.OrderLive.Index do
     week_start = List.first(days_range)
     week_end = List.last(days_range)
 
-    {DateTime.new!(week_start, ~T[00:00:00], "Etc/UTC"), DateTime.new!(week_end, ~T[23:59:59], "Etc/UTC")}
+    {DateTime.new!(week_start, ~T[00:00:00], "Etc/UTC"),
+     DateTime.new!(week_end, ~T[23:59:59], "Etc/UTC")}
   end
 
   defp load_orders_for_calendar(socket, filter_opts, days_range) do
@@ -727,7 +739,8 @@ defmodule CraftplanWeb.OrderLive.Index do
     |> assign(:order, nil)
   end
 
-  defp order_trail(%{live_action: :new}), do: [Navigation.root(:orders), Navigation.page(:orders, :new)]
+  defp order_trail(%{live_action: :new}),
+    do: [Navigation.root(:orders), Navigation.page(:orders, :new)]
 
   defp order_trail(_), do: [Navigation.root(:orders)]
 

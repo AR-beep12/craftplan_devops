@@ -3,6 +3,7 @@ defmodule CraftplanWeb.ProductLive.Index do
   use CraftplanWeb, :live_view
 
   alias Craftplan.Catalog
+  alias CraftplanWeb.Components.Page
   alias Craftplan.Catalog.Product.Photo
 
   @impl true
@@ -19,48 +20,49 @@ defmodule CraftplanWeb.ProductLive.Index do
         </.link>
       </:actions>
     </.header>
+    <Page.surface>
+      <.table
+        id="products"
+        rows={@streams.products}
+        row_click={fn {_, product} -> JS.navigate(~p"/manage/products/#{product.id}") end}
+        row_id={fn {dom_id, _} -> dom_id end}
+      >
+        <:col :let={{_, product}} label="Nombre">
+          <div class="flex items-center space-x-2">
+            <img
+              :if={product.featured_photo != nil}
+              src={CraftplanWeb.PhotoUrl.signed(Photo, :thumb, {product.featured_photo, product})}
+              alt={product.name}
+              class="h-5 w-5"
+            />
+            <span>
+              {product.name}
+            </span>
+          </div>
+        </:col>
+        <:col :let={{_, product}} label="Categoría">
+          {(product.category && product.category.name) || "-"}
+        </:col>
+        <:col :let={{_, product}} label="Precio">
+          {format_money(@settings.currency, product.price)}
+        </:col>
 
-    <.table
-      id="products"
-      rows={@streams.products}
-      row_click={fn {_, product} -> JS.navigate(~p"/manage/products/#{product.id}") end}
-      row_id={fn {dom_id, _} -> dom_id end}
-    >
-      <:col :let={{_, product}} label="Nombre">
-        <div class="flex items-center space-x-2">
-          <img
-            :if={product.featured_photo != nil}
-            src={CraftplanWeb.PhotoUrl.signed(Photo, :thumb, {product.featured_photo, product})}
-            alt={product.name}
-            class="h-5 w-5"
-          />
-          <span>
-            {product.name}
-          </span>
-        </div>
-      </:col>
-      <:col :let={{_, product}} label="Categoría">
-        {(product.category && product.category.name) || "-"}
-      </:col>
-      <:col :let={{_, product}} label="Precio">
-        {format_money(@settings.currency, product.price)}
-      </:col>
+        <:action :let={{_, product}}>
+          <.link
+            phx-click={JS.push("delete", value: %{id: product.id}) |> hide("#product-#{product.id}")}
+            data-confirm="¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer."
+          >
+            <.button size={:sm} variant={:danger}>
+              Eliminar
+            </.button>
+          </.link>
+        </:action>
+      </.table>
 
-      <:action :let={{_, product}}>
-        <.link
-          phx-click={JS.push("delete", value: %{id: product.id}) |> hide("#product-#{product.id}")}
-          data-confirm="¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer."
-        >
-          <.button size={:sm} variant={:danger}>
-            Eliminar
-          </.button>
-        </.link>
-      </:action>
-    </.table>
-
-    <div :if={@products_count == 0} class="py-8 text-center text-sm text-stone-500">
-      No se encontraron productos
-    </div>
+      <div :if={@products_count == 0} class="py-8 text-center text-sm text-stone-500">
+        No se encontraron productos
+      </div>
+    </Page.surface>
 
     <.modal
       :if={@live_action in [:new, :edit]}
@@ -175,7 +177,8 @@ defmodule CraftplanWeb.ProductLive.Index do
 
         Logger.error("Failed to delete product #{id}: #{inspect(error)}")
 
-        {:noreply, put_flash(socket, :error, "No se pudo eliminar el producto: #{inspect(error)}")}
+        {:noreply,
+         put_flash(socket, :error, "No se pudo eliminar el producto: #{inspect(error)}")}
     end
   end
 

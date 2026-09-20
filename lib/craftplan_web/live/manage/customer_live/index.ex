@@ -10,7 +10,6 @@ defmodule CraftplanWeb.CustomerLive.Index do
     ~H"""
     <.header>
       Clientes
-      <:subtitle>Gestiona los registros de tus clientes</:subtitle>
       <:actions>
         <.link patch={~p"/manage/customers/new"}>
           <.button variant={:primary}>Nuevo cliente</.button>
@@ -23,15 +22,27 @@ defmodule CraftplanWeb.CustomerLive.Index do
         id="customers"
         rows={@streams.customers}
         row_click={fn {_id, customer} -> JS.navigate(~p"/manage/customers/#{customer.reference}") end}
+        row_id={fn {dom_id, _} -> dom_id end}
       >
-        <:col :let={{_id, customer}} label="Nombre">{customer.full_name}</:col>
-        <:col :let={{_id, customer}} label="ID">
+        <:col :let={{_, customer}} label="Nombre">{customer.full_name}</:col>
+        <:col :let={{_, customer}} label="ID">
           <.kbd>
             {format_reference(customer.reference)}
           </.kbd>
         </:col>
-        <:col :let={{_id, customer}} label="Correo electrónico">{customer.email}</:col>
-        <:col :let={{_id, customer}} label="Teléfono">{customer.phone}</:col>
+        <:col :let={{_, customer}} label="Correo electrónico">{customer.email}</:col>
+        <:col :let={{_, customer}} label="Teléfono">{customer.phone}</:col>
+
+        <:action :let={{_, customer}}>
+          <.link
+            phx-click={JS.push("delete", value: %{id: customer.id}) |> hide("#customer-#{customer.id}")}
+            data-confirm="¿Estás seguro de que deseas eliminar este cliente? Esta acción no se puede deshacer."
+          >
+            <.button size={:sm} variant={:danger}>
+              Eliminar
+            </.button>
+          </.link>
+        </:action>
       </.table>
       <div
         :if={@customers_empty?}
@@ -130,24 +141,30 @@ defmodule CraftplanWeb.CustomerLive.Index do
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    case id
-         |> Craftplan.CRM.get_customer_by_id!(actor: socket.assigns.current_user)
-         |> Craftplan.CRM.destroy_customer(actor: socket.assigns.current_user) do
+    customer =
+      Craftplan.CRM.get_customer_by_id!(id, actor: socket.assigns.current_user)
+
+    case Craftplan.CRM.destroy_customer(customer, actor: socket.assigns.current_user) do
       :ok ->
-        socket = stream_delete(socket, :customers, %{id: id})
-
-        remaining =
-          [actor: socket.assigns.current_user, load: [:full_name]]
-          |> Craftplan.CRM.list_customers!()
-          |> Enum.to_list()
-
         {:noreply,
          socket
          |> put_flash(:info, "Cliente eliminado correctamente")
-         |> assign(:customers_empty?, Enum.empty?(remaining))}
+         |> stream_delete(:customers, %{id: id})}
 
-      {:error, _error} ->
-        {:noreply, put_flash(socket, :error, "No se pudo eliminar el cliente.")}
+      {:error, error} ->
+        require Logger
+        Logger.error("Failed to delete customer #{id}: #{inspect(error)}")
+
+        {:noreply, put_flash(socket, :error, delete_error_message(error))}
+    end
+  end
+
+  defp delete_error_message(error) do
+    message = inspect(error)
+
+    case Regex.run(~r/No se puede eliminar el cliente[^."]*/, message) do
+      [friendly | _] -> friendly <> "."
+      _ -> "No se pudo eliminar el cliente."
     end
   end
 end

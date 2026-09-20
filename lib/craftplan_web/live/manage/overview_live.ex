@@ -91,7 +91,9 @@ defmodule CraftplanWeb.OverviewLive do
               <Page.surface>
                 <:header>
                   <div>
-                    <h3 class="text-sm font-semibold text-stone-900">Detalles de exceso de capacidad</h3>
+                    <h3 class="text-sm font-semibold text-stone-900">
+                      Detalles de exceso de capacidad
+                    </h3>
                     <p class="text-xs text-stone-500">
                       Productos que superan su límite diario.
                     </p>
@@ -119,7 +121,9 @@ defmodule CraftplanWeb.OverviewLive do
               <Page.surface>
                 <:header>
                   <div>
-                    <h3 class="text-sm font-semibold text-stone-900">Días que superan la capacidad de pedidos</h3>
+                    <h3 class="text-sm font-semibold text-stone-900">
+                      Días que superan la capacidad de pedidos
+                    </h3>
                     <p class="text-xs text-stone-500">
                       Cuando los pedidos confirmados superan el límite diario general.
                     </p>
@@ -147,7 +151,9 @@ defmodule CraftplanWeb.OverviewLive do
               <Page.surface class="mt-4 lg:col-span-2 xl:col-span-3">
                 <:header>
                   <div>
-                    <h3 class="text-sm font-semibold text-stone-900">Próximas escaseces de materiales</h3>
+                    <h3 class="text-sm font-semibold text-stone-900">
+                      Próximas escaseces de materiales
+                    </h3>
                     <p class="text-xs text-stone-500">
                       Dónde el inventario resulta insuficiente al aplicar la producción.
                     </p>

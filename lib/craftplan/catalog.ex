@@ -13,9 +13,15 @@ defmodule Craftplan.Catalog do
   @type product_id :: integer()
 
   resources do
+    resource Craftplan.Catalog.Category do
+      define :list_categories, action: :read
+      define :get_category_by_id, action: :read, get_by: [:id]
+      define :create_category, action: :create
+      define :update_category, action: :update
+    end
+
     resource Craftplan.Catalog.Product do
       define :get_product_by_id, action: :read, get_by: [:id]
-      define :get_product_by_sku, action: :read, get_by: [:sku]
       define :list_products, action: :list
       define :list_products_with_keyset, action: :keyset
       define :destroy_product, action: :destroy

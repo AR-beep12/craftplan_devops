@@ -7,7 +7,7 @@ defmodule CraftplanWeb.DashboardLive do
   alias CraftplanWeb.Components.Page
   alias Phoenix.LiveView.JS
 
-  @pending_statuses [:unconfirmed, :confirmed, :in_progress, :ready]
+  @pending_statuses [:pending, :in_progress]
 
   @impl true
   def mount(_params, _session, socket) do
@@ -44,14 +44,11 @@ defmodule CraftplanWeb.DashboardLive do
     <Page.page>
       <.header>
         Dashboard
-        <:subtitle>
-          Un vistazo rápido a lo que necesita tu atención hoy.
-        </:subtitle>
       </.header>
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div class="flex items-center gap-4 rounded-lg border border-stone-200 bg-white p-4 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-primary-200 hover:shadow-md">
-          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary-50 text-primary-600">
+        <div class="shadow-xs flex items-center gap-4 rounded-lg border border-stone-200 bg-white p-4 transition-all duration-200 hover:border-primary-200 hover:-translate-y-0.5 hover:shadow-md">
+          <div class="bg-primary-50 text-primary-600 flex h-10 w-10 shrink-0 items-center justify-center rounded-md">
             <.icon name="hero-shopping-bag-solid" class="h-5 w-5" />
           </div>
           <div>
@@ -61,8 +58,8 @@ defmodule CraftplanWeb.DashboardLive do
             <p class="text-2xl font-semibold text-stone-900">{@pending_orders_count}</p>
           </div>
         </div>
-        <div class="flex items-center gap-4 rounded-lg border border-stone-200 bg-white p-4 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-primary-200 hover:shadow-md">
-          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary-50 text-primary-600">
+        <div class="shadow-xs flex items-center gap-4 rounded-lg border border-stone-200 bg-white p-4 transition-all duration-200 hover:border-primary-200 hover:-translate-y-0.5 hover:shadow-md">
+          <div class="bg-primary-50 text-primary-600 flex h-10 w-10 shrink-0 items-center justify-center rounded-md">
             <.icon name="hero-archive-box-solid" class="h-5 w-5" />
           </div>
           <div>
@@ -143,7 +140,8 @@ defmodule CraftplanWeb.DashboardLive do
     actor
     |> then(&Inventory.list_materials!(actor: &1, load: [:current_stock]))
     |> Enum.filter(fn material ->
-      is_nil(material.current_stock) or Decimal.compare(material.current_stock, Decimal.new(0)) != :gt
+      is_nil(material.current_stock) or
+        Decimal.compare(material.current_stock, Decimal.new(0)) != :gt
     end)
     |> Enum.sort_by(& &1.name)
   end

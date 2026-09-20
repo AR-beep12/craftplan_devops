@@ -83,16 +83,26 @@ if config_env() == :prod do
 
   # S3 / Waffle (product photo uploads)
   if System.get_env("AWS_ACCESS_KEY_ID") do
+    s3_port =
+      case System.get_env("AWS_S3_PORT") do
+        nil -> nil
+        "" -> nil
+        port -> String.to_integer(port)
+      end
+
+    s3_config =
+      [
+        scheme: System.get_env("AWS_S3_SCHEME") || "https://",
+        host: System.get_env("AWS_S3_HOST") || "s3.amazonaws.com",
+        region: System.get_env("AWS_REGION") || "us-east-1"
+      ] ++ if(s3_port, do: [port: s3_port], else: [])
+
     config :ex_aws,
       json_codec: Jason,
       access_key_id: System.get_env("AWS_ACCESS_KEY_ID"),
       secret_access_key: System.get_env("AWS_SECRET_ACCESS_KEY"),
       region: System.get_env("AWS_REGION") || "us-east-1",
-      s3: [
-        scheme: System.get_env("AWS_S3_SCHEME") || "https://",
-        host: System.get_env("AWS_S3_HOST") || "s3.amazonaws.com",
-        region: System.get_env("AWS_REGION") || "us-east-1"
-      ]
+      s3: s3_config
 
     config :waffle,
       storage: Waffle.Storage.S3,

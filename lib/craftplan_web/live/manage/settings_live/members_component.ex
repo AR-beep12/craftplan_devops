@@ -22,12 +22,12 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
     <div class="space-y-6">
       <.header>
         <:subtitle>
-          Gestiona los miembros del equipo y sus roles de acceso.
+          Gestiona los usuarios del equipo y sus roles de acceso.
         </:subtitle>
-        Miembros
+        Usuarios
         <:actions>
           <.button type="button" variant={:primary} phx-click="show_invite_modal" phx-target={@myself}>
-            <.icon name="hero-plus" class="mr-2 -ml-1 h-4 w-4" /> Invitar miembro
+            <.icon name="hero-plus" class="mr-2 -ml-1 h-4 w-4" /> Invitar usuario
           </.button>
         </:actions>
       </.header>
@@ -223,7 +223,12 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
          |> put_flash(:info, "Miembro invitado correctamente")}
 
       {:error, _error} ->
-        {:noreply, put_flash(socket, :error, "No se pudo invitar al miembro. Es posible que el correo ya esté en uso.")}
+        {:noreply,
+         put_flash(
+           socket,
+           :error,
+           "No se pudo invitar al miembro. Es posible que el correo ya esté en uso."
+         )}
     end
   end
 
@@ -231,7 +236,9 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
   def handle_event("update_role", %{"role_edit" => params}, socket) do
     member = socket.assigns.editing_member
 
-    case Accounts.update_user_role(member, %{role: params["role"]}, actor: socket.assigns.current_user) do
+    case Accounts.update_user_role(member, %{role: params["role"]},
+           actor: socket.assigns.current_user
+         ) do
       {:ok, _updated} ->
         members = load_members(socket.assigns.current_user)
 
@@ -282,6 +289,9 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
   defp role_label(:admin), do: "Administrador"
   defp role_label(:staff), do: "Personal"
   defp role_label(:customer), do: "Cliente"
-  defp role_label(role) when is_binary(role), do: role |> String.to_existing_atom() |> role_label()
+
+  defp role_label(role) when is_binary(role),
+    do: role |> String.to_existing_atom() |> role_label()
+
   defp role_label(role), do: to_string(role)
 end

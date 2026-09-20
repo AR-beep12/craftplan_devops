@@ -1,5 +1,6 @@
 import KanbanDragDrop from "./kanban_drag_drop";
 import CommandPalette from "./command_palette";
+import CategorySearch from "./category_search";
 
 const Hooks = {
   TimezoneInput: {
@@ -9,6 +10,7 @@ const Hooks = {
   },
   KanbanDragDrop,
   CommandPalette,
+  CategorySearch,
 };
 
 export default Hooks;

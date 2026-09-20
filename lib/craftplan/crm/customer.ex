@@ -44,7 +44,36 @@ defmodule Craftplan.CRM.Customer do
 
   actions do
     default_accept :*
-    defaults [:read, :create, :update, :destroy]
+    defaults [:read, :create, :update]
+
+    destroy :destroy do
+      require_atomic? false
+      require Ash.Query
+      change fn changeset, _ ->
+        customer = changeset.data
+
+        active_statuses = [:pending, :in_progress]
+
+        active_orders =
+          case Craftplan.Orders.Order
+               |> Ash.Query.filter(expr(customer_id == ^customer.id and status in ^active_statuses))
+               |> Ash.read(authorize?: false) do
+            {:ok, orders} -> length(orders)
+            {:error, _} -> 0
+          end
+
+        if active_orders > 0 do
+          Ash.Changeset.add_error(
+            changeset,
+            field: :base,
+            message:
+              "No se puede eliminar el cliente: tiene #{active_orders} pedido(s) pendiente(s) o en progreso."
+          )
+        else
+          changeset
+        end
+      end
+    end
 
     # Narrow read used by checkout
     read :get_by_email do
@@ -167,7 +196,7 @@ defmodule Craftplan.CRM.Customer do
   end
 
   identities do
-    identity :phone, [:phone]
+    identity :phone, [:phone], message: "Este teléfono ya está registrado"
     identity :email, [:email]
     identity :reference, [:reference]
   end

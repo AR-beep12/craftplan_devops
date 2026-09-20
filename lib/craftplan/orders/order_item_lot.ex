@@ -9,6 +9,10 @@ defmodule Craftplan.Orders.OrderItemLot do
   postgres do
     table "orders_item_lots"
     repo Craftplan.Repo
+
+    references do
+      reference :order_item, on_delete: :delete
+    end
   end
 
   actions do

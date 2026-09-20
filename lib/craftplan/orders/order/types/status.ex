@@ -2,11 +2,8 @@ defmodule Craftplan.Orders.Order.Types.Status do
   @moduledoc false
   use Ash.Type.Enum,
     values: [
-      :unconfirmed,
-      :confirmed,
+      :pending,
       :in_progress,
-      :ready,
-      :delivered,
       :completed,
       :cancelled
     ]

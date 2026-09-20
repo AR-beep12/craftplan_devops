@@ -48,39 +48,24 @@ defmodule Craftplan.Catalog.Product do
       :destroy,
       create: [
         :name,
-        :status,
         :price,
-        :sku,
         :photos,
         :featured_photo,
         :selling_availability,
-        :max_daily_quantity,
-        :nutrition_output_quantity,
-        :nutrition_output_unit
+        :category_id
       ],
       update: [
         :name,
-        :status,
         :price,
-        :sku,
         :photos,
         :featured_photo,
         :selling_availability,
-        :max_daily_quantity,
-        :nutrition_output_quantity,
-        :nutrition_output_unit
+        :category_id
       ]
     ]
 
     read :list do
       prepare build(sort: :name)
-
-      argument :status, {:array, :atom} do
-        allow_nil? true
-        default nil
-      end
-
-      filter expr(is_nil(^arg(:status)) or status in ^arg(:status))
 
       pagination do
         required? false
@@ -107,9 +92,9 @@ defmodule Craftplan.Catalog.Product do
       authorize_if always()
     end
 
-    # Public read for active/available products; staff/admin read everything
+    # Public read for available products; staff/admin read everything
     policy action_type(:read) do
-      authorize_if expr(status == :active or selling_availability != :off)
+      authorize_if expr(selling_availability != :off)
       authorize_if expr(^actor(:role) in [:staff, :admin])
     end
 
@@ -131,18 +116,8 @@ defmodule Craftplan.Catalog.Product do
                   match: ~r/^[\p{L}\p{N}\w\s\-\.&・（）「」]+$/u
     end
 
-    attribute :status, Craftplan.Catalog.Product.Types.Status do
-      allow_nil? false
-      public? true
-      default :draft
-    end
-
     attribute :price, :decimal do
       public? true
-      allow_nil? false
-    end
-
-    attribute :sku, :string do
       allow_nil? false
     end
 
@@ -170,25 +145,18 @@ defmodule Craftplan.Catalog.Product do
       public? true
       allow_nil? false
       default 0
-      constraints min: 0
-      description "Optional per-product capacity per day (0 = unlimited)"
-    end
-
-    attribute :nutrition_output_quantity, :decimal do
-      public? true
-      constraints min: 0
-      description "Finished product quantity used to express nutrition per 100g or 100ml."
-    end
-
-    attribute :nutrition_output_unit, :unit do
-      public? true
-      description "Finished product unit used to express nutrition per 100g or 100ml."
+      description "Maximum quantity that can be sold per day for this product (0 = unlimited)"
     end
 
     timestamps()
   end
 
   relationships do
+    belongs_to :category, Craftplan.Catalog.Category do
+      allow_nil? true
+      public? true
+    end
+
     has_many :boms, BOM
 
     has_one :active_bom, BOM do
@@ -225,7 +193,6 @@ defmodule Craftplan.Catalog.Product do
   end
 
   identities do
-    identity :sku, [:sku]
     identity :name, [:name]
   end
 end

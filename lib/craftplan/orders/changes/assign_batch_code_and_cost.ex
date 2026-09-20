@@ -36,13 +36,14 @@ defmodule Craftplan.Orders.Changes.AssignBatchCodeAndCost do
           message: "product must be present to finalize batch costing"
         )
 
-      %{sku: sku} ->
+      %{id: id} ->
         quantity =
           Changeset.get_attribute(changeset, :quantity) || get_data_field(changeset, :quantity)
 
         batch_quantity = DecimalHelpers.to_decimal(quantity)
         bom = resolve_bom(changeset, product)
         authorize? = false
+        short = id |> to_string() |> String.slice(0, 8)
 
         costs =
           case bom do
@@ -58,7 +59,7 @@ defmodule Craftplan.Orders.Changes.AssignBatchCodeAndCost do
 
         changeset
         |> maybe_put_bom(bom)
-        |> ensure_batch_code(sku, actor, authorize?)
+        |> ensure_batch_code(short, actor, authorize?)
         |> Changeset.force_change_attribute(
           :material_cost,
           Map.get(costs, :material_cost, D.new(0))
@@ -83,10 +84,10 @@ defmodule Craftplan.Orders.Changes.AssignBatchCodeAndCost do
     end
   end
 
-  defp ensure_batch_code(changeset, sku, actor, authorize?) do
+  defp ensure_batch_code(changeset, short, actor, authorize?) do
     case Changeset.get_attribute(changeset, :batch_code) || get_data_field(changeset, :batch_code) do
       nil ->
-        code = generate_batch_code(sku, actor, authorize?)
+        code = generate_batch_code(short, actor, authorize?)
         Changeset.force_change_attribute(changeset, :batch_code, code)
 
       _existing ->
@@ -94,10 +95,10 @@ defmodule Craftplan.Orders.Changes.AssignBatchCodeAndCost do
     end
   end
 
-  defp generate_batch_code(sku, actor, authorize?) do
+  defp generate_batch_code(short, actor, authorize?) do
     date = Date.utc_today()
     date_str = Calendar.strftime(date, "%Y%m%d")
-    prefix = "B-#{date_str}-#{sku}"
+    prefix = "B-#{date_str}-#{short}"
 
     next_seq =
       OrderItem
@@ -221,3 +222,4 @@ defmodule Craftplan.Orders.Changes.AssignBatchCodeAndCost do
 
   defp to_integer(_, default), do: default
 end
+

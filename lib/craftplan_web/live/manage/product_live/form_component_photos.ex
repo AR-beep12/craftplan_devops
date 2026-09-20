@@ -27,6 +27,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentPhotos do
           <div class="mb-4 hidden">
             <.live_file_input upload={@uploads.photos} />
           </div>
+
           <label for={@uploads.photos.ref}>
             <section
               phx-drop-target={@uploads.photos.ref}
@@ -49,8 +50,10 @@ defmodule CraftplanWeb.ProductLive.FormComponentPhotos do
                         />
                       </svg>
                     </div>
+
                     <div class="ml-3">
                       <h3 class="text-sm font-medium text-yellow-800">Advertencia de carga</h3>
+
                       <div class="mt-2 text-sm text-yellow-700">
                         <p>{@upload_warning}</p>
                       </div>
@@ -84,10 +87,12 @@ defmodule CraftplanWeb.ProductLive.FormComponentPhotos do
                             >
                             </div>
                           </div>
+
                           <p class="mt-1.5 text-xs text-stone-500">
                             {entry.progress}% subido
                           </p>
                         </div>
+
                         <div class="flex-shrink-0">
                           <.button
                             type="button"
@@ -129,6 +134,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentPhotos do
           <%= if not Enum.empty?(@product_photos) or not Enum.empty?(@uploaded_files) do %>
             <div class="mt-6">
               <h4 class="text-md mb-2 font-medium">Fotos actuales</h4>
+
               <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
                 <%= for photo <- @product_photos ++ @uploaded_files do %>
                   <div class="relative">
@@ -138,10 +144,9 @@ defmodule CraftplanWeb.ProductLive.FormComponentPhotos do
                         "border-stone-200"
                     ]}>
                       <img
-                        src={Photo.url({photo, @product}, :thumb, signed: true)}
+                        src={CraftplanWeb.PhotoUrl.signed(Photo, :thumb, {photo, @product})}
                         class="h-40 w-full object-cover"
                       />
-
                       <%= if @form[:featured_photo].value == photo do %>
                         <div class="absolute top-1 right-1">
                           <div class="rounded-full bg-blue-500 p-1">
@@ -171,6 +176,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentPhotos do
                           do: "Destacada",
                           else: "Marcar como destacada"}
                       </.button>
+
                       <.button
                         type="button"
                         size={:sm}

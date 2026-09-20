@@ -113,8 +113,9 @@ if System.get_env("SEED_DATA") == "true" or (Code.ensure_loaded?(Mix) and Mix.en
   Repo.delete_all(Catalog.LaborStep)
   Repo.delete_all(Catalog.BOM)
 
-  # Clear products (after BOM cleanup)
+  # Clear products and categories (after BOM cleanup)
   Repo.delete_all(Catalog.Product)
+  Repo.delete_all(Catalog.Category)
   Repo.delete_all(Inventory.Movement)
   Repo.delete_all(Inventory.Lot)
   Repo.delete_all(Inventory.MaterialNutritionalFact)
@@ -220,13 +221,20 @@ if System.get_env("SEED_DATA") == "true" or (Code.ensure_loaded?(Mix) and Mix.en
     lot
   end
 
-  seed_product = fn name, sku, price ->
-    Ash.Seed.seed!(Catalog.Product, %{
-      name: name,
-      sku: sku,
-      status: :active,
-      price: Decimal.new(price)
-    })
+  seed_category = fn name ->
+    Ash.Seed.seed!(Catalog.Category, %{name: name}, identity: :name)
+  end
+
+  seed_product = fn name, price, category ->
+    Ash.Seed.seed!(
+      Catalog.Product,
+      %{
+        name: name,
+        price: Decimal.new(price),
+        category_id: category && category.id
+      },
+      identity: :name
+    )
   end
 
   # No recipe helpers (BOM-only seeding)
@@ -374,7 +382,14 @@ if System.get_env("SEED_DATA") == "true" or (Code.ensure_loaded?(Mix) and Mix.en
     flour: seed_material.("All Purpose Flour", :gram, "beige", "5000", "All Purpose Flour - demo"),
     whole_wheat: seed_material.("Whole Wheat Flour", :gram, "beige", "3000", "Whole Wheat Flour - demo"),
     rye_flour: seed_material.("Rye Flour", :gram, "beige", "2000", "Rye Flour - demo"),
-    gluten_free_mix: seed_material.("Gluten-Free Flour Mix", :gram, "beige", "1000", "Gluten-Free Flour Mix - demo"),
+    gluten_free_mix:
+      seed_material.(
+        "Gluten-Free Flour Mix",
+        :gram,
+        "beige",
+        "1000",
+        "Gluten-Free Flour Mix - demo"
+      ),
     oats: seed_material.("Rolled Oats", :gram, "khaki", "2000", "Rolled Oats - demo"),
     almonds: seed_material.("Whole Almonds", :gram, "tan", "2000", "Whole Almonds - demo"),
     walnuts: seed_material.("Walnuts", :gram, "saddlebrown", "1500", "Walnuts - demo"),
@@ -385,7 +400,14 @@ if System.get_env("SEED_DATA") == "true" or (Code.ensure_loaded?(Mix) and Mix.en
     sugar: seed_material.("White Sugar", :gram, "white", "3000", "White Sugar - demo"),
     brown_sugar: seed_material.("Brown Sugar", :gram, "white", "2000", "Brown Sugar - demo"),
     chocolate: seed_material.("Dark Chocolate", :gram, "brown", "2000", "Dark Chocolate - demo"),
-    vanilla: seed_material.("Vanilla Extract", :milliliter, "lemonchiffon", "500", "Vanilla Extract - demo"),
+    vanilla:
+      seed_material.(
+        "Vanilla Extract",
+        :milliliter,
+        "lemonchiffon",
+        "500",
+        "Vanilla Extract - demo"
+      ),
     cinnamon: seed_material.("Ground Cinnamon", :gram, "cinnamon", "300", "Ground Cinnamon - demo"),
     yeast: seed_material.("Active Dry Yeast", :gram, "lightyellow", "500", "Active Dry Yeast - demo"),
     salt: seed_material.("Sea Salt", :gram, "white", "1000", "Sea Salt - demo")
@@ -514,40 +536,46 @@ if System.get_env("SEED_DATA") == "true" or (Code.ensure_loaded?(Mix) and Mix.en
       365
     )
 
-  # -- 3.9 Seed products
-  products = %{
-    almond_cookies: seed_product.("Almond Cookies", "COOK-001", "3.99"),
-    choc_cake: seed_product.("Chocolate Cake", "CAKE-001", "15.99"),
-    bread: seed_product.("Artisan Bread", "BREAD-001", "4.99"),
-    muffins: seed_product.("Blueberry Muffins", "MUF-001", "2.99"),
-    croissants: seed_product.("Butter Croissants", "PAST-001", "2.50"),
-    gf_cupcakes: seed_product.("Gluten-Free Cupcakes", "CUP-001", "3.49"),
-    rye_loaf: seed_product.("Rye Loaf Bread", "BREAD-002", "5.49"),
-    carrot_cake: seed_product.("Carrot Cake", "CAKE-002", "12.99"),
-    oatmeal_cookies: seed_product.("Oatmeal Cookies", "COOK-002", "3.49"),
-    cheese_danish: seed_product.("Cheese Danish", "PAST-002", "2.99")
+  # -- 3.8.3 Seed categories (dropdown for Nuevo Producto)
+  categories = %{
+    sticker: seed_category.("Sticker"),
+    cake_topper: seed_category.("Cake Topper"),
+    maqueta: seed_category.("Maqueta"),
+    rotulos_pvc: seed_category.("Rótulos PVC"),
+    manualidades: seed_category.("Manualidades"),
+    trifolio: seed_category.("Trifolio"),
+    camisetas: seed_category.("Camisetas")
   }
 
-  # Set product availability and per-day capacity to try the feature
+  # -- 3.9 Seed products (now with category, price, availability)
+  products = %{
+    almond_cookies: seed_product.("Almond Cookies", "3.99", categories.camisetas),
+    choc_cake: seed_product.("Chocolate Cake", "15.99", categories.cake_topper),
+    bread: seed_product.("Artisan Bread", "4.99", categories.maqueta),
+    muffins: seed_product.("Blueberry Muffins", "2.99", categories.manualidades),
+    croissants: seed_product.("Butter Croissants", "2.50", categories.trifolio),
+    gf_cupcakes: seed_product.("Gluten-Free Cupcakes", "3.49", categories.sticker),
+    rye_loaf: seed_product.("Rye Loaf Bread", "5.49", categories.rotulos_pvc),
+    carrot_cake: seed_product.("Carrot Cake", "12.99", categories.camisetas),
+    oatmeal_cookies: seed_product.("Oatmeal Cookies", "3.49", categories.camisetas),
+    cheese_danish: seed_product.("Cheese Danish", "2.99", categories.camisetas)
+  }
+
   update_product = fn product, attrs ->
     product |> Ash.Changeset.for_update(:update, attrs) |> Ash.update!(authorize?: false)
   end
 
   products = %{
-    almond_cookies: update_product.(products.almond_cookies, %{max_daily_quantity: 200}),
-    choc_cake: update_product.(products.choc_cake, %{max_daily_quantity: 20}),
-    bread: update_product.(products.bread, %{max_daily_quantity: 150}),
-    muffins: update_product.(products.muffins, %{max_daily_quantity: 120}),
-    croissants:
-      update_product.(products.croissants, %{
-        max_daily_quantity: 80,
-        selling_availability: :preorder
-      }),
-    gf_cupcakes: update_product.(products.gf_cupcakes, %{max_daily_quantity: 60}),
-    rye_loaf: update_product.(products.rye_loaf, %{max_daily_quantity: 50}),
-    carrot_cake: update_product.(products.carrot_cake, %{selling_availability: :off, max_daily_quantity: 0}),
-    oatmeal_cookies: update_product.(products.oatmeal_cookies, %{max_daily_quantity: 200}),
-    cheese_danish: update_product.(products.cheese_danish, %{max_daily_quantity: 100})
+    almond_cookies: products.almond_cookies,
+    choc_cake: products.choc_cake,
+    bread: products.bread,
+    muffins: products.muffins,
+    croissants: update_product.(products.croissants, %{selling_availability: :preorder}),
+    gf_cupcakes: products.gf_cupcakes,
+    rye_loaf: products.rye_loaf,
+    carrot_cake: update_product.(products.carrot_cake, %{selling_availability: :off}),
+    oatmeal_cookies: products.oatmeal_cookies,
+    cheese_danish: products.cheese_danish
   }
 
   # -- 3.12 Seed customers
@@ -702,7 +730,9 @@ if System.get_env("SEED_DATA") == "true" or (Code.ensure_loaded?(Mix) and Mix.en
     })
 
   demo_batch_code =
-    "B-" <> Calendar.strftime(Date.utc_today(), "%Y%m%d") <> "-" <> products.bread.sku <> "-DEV"
+    "B-" <>
+      Calendar.strftime(Date.utc_today(), "%Y%m%d") <>
+      "-" <> String.slice(to_string(products.bread.id), 0, 8) <> "-DEV"
 
   bread_batch =
     Ash.Seed.seed!(Orders.ProductionBatch, %{
@@ -786,17 +816,11 @@ if System.get_env("SEED_DATA") == "true" or (Code.ensure_loaded?(Mix) and Mix.en
 
   # C) New products
   new_products = %{
-    sesame_bagel: seed_product.("Sesame Bagel", "BAGEL-001", "2.25"),
-    pb_cookies: seed_product.("Peanut Butter Cookies", "COOK-003", "3.79")
+    sesame_bagel: seed_product.("Sesame Bagel", "2.25", categories.manualidades),
+    pb_cookies: seed_product.("Peanut Butter Cookies", "3.79", categories.camisetas)
   }
 
   products = Map.merge(products, new_products)
-
-  # Availability and caps for new products
-  products =
-    products
-    |> Map.put(:sesame_bagel, update_product.(products.sesame_bagel, %{max_daily_quantity: 120}))
-    |> Map.put(:pb_cookies, update_product.(products.pb_cookies, %{max_daily_quantity: 180}))
 
   # -- 3.11 Seed BOMs (80%+ active coverage, no drafts)
   _almond_cookies_bom =

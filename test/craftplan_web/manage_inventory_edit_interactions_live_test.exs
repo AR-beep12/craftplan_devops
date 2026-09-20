@@ -9,11 +9,7 @@ defmodule CraftplanWeb.ManageInventoryEditInteractionsLiveTest do
     Material
     |> Ash.Changeset.for_create(:create, %{
       name: "Mat-#{System.unique_integer()}",
-      sku: "MAT-#{System.unique_integer()}",
-      price: Decimal.new("1.00"),
-      unit: :gram,
-      minimum_stock: Decimal.new(0),
-      maximum_stock: Decimal.new(0)
+      unit: :gram
     })
     |> Ash.create!(actor: Craftplan.DataCase.staff_actor())
   end
@@ -21,7 +17,7 @@ defmodule CraftplanWeb.ManageInventoryEditInteractionsLiveTest do
   @tag role: :staff
   test "edit material and save", %{conn: conn} do
     m = create_material!()
-    {:ok, view, _} = live(conn, ~p"/manage/inventory/#{m.sku}/edit")
+    {:ok, view, _} = live(conn, ~p"/manage/inventory/#{m.id}/edit")
 
     params = %{"material" => %{"name" => m.name <> "X"}}
 
@@ -29,7 +25,7 @@ defmodule CraftplanWeb.ManageInventoryEditInteractionsLiveTest do
     |> element("#material-form")
     |> render_submit(params)
 
-    assert_patch(view, ~p"/manage/inventory/#{m.sku}/details")
+    assert_patch(view, ~p"/manage/inventory/#{m.id}/details")
     assert render(view) =~ "Material updated successfully"
   end
 end

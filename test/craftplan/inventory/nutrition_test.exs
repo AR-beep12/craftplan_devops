@@ -16,11 +16,7 @@ defmodule Craftplan.Inventory.NutritionTest do
     Material
     |> Ash.Changeset.for_create(:create, %{
       name: Map.get(attrs, :name, "Material-#{System.unique_integer()}"),
-      sku: Map.get(attrs, :sku, "MAT-#{System.unique_integer()}"),
-      unit: Map.get(attrs, :unit, :gram),
-      price: Map.get(attrs, :price, Decimal.new("1.00")),
-      minimum_stock: Decimal.new(0),
-      maximum_stock: Decimal.new(0)
+      unit: Map.get(attrs, :unit, :gram)
     })
     |> Ash.create!(actor: staff())
   end

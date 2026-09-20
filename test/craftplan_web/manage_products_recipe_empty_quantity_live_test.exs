@@ -24,11 +24,7 @@ defmodule CraftplanWeb.ManageProductsRecipeEmptyQuantityLiveTest do
     Material
     |> Ash.Changeset.for_create(:create, %{
       name: "Mat-#{System.unique_integer()}",
-      sku: "MAT-#{System.unique_integer()}",
-      unit: :gram,
-      price: Decimal.new("1.00"),
-      minimum_stock: Decimal.new(0),
-      maximum_stock: Decimal.new(0)
+      unit: :gram
     })
     |> Ash.create!(actor: staff())
   end

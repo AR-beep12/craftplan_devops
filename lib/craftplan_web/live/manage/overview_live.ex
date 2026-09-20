@@ -165,7 +165,7 @@ defmodule CraftplanWeb.OverviewLive do
                   variant={:compact}
                   zebra
                   no_margin
-                  row_click={fn row -> JS.navigate("/manage/inventory/#{row.material.sku}") end}
+                  row_click={fn row -> JS.navigate("/manage/inventory/#{row.material.id}") end}
                 >
                   <:col :let={row} label="Día">{format_date(row.day, format: "%a %d")}</:col>
                   <:col :let={row} label="Material">{row.material.name}</:col>

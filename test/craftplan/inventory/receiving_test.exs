@@ -6,16 +6,14 @@ defmodule Craftplan.Inventory.ReceivingTest do
 
   require Ash.Query
 
-  defp mk_material(name, sku, unit, price) do
+  defp mk_material(name, unit) do
     actor = Craftplan.DataCase.staff_actor()
 
     {:ok, mat} =
       Inventory.Material
       |> Ash.Changeset.for_create(:create, %{
         name: name,
-        sku: sku,
-        unit: unit,
-        price: Decimal.new(price)
+        unit: unit
       })
       |> Ash.create(actor: actor)
 
@@ -29,7 +27,7 @@ defmodule Craftplan.Inventory.ReceivingTest do
   end
 
   test "receiving a PO increases stock and is idempotent" do
-    mat = mk_material("Sugar", "SUG-1", :gram, "0.01")
+    mat = mk_material("Sugar", :gram)
 
     actor = Craftplan.DataCase.staff_actor()
 

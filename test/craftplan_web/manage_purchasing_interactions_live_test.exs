@@ -21,11 +21,7 @@ defmodule CraftplanWeb.ManagePurchasingInteractionsLiveTest do
     Material
     |> Ash.Changeset.for_create(:create, %{
       name: "Mat-#{System.unique_integer()}",
-      sku: "MAT-#{System.unique_integer()}",
-      price: Decimal.new("1.00"),
-      unit: :gram,
-      minimum_stock: Decimal.new(0),
-      maximum_stock: Decimal.new(0)
+      unit: :gram
     })
     |> Ash.create!(actor: Craftplan.DataCase.staff_actor())
   end

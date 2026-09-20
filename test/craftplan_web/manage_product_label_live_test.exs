@@ -16,11 +16,7 @@ defmodule CraftplanWeb.ManageProductLabelLiveTest do
       Material
       |> Ash.Changeset.for_create(:create, %{
         name: name,
-        sku: Base.encode16("MAT-" <> :crypto.strong_rand_bytes(4), case: :lower),
-        unit: :gram,
-        price: Decimal.new("1.00"),
-        minimum_stock: Decimal.new("0"),
-        maximum_stock: Decimal.new("10000")
+        unit: :gram
       })
       |> Ash.create!(actor: staff)
 

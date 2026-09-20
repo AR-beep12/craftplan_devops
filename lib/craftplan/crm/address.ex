@@ -8,5 +8,4 @@ defmodule Craftplan.CRM.Address do
     default_accept :*
     defaults [:read, :create, :update, :destroy]
   end
-
 end

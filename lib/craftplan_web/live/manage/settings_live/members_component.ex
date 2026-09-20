@@ -36,9 +36,11 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
         <div class="p-4">
           <.table id="members" rows={@members} wrapper_class="mt-0">
             <:col :let={member} label="Correo electrónico">{member.email}</:col>
+
             <:col :let={member} label="Rol">
               <.badge text={role_label(member.role)} colors={role_colors()} />
             </:col>
+
             <:col :let={member} label="Estado">
               <span
                 :if={member.confirmed_at}
@@ -46,6 +48,7 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
               >
                 Activo
               </span>
+
               <span
                 :if={is_nil(member.confirmed_at)}
                 class="ring-yellow-600/20 inline-flex items-center rounded-full bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-700 ring-1 ring-inset"
@@ -53,11 +56,13 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
                 Pendiente
               </span>
             </:col>
+
             <:col :let={member} label="Se unió">
               {if Map.get(member, :confirmed_at),
                 do: Calendar.strftime(member.confirmed_at, "%Y-%m-%d"),
                 else: "—"}
             </:col>
+
             <:action :let={member}>
               <.button
                 :if={member.id != @current_user.id}
@@ -67,6 +72,7 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
               >
                 Editar
               </.button>
+
               <.button
                 :if={member.id != @current_user.id}
                 size={:sm}
@@ -77,6 +83,7 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
                 Quitar
               </.button>
             </:action>
+
             <:empty>
               <div class="py-6 text-center text-sm text-stone-500">
                 Aún no hay miembros del equipo. Invita a uno usando el botón de arriba.
@@ -114,7 +121,6 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
             options={[{"Personal", :staff}, {"Administrador", :admin}]}
             value={@invite_form[:role].value || :staff}
           />
-
           <:actions>
             <.button variant={:primary} phx-disable-with="Enviando...">Enviar invitación</.button>
           </:actions>
@@ -143,7 +149,6 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
             options={[{"Personal", :staff}, {"Administrador", :admin}]}
             value={@role_form[:role].value}
           />
-
           <:actions>
             <.button variant={:primary} phx-disable-with="Actualizando...">Actualizar rol</.button>
           </:actions>
@@ -236,9 +241,7 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
   def handle_event("update_role", %{"role_edit" => params}, socket) do
     member = socket.assigns.editing_member
 
-    case Accounts.update_user_role(member, %{role: params["role"]},
-           actor: socket.assigns.current_user
-         ) do
+    case Accounts.update_user_role(member, %{role: params["role"]}, actor: socket.assigns.current_user) do
       {:ok, _updated} ->
         members = load_members(socket.assigns.current_user)
 
@@ -290,8 +293,7 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
   defp role_label(:staff), do: "Personal"
   defp role_label(:customer), do: "Cliente"
 
-  defp role_label(role) when is_binary(role),
-    do: role |> String.to_existing_atom() |> role_label()
+  defp role_label(role) when is_binary(role), do: role |> String.to_existing_atom() |> role_label()
 
   defp role_label(role), do: to_string(role)
 end

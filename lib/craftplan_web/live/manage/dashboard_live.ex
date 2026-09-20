@@ -51,21 +51,26 @@ defmodule CraftplanWeb.DashboardLive do
           <div class="bg-primary-50 text-primary-600 flex h-10 w-10 shrink-0 items-center justify-center rounded-md">
             <.icon name="hero-shopping-bag-solid" class="h-5 w-5" />
           </div>
+
           <div>
             <p class="text-xs font-medium uppercase tracking-wide text-stone-500">
               Pedidos pendientes
             </p>
+
             <p class="text-2xl font-semibold text-stone-900">{@pending_orders_count}</p>
           </div>
         </div>
+
         <div class="shadow-xs flex items-center gap-4 rounded-lg border border-stone-200 bg-white p-4 transition-all duration-200 hover:border-primary-200 hover:-translate-y-0.5 hover:shadow-md">
           <div class="bg-primary-50 text-primary-600 flex h-10 w-10 shrink-0 items-center justify-center rounded-md">
             <.icon name="hero-archive-box-solid" class="h-5 w-5" />
           </div>
+
           <div>
             <p class="text-xs font-medium uppercase tracking-wide text-stone-500">
               Materiales sin stock
             </p>
+
             <p class="text-2xl font-semibold text-stone-900">{@out_of_stock_count}</p>
           </div>
         </div>
@@ -77,9 +82,11 @@ defmodule CraftplanWeb.DashboardLive do
             <:header>
               <div>
                 <h3 class="text-sm font-semibold text-stone-900">Próximos pedidos</h3>
+
                 <p class="text-xs text-stone-500">Los que están por confirmarse o entregarse.</p>
               </div>
             </:header>
+
             <.table
               id="dashboard-upcoming-orders"
               rows={@upcoming_orders}
@@ -91,11 +98,15 @@ defmodule CraftplanWeb.DashboardLive do
               <:col :let={row} label="Referencia">
                 <.kbd>{row.reference}</.kbd>
               </:col>
+
               <:col :let={row} label="Cliente">{row.customer.full_name}</:col>
+
               <:col :let={row} label="Entrega">{format_date(row.delivery_date)}</:col>
+
               <:col :let={row} label="Total" align={:right}>
                 {format_money(@settings.currency, row.total)}
               </:col>
+
               <:empty>
                 <div class="rounded-md border border-dashed border-stone-200 bg-stone-50 py-6 text-center text-sm text-stone-500">
                   No hay pedidos pendientes en este momento.
@@ -108,9 +119,11 @@ defmodule CraftplanWeb.DashboardLive do
             <:header>
               <div>
                 <h3 class="text-sm font-semibold text-stone-900">Sin stock</h3>
+
                 <p class="text-xs text-stone-500">Materiales que necesitás reponer.</p>
               </div>
             </:header>
+
             <.table
               id="dashboard-out-of-stock"
               rows={@out_of_stock_materials}
@@ -120,9 +133,11 @@ defmodule CraftplanWeb.DashboardLive do
               row_click={fn row -> JS.navigate("/manage/inventory/#{row.id}") end}
             >
               <:col :let={row} label="Material">{row.name}</:col>
+
               <:col :let={row} label="Actual" align={:right}>
                 {format_amount(row.unit, row.current_stock)}
               </:col>
+
               <:empty>
                 <div class="rounded-md border border-dashed border-stone-200 bg-stone-50 py-6 text-center text-sm text-stone-500">
                   Todos los materiales tienen stock disponible.

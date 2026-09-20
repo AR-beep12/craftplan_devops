@@ -3,8 +3,8 @@ defmodule CraftplanWeb.ProductLive.Index do
   use CraftplanWeb, :live_view
 
   alias Craftplan.Catalog
-  alias CraftplanWeb.Components.Page
   alias Craftplan.Catalog.Product.Photo
+  alias CraftplanWeb.Components.Page
 
   @impl true
   def render(assigns) do
@@ -20,6 +20,7 @@ defmodule CraftplanWeb.ProductLive.Index do
         </.link>
       </:actions>
     </.header>
+
     <Page.surface>
       <.table
         id="products"
@@ -40,9 +41,11 @@ defmodule CraftplanWeb.ProductLive.Index do
             </span>
           </div>
         </:col>
+
         <:col :let={{_, product}} label="Categoría">
           {(product.category && product.category.name) || "-"}
         </:col>
+
         <:col :let={{_, product}} label="Precio">
           {format_money(@settings.currency, product.price)}
         </:col>
@@ -177,8 +180,7 @@ defmodule CraftplanWeb.ProductLive.Index do
 
         Logger.error("Failed to delete product #{id}: #{inspect(error)}")
 
-        {:noreply,
-         put_flash(socket, :error, "No se pudo eliminar el producto: #{inspect(error)}")}
+        {:noreply, put_flash(socket, :error, "No se pudo eliminar el producto: #{inspect(error)}")}
     end
   end
 

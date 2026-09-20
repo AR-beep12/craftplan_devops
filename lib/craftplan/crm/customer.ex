@@ -7,6 +7,8 @@ defmodule Craftplan.CRM.Customer do
     authorizers: [Ash.Policy.Authorizer],
     extensions: [AshJsonApi.Resource, AshGraphql.Resource]
 
+  alias Craftplan.Orders.Order
+
   require Ash.Resource.Preparation.Builtins
 
   json_api do
@@ -47,15 +49,17 @@ defmodule Craftplan.CRM.Customer do
     defaults [:read, :create, :update]
 
     destroy :destroy do
-      require_atomic? false
       require Ash.Query
+
+      require_atomic? false
+
       change fn changeset, _ ->
         customer = changeset.data
 
         active_statuses = [:pending, :in_progress]
 
         active_orders =
-          case Craftplan.Orders.Order
+          case Order
                |> Ash.Query.filter(expr(customer_id == ^customer.id and status in ^active_statuses))
                |> Ash.read(authorize?: false) do
             {:ok, orders} -> length(orders)
@@ -66,8 +70,7 @@ defmodule Craftplan.CRM.Customer do
           Ash.Changeset.add_error(
             changeset,
             field: :base,
-            message:
-              "No se puede eliminar el cliente: tiene #{active_orders} pedido(s) pendiente(s) o en progreso."
+            message: "No se puede eliminar el cliente: tiene #{active_orders} pedido(s) pendiente(s) o en progreso."
           )
         else
           changeset
@@ -181,7 +184,7 @@ defmodule Craftplan.CRM.Customer do
   end
 
   relationships do
-    has_many :orders, Craftplan.Orders.Order
+    has_many :orders, Order
   end
 
   calculations do

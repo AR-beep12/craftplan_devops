@@ -227,4 +227,3 @@ defmodule Craftplan.Orders.OrderItem do
     sum :completed_qty_sum, :allocations, :completed_qty
   end
 end
-

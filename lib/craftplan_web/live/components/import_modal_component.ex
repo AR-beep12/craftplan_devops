@@ -62,7 +62,9 @@ defmodule CraftplanWeb.ImportModalComponent do
 
           <div class="mb-4 text-sm text-stone-700">
             <div class="font-medium">Este es el formato:</div>
+
             <div :for={line <- @config.instructions}>{line}</div>
+
             <div class="mt-2">
               <.button variant={:outline} id="csv-template-download" type="button">
                 Descargar plantilla
@@ -88,6 +90,7 @@ defmodule CraftplanWeb.ImportModalComponent do
               <div class="sm:col-span-2">
                 <.input type="textarea" name="csv_content" label="Pegar CSV" value="" />
               </div>
+
               <div class="sm:col-span-2">
                 <label class="mb-1 block text-sm font-medium text-stone-700">O elige un archivo…</label>
                 <.live_file_input upload={@uploads[:csv]} class="block w-full text-sm" />
@@ -98,10 +101,12 @@ defmodule CraftplanWeb.ImportModalComponent do
           <div :if={@wizard_step in [:map, :import]} class="mt-6">
             <div class="mb-2 flex items-center justify-between">
               <h4 class="font-medium">Datos</h4>
+
               <div :if={@csv_errors && @csv_errors != []} class="text-xs text-red-700">
                 {length(@csv_errors)} error(es)
               </div>
             </div>
+
             <div class="mb-2">
               <div
                 role="tablist"
@@ -121,6 +126,7 @@ defmodule CraftplanWeb.ImportModalComponent do
                 >
                   Mapeo
                 </button>
+
                 <button
                   type="button"
                   phx-target={@myself}
@@ -134,6 +140,7 @@ defmodule CraftplanWeb.ImportModalComponent do
                 >
                   Vista previa
                 </button>
+
                 <button
                   type="button"
                   phx-target={@myself}
@@ -149,6 +156,7 @@ defmodule CraftplanWeb.ImportModalComponent do
                 </button>
               </div>
             </div>
+
             <div class="rounded-md border bg-white">
               <div
                 :if={@dry_run_summary && @map_view_tab in [:preview, :errors]}
@@ -156,6 +164,7 @@ defmodule CraftplanWeb.ImportModalComponent do
               >
                 {@dry_run_summary}
               </div>
+
               <div class="max-h-96 overflow-auto p-2">
                 <div :if={@map_view_tab == :mapping}>
                   <.form
@@ -178,6 +187,7 @@ defmodule CraftplanWeb.ImportModalComponent do
                     </div>
                   </.form>
                 </div>
+
                 <div :if={@map_view_tab == :preview}>
                   <table class="min-w-full divide-y divide-stone-200 border">
                     <thead>
@@ -190,6 +200,7 @@ defmodule CraftplanWeb.ImportModalComponent do
                         </th>
                       </tr>
                     </thead>
+
                     <tbody class="divide-y divide-stone-100">
                       <tr :for={row <- @csv_rows}>
                         <td :for={i <- 0..(length(@csv_headers) - 1)} class="px-2 py-1 text-xs">
@@ -199,25 +210,31 @@ defmodule CraftplanWeb.ImportModalComponent do
                     </tbody>
                   </table>
                 </div>
+
                 <div :if={@map_view_tab == :errors}>
                   <div :if={@csv_errors == []} class="text-sm text-stone-600">Sin errores.</div>
+
                   <div :if={@csv_errors && @csv_errors != []}>
                     <table class="min-w-full divide-y divide-red-200 border">
                       <thead class="bg-red-50">
                         <tr>
                           <th class="px-2 py-1 text-left text-xs font-medium text-red-700">Fila</th>
+
                           <th class="px-2 py-1 text-left text-xs font-medium text-red-700">
                             Mensaje
                           </th>
                         </tr>
                       </thead>
+
                       <tbody class="divide-y divide-red-100">
                         <tr :for={e <- Enum.take(@csv_errors, 25)}>
                           <td class="px-2 py-1 text-xs text-red-800">{e.row}</td>
+
                           <td class="px-2 py-1 text-xs text-red-800">{e.message}</td>
                         </tr>
                       </tbody>
                     </table>
+
                     <div :if={length(@csv_errors) > 25} class="mt-1 text-xs text-stone-600">
                       Mostrando los primeros 25 errores de {length(@csv_errors)}.
                     </div>
@@ -239,6 +256,7 @@ defmodule CraftplanWeb.ImportModalComponent do
             >
               Siguiente
             </.button>
+
             <.button
               :if={@wizard_step == :map and @map_view_tab == :mapping}
               type="submit"
@@ -248,6 +266,7 @@ defmodule CraftplanWeb.ImportModalComponent do
             >
               Verificar
             </.button>
+
             <.button
               :if={@wizard_step == :map}
               id={@id <> "-next-import"}
@@ -259,6 +278,7 @@ defmodule CraftplanWeb.ImportModalComponent do
             >
               Siguiente
             </.button>
+
             <.button
               :if={@wizard_step == :import}
               id={@id <> "-run-import"}
@@ -269,6 +289,7 @@ defmodule CraftplanWeb.ImportModalComponent do
             >
               Importar
             </.button>
+
             <.button variant={:outline} type="button" phx-target={@myself} phx-click="wizard_close">
               Cerrar
             </.button>

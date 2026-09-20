@@ -33,6 +33,7 @@ defmodule CraftplanWeb.OrderLive.Show do
           <.link patch={~p"/manage/orders/#{@order.reference}/edit"} phx-click={JS.push_focus()}>
             <.button variant={:primary}>Editar pedido</.button>
           </.link>
+
           <form phx-change="change_status" class="w-44">
             <.input
               name="new_status"
@@ -50,9 +51,7 @@ defmodule CraftplanWeb.OrderLive.Show do
         </div>
       </:actions>
     </.header>
-
     <.sub_nav links={@tabs_links} />
-
     <div class="mt-4 space-y-6">
       <.tabs_content :if={@live_action in [:details, :show, :edit]}>
         <.list>
@@ -127,13 +126,17 @@ defmodule CraftplanWeb.OrderLive.Show do
               </div>
             </.link>
           </:col>
+
           <:col :let={item} label="Cantidad">{item.quantity}</:col>
+
           <:col :let={item} label="Precio unitario">
             {format_money(@settings.currency, item.product.price)}
           </:col>
+
           <:col :let={item} label="Total">
             {format_money(@settings.currency, item.cost)}
           </:col>
+
           <:col :let={item} label="Estado">
             <.badge
               text={order_item_status_label(item.status)}
@@ -145,6 +148,7 @@ defmodule CraftplanWeb.OrderLive.Show do
               ]}
             />
           </:col>
+
           <:action :let={item}>
             <button
               type="button"
@@ -180,13 +184,17 @@ defmodule CraftplanWeb.OrderLive.Show do
       <p class="mb-3 text-sm text-stone-700">
         Completar este artículo consumirá materiales según la lista de materiales (BOM) del producto. Revisa las cantidades y confirma.
       </p>
+
       <.table id="order-consumption-recap" rows={@pending_consumption_recap}>
         <:col :let={row} label="Material">{row.material.name}</:col>
+
         <:col :let={row} label="Requerido">{format_amount(row.material.unit, row.required)}</:col>
+
         <:col :let={row} label="Stock actual">
           {format_amount(row.material.unit, row.current_stock || Decimal.new(0))}
         </:col>
       </.table>
+
       <footer>
         <.button variant={:outline} phx-click="cancel_consume">Cerrar</.button>
         <.button variant={:primary} phx-click="confirm_consume">Consumir ahora</.button>

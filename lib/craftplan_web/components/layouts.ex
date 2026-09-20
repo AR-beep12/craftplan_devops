@@ -70,7 +70,6 @@ defmodule CraftplanWeb.Layouts do
           phx-click={hide_sidebar()}
           aria-hidden="true"
         />
-
         <aside
           id="mobile-sidebar-panel"
           class="from-primary-50/50 ease-[cubic-bezier(0.16,1,0.3,1)] fixed inset-y-0 left-0 z-50 w-72 -translate-x-full transform bg-gradient-to-b via-stone-50 to-stone-50 shadow-lg transition-transform duration-300 focus-visible:ring-primary-400 focus-visible:outline-none focus-visible:ring-2"
@@ -162,6 +161,7 @@ defmodule CraftplanWeb.Layouts do
                     <span class="max-w-[12rem] hidden truncate sm:block">{@current_user.email}</span>
                     <.nav_icon name={:chevron_down} />
                   </button>
+
                   <div
                     id="user-dropdown"
                     class="absolute right-0 mt-2 hidden w-56 rounded-md border border-stone-200 bg-white py-2 shadow-lg"
@@ -176,6 +176,7 @@ defmodule CraftplanWeb.Layouts do
                     >
                       <.nav_icon name={:manage} /> Panel de gestión
                     </.link>
+
                     <.link
                       href={~p"/sign-out"}
                       class="flex items-center gap-2 px-4 py-2 text-sm text-stone-600 transition hover:bg-stone-50 hover:text-stone-900"
@@ -198,8 +199,7 @@ defmodule CraftplanWeb.Layouts do
           </header>
 
           <main class="flex-1 px-4 py-6 sm:px-6 lg:px-8">
-            <.flash_group flash={@flash} />
-            {render_slot(@inner_block)}
+            <.flash_group flash={@flash} /> {render_slot(@inner_block)}
           </main>
         </div>
       </div>
@@ -222,7 +222,6 @@ defmodule CraftplanWeb.Layouts do
     ~H"""
     <nav class="h-[calc(100vh-4rem)] flex flex-col justify-between overflow-y-auto px-4 pt-6 pb-6 md:h-full md:pb-8">
       <div>
-
         <% primary_links = if @is_manage?, do: @manage_links, else: @shop_links %>
         <ul class="mt-3 space-y-1">
           <li :for={link <- primary_links}>
@@ -234,9 +233,9 @@ defmodule CraftplanWeb.Layouts do
               <.nav_icon
                 name={link.icon}
                 class={"transition-transform duration-150 group-hover:translate-x-0.5" <> if link.active, do: " text-primary-600", else: ""}
-              />
-              <span>{link.label}</span>
+              /> <span>{link.label}</span>
             </.link>
+
             <div
               :if={link.active and @nav_sub_links != []}
               class="sidebar-reveal mt-2 space-y-2"
@@ -247,6 +246,7 @@ defmodule CraftplanWeb.Layouts do
               >
                 {@nav_sub_label}
               </p>
+
               <ul class="space-y-1 border-l border-stone-200 pl-4" role={@sub_nav_role}>
                 <li :for={sub <- @nav_sub_links}>
                   <.link
@@ -260,9 +260,9 @@ defmodule CraftplanWeb.Layouts do
                         :if={sub[:icon]}
                         name={sub.icon}
                         class={"h-3.5 w-3.5 " <> if sub.active, do: "text-primary-600", else: "text-stone-500"}
-                      />
-                      <span>{sub.label}</span>
+                      /> <span>{sub.label}</span>
                     </span>
+
                     <span :if={sub[:description]} class="block text-xs text-stone-400">
                       {sub.description}
                     </span>
@@ -293,6 +293,7 @@ defmodule CraftplanWeb.Layouts do
 
         <div :if={is_nil(@current_user)} class="space-y-3">
           <p>¿Listo para gestionar tu flujo de producción?</p>
+
           <.link
             href={~p"/sign-in"}
             class="bg-primary-600 shadow-xs inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-primary-500 hover:-translate-y-0.5 hover:shadow-md"
@@ -605,8 +606,7 @@ defmodule CraftplanWeb.Layouts do
     end)
   end
 
-  defp nav_active?(current_path, nav_section, %{nav_section: section} = link)
-       when not is_nil(section) do
+  defp nav_active?(current_path, nav_section, %{nav_section: section} = link) when not is_nil(section) do
     nav_section == section or String.starts_with?(current_path, Map.get(link, :prefix, ""))
   end
 
@@ -639,6 +639,7 @@ defmodule CraftplanWeb.Layouts do
           >
             {crumb.label}
           </.link>
+
           <span
             :if={Map.get(crumb, :current?, index == @count - 1)}
             class="truncate text-stone-900"

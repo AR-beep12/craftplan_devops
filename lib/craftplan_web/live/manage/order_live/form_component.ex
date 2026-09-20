@@ -32,7 +32,6 @@ defmodule CraftplanWeb.OrderLive.FormComponent do
             </button>
           </div>
           <input type="hidden" name="order[customer_id]" value={@draft.customer_id} />
-
           <div
             :if={@customer_mode == :select}
             id="customer-select-widget"
@@ -98,6 +97,7 @@ defmodule CraftplanWeb.OrderLive.FormComponent do
           >
             <div class="flex items-center justify-between">
               <p class="text-sm font-medium text-stone-700">Nuevo cliente</p>
+
               <button
                 type="button"
                 phx-click="cancel_create_customer"
@@ -107,6 +107,7 @@ defmodule CraftplanWeb.OrderLive.FormComponent do
                 Elegir existente
               </button>
             </div>
+
             <div class="grid grid-cols-2 gap-3">
               <.input
                 type="text"
@@ -145,6 +146,7 @@ defmodule CraftplanWeb.OrderLive.FormComponent do
                 phx-target={@myself}
               />
             </div>
+
             <p :if={@new_customer_error} class="text-xs text-red-600">
               {@new_customer_error}
             </p>
@@ -172,6 +174,7 @@ defmodule CraftplanWeb.OrderLive.FormComponent do
           >
             Agregar producto
           </label>
+
           <div
             :if={not Enum.empty?(@available_products)}
             class="mt-2 flex items-end gap-2"
@@ -187,6 +190,7 @@ defmodule CraftplanWeb.OrderLive.FormComponent do
                 options={Enum.map(@available_products, &{&1.name, &1.id})}
               />
             </div>
+
             <.button
               type="button"
               variant={:outline}
@@ -197,12 +201,14 @@ defmodule CraftplanWeb.OrderLive.FormComponent do
               Agregar
             </.button>
           </div>
+
           <p :if={Enum.empty?(@available_products)} class="mt-2 text-sm text-stone-400">
             Todos los productos ya están agregados.
           </p>
         </div>
 
         <.label>Artículos</.label>
+
         <div
           id="order-items"
           class="mt-2 grid w-full grid-cols-4 gap-x-4 text-sm leading-6 text-stone-700"
@@ -214,12 +220,15 @@ defmodule CraftplanWeb.OrderLive.FormComponent do
             <div class="border-r border-stone-200 p-0 pr-6 pb-4 font-normal last:border-r-0 ">
               Producto
             </div>
+
             <div class="border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0">
               Cantidad
             </div>
+
             <div class="border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0">
               Total
             </div>
+
             <div class="border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0">
               <span class="opacity-0">Acciones</span>
             </div>

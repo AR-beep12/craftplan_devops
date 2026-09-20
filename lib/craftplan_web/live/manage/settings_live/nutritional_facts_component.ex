@@ -12,7 +12,9 @@ defmodule CraftplanWeb.SettingsLive.NutritionalFactsComponent do
     ~H"""
     <div class="space-y-6">
       <.header>
-        <:subtitle>Mantén una lista central de los nutrientes que agregas a recetas y empaques.</:subtitle>
+        <:subtitle>
+          Mantén una lista central de los nutrientes que agregas a recetas y empaques.
+        </:subtitle>
         Datos nutricionales
       </.header>
 
@@ -33,6 +35,7 @@ defmodule CraftplanWeb.SettingsLive.NutritionalFactsComponent do
                 >
                   Buscar datos nutricionales
                 </label>
+
                 <input
                   id="nutritional-fact-filter-query"
                   name="query"
@@ -56,12 +59,15 @@ defmodule CraftplanWeb.SettingsLive.NutritionalFactsComponent do
                     {settings_fact_name(fact)}
                   </span>
                 </:col>
+
                 <:col :let={fact} label="Unidad">{unit_label(fact.default_unit)}</:col>
+
                 <:col :let={fact} label="Tipo">
                   <.badge :if={fact.eu_required} text="Requerido por la UE" />
                   <.badge :if={!fact.eu_required && fact.system} text="Sistema" />
                   <span :if={!fact.system} class="text-sm text-stone-500">Personalizado</span>
                 </:col>
+
                 <:action :let={fact}>
                   <.link
                     :if={!fact.system}
@@ -74,6 +80,7 @@ defmodule CraftplanWeb.SettingsLive.NutritionalFactsComponent do
                   </.link>
                   <span :if={fact.system} class="text-sm text-stone-400">Bloqueado</span>
                 </:action>
+
                 <:empty>
                   <div class="py-6 text-center text-sm text-stone-500">
                     {if String.trim(@search_query) == "" do
@@ -91,9 +98,11 @@ defmodule CraftplanWeb.SettingsLive.NutritionalFactsComponent do
         <aside class="lg:w-80">
           <div class="space-y-4 rounded-md border border-gray-200 bg-white p-4">
             <h3 class="text-sm font-semibold text-stone-800">Gestionar</h3>
+
             <p class="text-sm text-stone-600">
               Agrega datos nutricionales que consultas con frecuencia. Aparecerán en cualquier lugar donde selecciones nutrientes.
             </p>
+
             <.button
               type="button"
               variant={:primary}

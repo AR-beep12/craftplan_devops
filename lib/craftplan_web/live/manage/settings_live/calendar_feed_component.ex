@@ -28,9 +28,11 @@ defmodule CraftplanWeb.SettingsLive.CalendarFeedComponent do
             <p class="text-sm font-semibold text-green-800">
               Tu nueva URL de suscripción al calendario
             </p>
+
             <p class="mt-1 text-xs text-green-700">
               Copia esta URL ahora — la clave completa no se volverá a mostrar.
             </p>
+
             <div class="mt-2 flex items-center gap-2">
               <code
                 id="calendar-new-feed-url"
@@ -38,6 +40,7 @@ defmodule CraftplanWeb.SettingsLive.CalendarFeedComponent do
               >
                 {@just_created_url}
               </code>
+
               <.button
                 type="button"
                 size={:sm}
@@ -61,10 +64,12 @@ defmodule CraftplanWeb.SettingsLive.CalendarFeedComponent do
             <div class="flex items-center justify-between">
               <div>
                 <h3 class="text-base font-semibold text-stone-900">Feeds de calendario</h3>
+
                 <p class="mt-1 text-sm text-stone-600">
                   Cada feed tiene su propia clave API. Revocar un feed deshabilita su URL.
                 </p>
               </div>
+
               <.button
                 type="button"
                 variant={:primary}
@@ -88,17 +93,21 @@ defmodule CraftplanWeb.SettingsLive.CalendarFeedComponent do
                 variant={:compact}
               >
                 <:col :let={key} label="Nombre">{key.name}</:col>
+
                 <:col :let={key} label="URL del feed">
                   <code class="text-xs text-stone-600">…/feed.ics?key={key.prefix}••••••</code>
                 </:col>
+
                 <:col :let={key} label="Creado" class="whitespace-nowrap">
                   {Calendar.strftime(key.inserted_at, "%Y-%m-%d")}
                 </:col>
+
                 <:col :let={key} label="Último uso" class="whitespace-nowrap">
                   {if key.last_used_at,
                     do: Calendar.strftime(key.last_used_at, "%Y-%m-%d %H:%M"),
                     else: "Nunca"}
                 </:col>
+
                 <:action :let={key}>
                   <.button
                     size={:sm}
@@ -121,21 +130,31 @@ defmodule CraftplanWeb.SettingsLive.CalendarFeedComponent do
             <div class="mt-4 space-y-4 text-sm text-stone-600">
               <div>
                 <h4 class="font-medium text-stone-800">Google Calendar</h4>
+
                 <ol class="mt-1 list-inside list-decimal space-y-1">
                   <li>Haz clic en "Generar feed de calendario" y copia la URL</li>
+
                   <li>Abre la configuración de Google Calendar</li>
+
                   <li>
-                    En "Otros calendarios", haz clic en <strong>+</strong> → <strong>Desde URL</strong>
+                    En "Otros calendarios", haz clic en <strong>+</strong>
+                    → <strong>Desde URL</strong>
                   </li>
+
                   <li>Pega la URL y haz clic en "Agregar calendario"</li>
                 </ol>
               </div>
 
               <div>
                 <h4 class="font-medium text-stone-800">Apple Calendar</h4>
+
                 <ol class="mt-1 list-inside list-decimal space-y-1">
                   <li>Haz clic en "Generar feed de calendario" y copia la URL</li>
-                  <li>En Calendar, ve a <strong>Archivo → Nueva suscripción de calendario</strong></li>
+
+                  <li>
+                    En Calendar, ve a <strong>Archivo → Nueva suscripción de calendario</strong>
+                  </li>
+
                   <li>Pega la URL y haz clic en "Suscribirse"</li>
                 </ol>
               </div>
@@ -144,6 +163,7 @@ defmodule CraftplanWeb.SettingsLive.CalendarFeedComponent do
 
           <section class="border-primary-200 bg-primary-50 text-primary-800 rounded-md border border-dashed p-6 text-sm">
             <h4 class="text-primary-900 font-semibold">Consejo</h4>
+
             <p class="mt-2">
               El feed incluye entregas de pedidos y programaciones de lotes de producción desde los últimos 30 días hasta los próximos 90 días. Tu app de calendario se actualizará automáticamente.
             </p>

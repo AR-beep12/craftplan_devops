@@ -22,16 +22,12 @@ defmodule CraftplanWeb.PurchasingLive.PurchaseOrderFormComponent do
           label="Proveedor"
           options={for s <- @suppliers, do: {s.name, s.id}}
         />
-
         <.input
           field={@form[:status]}
           type="select"
           label="Estado"
           options={[{"Borrador", :draft}, {"Pedido", :ordered}, {"Recibido", :received}]}
-        />
-
-        <.input field={@form[:ordered_at]} type="datetime-local" label="Fecha de pedido" />
-
+        /> <.input field={@form[:ordered_at]} type="datetime-local" label="Fecha de pedido" />
         <:actions>
           <.button variant={:primary} phx-disable-with="Guardando...">Guardar orden de compra</.button>
         </:actions>

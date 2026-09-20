@@ -51,7 +51,6 @@ defmodule CraftplanWeb.OrderLive.Index do
     <Page.page>
       <.header>
         Pedidos
-
         <:actions>
           <div class="flex flex-wrap items-center gap-3">
             <.link patch={~p"/manage/orders/new"} phx-click={JS.push_focus()}>
@@ -669,8 +668,7 @@ defmodule CraftplanWeb.OrderLive.Index do
     week_start = List.first(days_range)
     week_end = List.last(days_range)
 
-    {DateTime.new!(week_start, ~T[00:00:00], "Etc/UTC"),
-     DateTime.new!(week_end, ~T[23:59:59], "Etc/UTC")}
+    {DateTime.new!(week_start, ~T[00:00:00], "Etc/UTC"), DateTime.new!(week_end, ~T[23:59:59], "Etc/UTC")}
   end
 
   defp load_orders_for_calendar(socket, filter_opts, days_range) do
@@ -739,8 +737,7 @@ defmodule CraftplanWeb.OrderLive.Index do
     |> assign(:order, nil)
   end
 
-  defp order_trail(%{live_action: :new}),
-    do: [Navigation.root(:orders), Navigation.page(:orders, :new)]
+  defp order_trail(%{live_action: :new}), do: [Navigation.root(:orders), Navigation.page(:orders, :new)]
 
   defp order_trail(_), do: [Navigation.root(:orders)]
 

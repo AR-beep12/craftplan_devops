@@ -156,6 +156,7 @@ defmodule CraftplanWeb.Components.Core do
                   >
                     {@title}
                   </h2>
+
                   <p :if={@description} id={"#{@id}-description"} class="text-sm text-stone-600">
                     {@description}
                   </p>
@@ -221,10 +222,11 @@ defmodule CraftplanWeb.Components.Core do
     >
       <p :if={@title} class="flex items-center gap-1.5 text-sm font-semibold leading-6">
         <%!-- <.icon :if={@kind == :info} name="hero-information-circle-mini bg-blue-500" class="h-4 w-4" /> --%>
-        <.icon :if={@kind == :error} name="hero-exclamation-circle-mini bg-rose-500" class="h-4 w-4" />
-        {@title}
+        <.icon :if={@kind == :error} name="hero-exclamation-circle-mini bg-rose-500" class="h-4 w-4" /> {@title}
       </p>
+
       <p class="mt-0.5 text-xs leading-5 text-stone-600">{msg}</p>
+
       <button
         type="button"
         class="group absolute top-1 right-2 p-1 opacity-40 transition-all group-hover:opacity-100"
@@ -371,6 +373,7 @@ defmodule CraftplanWeb.Components.Core do
           <.tab_link label={tab.label} path={tab.path} selected?={tab.selected?} />
         </:tab>
       </.tabs_nav>
+
       <.tabs_content>
         <div :for={tab <- @tab} :if={tab.selected?} class="relative w-full">
           {render_slot(tab)}
@@ -410,6 +413,7 @@ defmodule CraftplanWeb.Components.Core do
           ]}>
             {idx + 1}
           </div>
+
           <%= if @goto_event && not current? && idx < current_idx do %>
             <button
               type="button"
@@ -428,6 +432,7 @@ defmodule CraftplanWeb.Components.Core do
             </div>
           <% end %>
         </div>
+
         <div :if={idx < length(@steps) - 1} class="h-px w-8 bg-stone-300"></div>
       <% end %>
     </div>
@@ -596,8 +601,9 @@ defmodule CraftplanWeb.Components.Core do
   def error(assigns) do
     ~H"""
     <p class="mt-3 flex gap-3 text-sm leading-6 text-rose-600">
-      <.icon name="hero-exclamation-circle-mini" class="mt-0.5 h-5 w-5 flex-none" />
-      {render_slot(@inner_block)}
+      <.icon name="hero-exclamation-circle-mini" class="mt-0.5 h-5 w-5 flex-none" /> {render_slot(
+        @inner_block
+      )}
     </p>
     """
   end
@@ -631,10 +637,12 @@ defmodule CraftplanWeb.Components.Core do
               {render_slot(@inner_block)}
             </h1>
           </div>
+
           <p :if={@has_subtitle?} class="mt-2 text-sm leading-6 text-stone-600">
             {render_slot(@subtitle)}
           </p>
         </div>
+
         <div :if={@has_actions?} class="flex-none print:hidden">
           {render_slot(@actions)}
         </div>
@@ -705,8 +713,7 @@ defmodule CraftplanWeb.Components.Core do
         navigate={@navigate}
         class="text-sm font-semibold leading-6 text-stone-900 hover:text-stone-700"
       >
-        <.icon name="hero-arrow-left-solid" class="h-3 w-3" />
-        {render_slot(@inner_block)}
+        <.icon name="hero-arrow-left-solid" class="h-3 w-3" /> {render_slot(@inner_block)}
       </.link>
     </div>
     """

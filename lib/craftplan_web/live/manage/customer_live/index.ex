@@ -25,17 +25,22 @@ defmodule CraftplanWeb.CustomerLive.Index do
         row_id={fn {dom_id, _} -> dom_id end}
       >
         <:col :let={{_, customer}} label="Nombre">{customer.full_name}</:col>
+
         <:col :let={{_, customer}} label="ID">
           <.kbd>
             {format_reference(customer.reference)}
           </.kbd>
         </:col>
+
         <:col :let={{_, customer}} label="Correo electrónico">{customer.email}</:col>
+
         <:col :let={{_, customer}} label="Teléfono">{customer.phone}</:col>
 
         <:action :let={{_, customer}}>
           <.link
-            phx-click={JS.push("delete", value: %{id: customer.id}) |> hide("#customer-#{customer.id}")}
+            phx-click={
+              JS.push("delete", value: %{id: customer.id}) |> hide("#customer-#{customer.id}")
+            }
             data-confirm="¿Estás seguro de que deseas eliminar este cliente? Esta acción no se puede deshacer."
           >
             <.button size={:sm} variant={:danger}>
@@ -44,6 +49,7 @@ defmodule CraftplanWeb.CustomerLive.Index do
           </.link>
         </:action>
       </.table>
+
       <div
         :if={@customers_empty?}
         class="rounded-md border border-dashed border-stone-200 bg-stone-50 py-10 text-center text-sm text-stone-500"
@@ -153,6 +159,7 @@ defmodule CraftplanWeb.CustomerLive.Index do
 
       {:error, error} ->
         require Logger
+
         Logger.error("Failed to delete customer #{id}: #{inspect(error)}")
 
         {:noreply, put_flash(socket, :error, delete_error_message(error))}

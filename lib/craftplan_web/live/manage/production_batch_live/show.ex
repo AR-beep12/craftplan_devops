@@ -83,6 +83,7 @@ defmodule CraftplanWeb.ProductionBatchLive.Show do
         <:subtitle>
           {@product && @product.name}
         </:subtitle>
+
         <:actions>
           <.link href={~p"/manage/production/batches/#{@batch_code}/sheet.pdf"} target="_blank">
             <.button variant={:primary}>Imprimir hoja de lote</.button>
@@ -97,20 +98,24 @@ defmodule CraftplanWeb.ProductionBatchLive.Show do
               <.summary_card label="Producto" value={@product && @product.name}>
                 <div class="text-xs text-stone-500">{@product && @product.sku}</div>
               </.summary_card>
+
               <.summary_card
                 label="Estado"
                 value={@production_batch && batch_status_text(@production_batch.status)}
               >
                 <div class="text-xs text-stone-500">Estado del lote de un vistazo</div>
               </.summary_card>
+
               <.summary_card label="Producido" value={format_quantity(@totals)}>
                 <div class="text-xs text-stone-500">Unidades totales en este lote</div>
               </.summary_card>
+
               <.summary_card label="Producido el" value={format_batch_time(@produced_at, @time_zone)}>
                 <div class="text-xs text-stone-500">
                   Capturado a partir de eventos de finalización
                 </div>
               </.summary_card>
+
               <.summary_card
                 label="Costo unitario promedio"
                 value={
@@ -138,6 +143,7 @@ defmodule CraftplanWeb.ProductionBatchLive.Show do
                 currency={@settings.currency}
               />
             </div>
+
             <div class="mt-6 flex flex-wrap gap-2">
               <.button
                 :if={@production_batch && @production_batch.status == :open}
@@ -159,9 +165,11 @@ defmodule CraftplanWeb.ProductionBatchLive.Show do
         <Page.section>
           <Page.surface>
             <h3 class="mb-4 text-base font-semibold text-stone-900">Completar lote</h3>
+
             <p class="mb-4 text-sm text-stone-500">
               Ingresa la cantidad producida y, opcionalmente, ajusta las asignaciones de lotes de material. Los materiales se consumirán automáticamente usando FIFO (primero en expirar, primero en salir) a menos que lo reemplaces con la selección manual de lotes.
             </p>
+
             <.form for={%{}} id="complete-batch-form" phx-submit="complete_batch">
               <div class="grid gap-4 md:grid-cols-2">
                 <.input
@@ -187,6 +195,7 @@ defmodule CraftplanWeb.ProductionBatchLive.Show do
                 <h4 class="mb-2 text-sm font-semibold text-stone-800">
                   Cantidades completadas por artículo de pedido
                 </h4>
+
                 <div
                   :for={alloc <- @allocations_for_complete}
                   class="mb-2 flex items-center gap-3 rounded border border-stone-200 bg-stone-50 px-3 py-2"
@@ -198,6 +207,7 @@ defmodule CraftplanWeb.ProductionBatchLive.Show do
                       planificado: {D.to_string(alloc.planned_qty)}
                     </span>
                   </div>
+
                   <.input
                     type="number"
                     name={"completed_map[#{alloc.order_item_id}]"}
@@ -216,8 +226,7 @@ defmodule CraftplanWeb.ProductionBatchLive.Show do
                     phx-click="toggle_advanced_lots"
                     checked={@show_advanced_lots}
                     class="rounded border-stone-300 text-stone-600 focus:ring-stone-500"
-                  />
-                  <span>Avanzado: selección manual de lotes</span>
+                  /> <span>Avanzado: selección manual de lotes</span>
                 </label>
               </div>
 
@@ -228,13 +237,16 @@ defmodule CraftplanWeb.ProductionBatchLive.Show do
                 >
                   No se encontraron materiales con lotes disponibles para este lote.
                 </div>
+
                 <div :for={mat <- @consume_materials} class="mb-6">
                   <div class="mb-2 flex items-baseline justify-between">
                     <h4 class="text-sm font-semibold text-stone-800">{mat.name}</h4>
+
                     <span class="text-xs text-stone-500">
                       Requerido: {D.to_string(mat.required_qty)} por unidad
                     </span>
                   </div>
+
                   <div
                     :for={lot <- mat.lots}
                     class="mb-2 flex items-center gap-3 rounded border border-stone-200 bg-stone-50 px-3 py-2"
@@ -244,10 +256,12 @@ defmodule CraftplanWeb.ProductionBatchLive.Show do
                       <span class="ml-2 text-stone-500">
                         existencias: {D.to_string(lot.current_stock)}
                       </span>
+
                       <span :if={lot.expiry_date} class="ml-2 text-xs text-stone-400">
                         vence: {format_short_date(lot.expiry_date, format: "%b %d, %Y", missing: "—")}
                       </span>
                     </div>
+
                     <.input
                       type="number"
                       name={"lot_plan[#{mat.material_id}][#{lot.lot_id}]"}
@@ -278,18 +292,23 @@ defmodule CraftplanWeb.ProductionBatchLive.Show do
                   <.kbd>{format_reference(row.order.reference)}</.kbd>
                 </.link>
               </:col>
+
               <:col :let={row} label="Cliente">
                 {row.customer_name || "—"}
               </:col>
+
               <:col :let={row} label="Cantidad">
                 {row.quantity}
               </:col>
+
               <:col :let={row} label="Estado">
                 <.badge text={order_item_status_label(row.status)} value={row.status} />
               </:col>
+
               <:col :let={row} label="Total de línea">
                 {format_money(@settings.currency, row.line_total)}
               </:col>
+
               <:col :let={row} label="Costo unitario">
                 {format_money(@settings.currency, row.unit_cost)}
               </:col>
@@ -304,10 +323,12 @@ defmodule CraftplanWeb.ProductionBatchLive.Show do
             <div class="mb-4 flex items-center justify-between">
               <div>
                 <h3 class="text-base font-semibold text-stone-900">Lotes de material</h3>
+
                 <p class="text-sm text-stone-500">
                   Asignaciones de lotes en todos los artículos de pedido de este lote.
                 </p>
               </div>
+
               <span class="text-sm text-stone-500">
                 {@lots |> length()} lotes
               </span>
@@ -317,21 +338,27 @@ defmodule CraftplanWeb.ProductionBatchLive.Show do
               <:col :let={lot} label="Material">
                 {(lot.material && lot.material.name) || "Desconocido"}
               </:col>
+
               <:col :let={lot} label="Código de lote">
                 <div class="font-mono text-xs">{lot.lot_code}</div>
+
                 <div class="text-xs text-stone-500">
                   Vence {format_short_date(lot.expiry_date, format: "%b %d, %Y", missing: "—")}
                 </div>
               </:col>
+
               <:col :let={lot} label="Proveedor">
                 {(lot.supplier && lot.supplier.name) || "—"}
               </:col>
+
               <:col :let={lot} label="Usado">
                 {format_amount(lot.material && lot.material.unit, lot.quantity_used)}
               </:col>
+
               <:col :let={lot} label="Restante">
                 {format_amount(lot.material && lot.material.unit, lot.remaining)}
               </:col>
+
               <:col :let={lot} label="Pedidos">
                 <div class="space-y-1">
                   <div :for={entry <- lot.orders} class="text-xs text-stone-600">
@@ -354,9 +381,11 @@ defmodule CraftplanWeb.ProductionBatchLive.Show do
                 <p class="text-xs uppercase tracking-wide text-stone-500">
                   {(material.material && material.material.name) || "Material"}
                 </p>
+
                 <p class="mt-2 text-lg font-semibold text-stone-900">
                   {format_amount(material.material && material.material.unit, material.quantity_used)}
                 </p>
+
                 <p class="text-xs text-stone-500">
                   Lotes:
                   <span
@@ -378,6 +407,7 @@ defmodule CraftplanWeb.ProductionBatchLive.Show do
           <Page.surface padding="p-6">
             <div class="mb-4">
               <h3 class="text-base font-semibold text-stone-900">Notas de cumplimiento</h3>
+
               <p class="text-sm text-stone-500">
                 Registra la firma del operador y las observaciones para los registros imprimibles.
               </p>
@@ -386,6 +416,7 @@ defmodule CraftplanWeb.ProductionBatchLive.Show do
             <div class="space-y-4">
               <div>
                 <p class="text-xs uppercase tracking-wide text-stone-500">Operador</p>
+
                 <div class="min-h-[2rem] mt-1 rounded border border-dashed border-stone-300 px-3 py-2 text-sm text-stone-700">
                   ______________________________________
                 </div>
@@ -393,6 +424,7 @@ defmodule CraftplanWeb.ProductionBatchLive.Show do
 
               <div>
                 <p class="text-xs uppercase tracking-wide text-stone-500">Observaciones</p>
+
                 <div class="min-h-[5rem] mt-1 rounded border border-dashed border-stone-300 px-3 py-2 text-sm text-stone-700">
                   {(@bom && @bom.notes) || "Agrega notas de proceso o desviaciones antes de imprimir."}
                 </div>
@@ -618,7 +650,9 @@ defmodule CraftplanWeb.ProductionBatchLive.Show do
     ~H"""
     <div class="rounded border border-stone-200 bg-white p-4">
       <p class="text-xs uppercase tracking-wide text-stone-500">{@label}</p>
+
       <p class="mt-2 text-xl font-semibold text-stone-900">{@value || "—"}</p>
+
       <div class="mt-1 text-xs text-stone-500">
         {render_slot(@inner_block)}
       </div>
@@ -634,6 +668,7 @@ defmodule CraftplanWeb.ProductionBatchLive.Show do
     ~H"""
     <div class="rounded border border-stone-200 bg-stone-50 px-4 py-3">
       <p class="text-xs uppercase tracking-wide text-stone-500">{@label}</p>
+
       <p class="mt-1 text-lg font-semibold text-stone-900">
         {format_money(@currency, @amount)}
       </p>

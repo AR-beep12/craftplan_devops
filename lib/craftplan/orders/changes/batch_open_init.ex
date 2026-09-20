@@ -44,4 +44,3 @@ defmodule Craftplan.Orders.Changes.BatchOpenInit do
     |> Changeset.force_change_attribute(:status, :open)
   end
 end
-

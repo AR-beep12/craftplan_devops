@@ -104,6 +104,7 @@ defmodule CraftplanWeb.SettingsLive.Index do
             Trae tus registros existentes. Cada importación te guía a través del mapeo de columnas para que no se pierda nada.
           </:subtitle>
         </.header>
+
         <div class="flex flex-col gap-6 lg:flex-row">
           <section class="flex-1 rounded-md border border-gray-200 bg-white p-6">
             <div class="mt-6 space-y-4">
@@ -118,6 +119,7 @@ defmodule CraftplanWeb.SettingsLive.Index do
                   <div class="text-primary-500 rounded-lg border border-stone-300 bg-white p-2">
                     <.icon name={entity.icon} class="h-5 w-5" />
                   </div>
+
                   <div class="flex-1">
                     <div class="flex items-center justify-between">
                       <span class="text-base font-medium text-stone-900">{entity.label}</span>
@@ -125,7 +127,9 @@ defmodule CraftplanWeb.SettingsLive.Index do
                         CSV
                       </span>
                     </div>
+
                     <p class="mt-1 text-sm text-stone-600">{entity.description}</p>
+
                     <p class="mt-2 text-xs text-stone-500">
                       Incluye: {entity.includes}
                     </p>
@@ -142,6 +146,7 @@ defmodule CraftplanWeb.SettingsLive.Index do
           <aside class="space-y-6 lg:w-96">
             <section class="rounded-md border border-gray-200 bg-white p-6">
               <h3 class="text-base font-semibold text-stone-900">Exportar datos</h3>
+
               <p class="mt-1 text-sm text-stone-600">
                 Genera un extracto CSV para tus flujos de trabajo de informes y contabilidad.
               </p>
@@ -161,6 +166,7 @@ defmodule CraftplanWeb.SettingsLive.Index do
                     required
                   />
                 </div>
+
                 <div class="mt-6 flex gap-2">
                   <.button id="csv-export-submit" variant={:primary} class="flex-1 justify-center">
                     Exportar CSV

@@ -128,9 +128,9 @@ defmodule CraftplanWeb.Components.Forms do
           checked={@checked}
           class="rounded border-stone-300 text-stone-900 focus:ring-0"
           {@rest}
-        />
-        {@label}
+        /> {@label}
       </label>
+
       <.error :for={msg <- @errors}>{msg}</.error>
     </div>
     """
@@ -169,13 +169,13 @@ defmodule CraftplanWeb.Components.Forms do
                 value={value}
                 checked={value in @list_value}
                 class="mr-2 h-4 w-4 rounded border-stone-300 text-blue-500 checked:border-blue-300 focus:ring-0"
-              />
-              {label}
+              /> {label}
             </label>
           </div>
           <input type="hidden" name={@name} value="" />
         </div>
       </div>
+
       <.error :for={msg <- @errors}>{msg}</.error>
     </fieldset>
     """
@@ -277,6 +277,7 @@ defmodule CraftplanWeb.Components.Forms do
     ~H"""
     <div>
       <.label :if={@label} for={@id}>{@label}</.label>
+
       <div class={[
         "mt-1 w-full overflow-y-auto rounded-md bg-white text-left focus:outline-none focus:ring-1 sm:text-sm",
         @errors == [] && "border-stone-300 focus:border-stone-400",
@@ -301,12 +302,12 @@ defmodule CraftplanWeb.Components.Forms do
                 value={to_string(val)}
                 checked={to_string(val) == to_string(@value)}
                 class="mr-1 mb-0.5 h-4 w-4 border-blue-300 text-blue-400 focus:ring-0"
-              />
-              {label}
+              /> {label}
             </label>
           </div>
         </div>
       </div>
+
       <.error :for={msg <- @errors}>{msg}</.error>
     </div>
     """
@@ -316,6 +317,7 @@ defmodule CraftplanWeb.Components.Forms do
     ~H"""
     <div>
       <.label for={@id}>{@label}</.label>
+
       <select
         id={@id}
         name={@name}
@@ -330,6 +332,7 @@ defmodule CraftplanWeb.Components.Forms do
         <option :if={@prompt} value="">{@prompt}</option>
         {Phoenix.HTML.Form.options_for_select(@options, @value)}
       </select>
+
       <.error :for={msg <- @errors}>{msg}</.error>
     </div>
     """
@@ -395,6 +398,7 @@ defmodule CraftplanWeb.Components.Forms do
             <div class="px-2 py-1.5 text-xs font-medium text-stone-500">
               Selecciona una opción
             </div>
+
             <div :for={{label, val} <- @options} class="flex items-center">
               <label
                 for={"#{@name}-#{val}-#{@dropdown_id}"}
@@ -453,6 +457,7 @@ defmodule CraftplanWeb.Components.Forms do
     ~H"""
     <div>
       <.label for={@id}>{@label}</.label>
+
       <div class="flex">
         <input
           type={@type}
@@ -482,6 +487,7 @@ defmodule CraftplanWeb.Components.Forms do
           {@inline_label}
         </span>
       </div>
+
       <.error :for={msg <- @errors} :if={@flat != true}>{msg}</.error>
     </div>
     """

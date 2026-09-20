@@ -20,13 +20,16 @@ defmodule CraftplanWeb.InventoryLive.FormComponentMaterial do
           <.input field={@form[:name]} type="text" label="Nombre" />
           <.input field={@form[:color]} type="text" label="Color" />
         </div>
+
         <div :if={@material} class="rounded-md border border-stone-200 bg-stone-50 p-3">
           <div class="text-xs font-medium text-stone-500">Stock actual</div>
+
           <div class="text-sm font-semibold text-stone-900">
             {format_quantity(@material.current_stock)}
             <span class="font-normal text-stone-500">— usa Ajustar stock para modificar</span>
           </div>
         </div>
+
         <.input
           :if={!@material}
           field={@form[:quantity]}
@@ -34,8 +37,7 @@ defmodule CraftplanWeb.InventoryLive.FormComponentMaterial do
           label="Cantidad inicial"
           step="0.5"
           phx-debounce="blur"
-        />
-        <.input field={@form[:extra_description]} type="textarea" label="Descripción" />
+        /> <.input field={@form[:extra_description]} type="textarea" label="Descripción" />
         <:actions>
           <.button variant={:primary} phx-disable-with="Guardando...">Guardar material</.button>
         </:actions>

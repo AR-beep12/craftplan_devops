@@ -23,7 +23,6 @@ defmodule CraftplanWeb.PurchasingLive.SupplierFormComponent do
         </div>
         <.input field={@form[:contact_email]} type="email" label="Correo electrónico de contacto" />
         <.input field={@form[:notes]} type="textarea" label="Notas" />
-
         <:actions>
           <.button variant={:primary} phx-disable-with="Guardando...">Guardar proveedor</.button>
         </:actions>

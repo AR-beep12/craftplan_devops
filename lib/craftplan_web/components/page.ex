@@ -37,6 +37,7 @@ defmodule CraftplanWeb.Components.Page do
           <h2 :if={@title} class="text-base font-semibold text-stone-900 sm:text-lg">
             {@title}
           </h2>
+
           <p :if={@description} class="text-sm text-stone-500">
             {@description}
           </p>
@@ -81,6 +82,7 @@ defmodule CraftplanWeb.Components.Page do
           class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
         >
           <div>{render_slot(@header)}</div>
+
           <div :if={@actions != []} class="flex items-center gap-2">
             {render_slot(@actions)}
           </div>
@@ -114,6 +116,7 @@ defmodule CraftplanWeb.Components.Page do
       <div class={@left_class}>
         {render_slot(@left)}
       </div>
+
       <aside :if={@right != []} class={@right_class}>
         {render_slot(@right)}
       </aside>

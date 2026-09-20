@@ -334,4 +334,3 @@ defmodule Craftplan.Production.Batching do
   defp normalize(val) when is_float(val), do: D.from_float(val)
   defp normalize(val) when is_binary(val), do: D.new(val)
 end
-

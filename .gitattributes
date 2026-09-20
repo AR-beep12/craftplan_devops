@@ -1,0 +1,6 @@
+# Sourceror (usado por Spark.Formatter en `mix format`) no maneja CRLF:
+# parte "\r\n" en dos saltos de linea y corrompe los parches en modulos Ash.
+# Forzamos LF en el codigo que formatea `mix format`, sin importar core.autocrlf.
+*.ex text eol=lf
+*.exs text eol=lf
+*.heex text eol=lf

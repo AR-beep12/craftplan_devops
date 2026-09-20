@@ -131,7 +131,6 @@ defmodule CraftplanWeb.Components.CommandPalette do
           phx-click="close"
           phx-target={@myself}
         />
-
         <div class="top-[15%] fixed inset-x-0 mx-auto w-full max-w-xl px-4">
           <div class="overflow-hidden rounded-lg bg-white shadow-2xl ring-1 ring-stone-200">
             <form
@@ -153,6 +152,7 @@ defmodule CraftplanWeb.Components.CommandPalette do
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
               </svg>
+
               <input
                 id="command-palette-input"
                 type="text"
@@ -177,7 +177,6 @@ defmodule CraftplanWeb.Components.CommandPalette do
                 selected_index={@selected_index}
                 myself={@myself}
               />
-
               <.result_section
                 :if={@results.actions != []}
                 title="Acciones"
@@ -186,7 +185,6 @@ defmodule CraftplanWeb.Components.CommandPalette do
                 selected_index={@selected_index}
                 myself={@myself}
               />
-
               <.result_section
                 :if={@results.products != []}
                 title="Productos"
@@ -195,7 +193,6 @@ defmodule CraftplanWeb.Components.CommandPalette do
                 selected_index={@selected_index}
                 myself={@myself}
               />
-
               <.result_section
                 :if={@results.materials != []}
                 title="Materiales"
@@ -204,7 +201,6 @@ defmodule CraftplanWeb.Components.CommandPalette do
                 selected_index={@selected_index}
                 myself={@myself}
               />
-
               <.result_section
                 :if={@results.orders != []}
                 title="Pedidos"
@@ -213,7 +209,6 @@ defmodule CraftplanWeb.Components.CommandPalette do
                 selected_index={@selected_index}
                 myself={@myself}
               />
-
               <.result_section
                 :if={@results.customers != []}
                 title="Clientes"
@@ -234,14 +229,17 @@ defmodule CraftplanWeb.Components.CommandPalette do
               <div class="flex items-center gap-4">
                 <span class="flex items-center gap-1">
                   <.kbd>↑</.kbd>
+
                   <.kbd>↓</.kbd>
                   para navegar
                 </span>
+
                 <span class="flex items-center gap-1">
                   <.kbd>↵</.kbd>
                   para seleccionar
                 </span>
               </div>
+
               <span class="flex items-center gap-1">
                 <.kbd>esc</.kbd>
                 para cerrar
@@ -266,6 +264,7 @@ defmodule CraftplanWeb.Components.CommandPalette do
       <div class="px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-stone-400">
         {@title}
       </div>
+
       <ul>
         <li :for={item <- @items}>
           <% global_index = Enum.find_index(@flat_results, fn r -> r.path == item.path end) %>
@@ -285,10 +284,12 @@ defmodule CraftplanWeb.Components.CommandPalette do
             <.result_icon icon={item[:icon]} />
             <div class="min-w-0 flex-1">
               <div class="truncate font-medium">{item.label}</div>
+
               <div :if={item[:sublabel]} class="truncate text-xs text-stone-500">
                 {item.sublabel}
               </div>
             </div>
+
             <svg
               :if={global_index == @selected_index}
               class="h-4 w-4 text-stone-400"

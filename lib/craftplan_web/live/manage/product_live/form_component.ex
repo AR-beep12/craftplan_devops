@@ -19,7 +19,6 @@ defmodule CraftplanWeb.ProductLive.FormComponent do
         <div class="space-y-2">
           <label class="block text-sm font-medium text-stone-700">Categoría</label>
           <.input field={@form[:category_id]} type="hidden" />
-
           <div
             id="category-select-widget"
             phx-hook="CategorySearch"
@@ -79,7 +78,6 @@ defmodule CraftplanWeb.ProductLive.FormComponent do
         </div>
         <.input field={@form[:name]} type="text" label="Nombre" />
         <.input field={@form[:price]} type="number" label="Precio" step="0.01" />
-
         <.input
           field={@form[:selling_availability]}
           type="radiogroup"
@@ -90,7 +88,6 @@ defmodule CraftplanWeb.ProductLive.FormComponent do
             {"Desactivado", :off}
           ]}
         />
-
         <:actions>
           <.button variant={:primary} phx-disable-with="Guardando...">Guardar producto</.button>
         </:actions>

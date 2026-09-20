@@ -21,23 +21,25 @@ defmodule CraftplanWeb.ProductLive.Show do
         </.link>
       </:actions>
     </.header>
-
     <.sub_nav links={@tabs_links} />
-
     <div class="mt-6 space-y-6">
       <.tabs_content :if={@live_action in [:details, :show]}>
         <.list>
           <:item title="Categoría">
             {(@product.category && @product.category.name) || "-"}
           </:item>
+
           <:item title="Disponibilidad">
             <.badge text={selling_availability_label(@product.selling_availability)} />
           </:item>
+
           <:item title="Nombre">{@product.name}</:item>
+
           <:item title="Precio">
             {format_money(@settings.currency, @product.price)}
           </:item>
         </.list>
+
         <div class="mt-8 border-t border-stone-200 pt-6">
           <.live_component
             module={CraftplanWeb.ProductLive.FormComponentRecipe}

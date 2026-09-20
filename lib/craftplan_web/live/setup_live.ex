@@ -32,6 +32,7 @@ defmodule CraftplanWeb.SetupLive do
       <div class="w-full max-w-md space-y-6">
         <div class="text-center">
           <h1 class="text-2xl font-bold text-stone-900">Bienvenido a Craftplan</h1>
+
           <p class="mt-2 text-sm text-stone-600">
             Crea tu cuenta de administrador para comenzar.
           </p>
@@ -51,7 +52,6 @@ defmodule CraftplanWeb.SetupLive do
               type="password"
               label="Confirmar contraseña"
             />
-
             <:actions>
               <.button variant={:primary} phx-disable-with="Creando cuenta..." class="w-full">
                 Crear cuenta de administrador

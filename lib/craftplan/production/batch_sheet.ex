@@ -153,4 +153,3 @@ defmodule Craftplan.Production.BatchSheet do
 
   defp format_money(currency, _), do: format_money(currency, D.new(0))
 end
-

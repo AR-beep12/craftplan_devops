@@ -106,6 +106,7 @@ defmodule CraftplanWeb.Components.DataVis do
             >
               {col[:label]}
             </th>
+
             <th
               :if={@action != []}
               class="relative border-r border-stone-200 p-0 pr-4 pb-4 last:border-r-0"
@@ -114,6 +115,7 @@ defmodule CraftplanWeb.Components.DataVis do
             </th>
           </tr>
         </thead>
+
         <tbody
           id={@id}
           phx-update={match?(%Phoenix.LiveView.LiveStream{}, @rows) && "stream"}
@@ -128,6 +130,7 @@ defmodule CraftplanWeb.Components.DataVis do
               {render_slot(@empty)}
             </td>
           </tr>
+
           <tr :for={row <- @rows} id={@row_id && @row_id.(row)} class="group hover:bg-stone-200/40">
             <td
               :for={{col, i} <- Enum.with_index(@col)}
@@ -147,6 +150,7 @@ defmodule CraftplanWeb.Components.DataVis do
                 </span>
               </div>
             </td>
+
             <td
               :if={@action != []}
               class="relative w-14 border-r border-b border-stone-200 p-0 pr-4 align-top last:border-r-0"
@@ -187,6 +191,7 @@ defmodule CraftplanWeb.Components.DataVis do
       <dl class="-my-4 divide-y divide-stone-100">
         <div :for={item <- @item} class="flex gap-4 py-4 text-sm leading-6 sm:gap-8">
           <dt class="w-1/4 flex-none text-stone-500">{item.title}</dt>
+
           <dd class="text-stone-700">{render_slot(item)}</dd>
         </div>
       </dl>
@@ -233,8 +238,10 @@ defmodule CraftplanWeb.Components.DataVis do
     ~H"""
     <div class={["rounded border border-stone-200 bg-white", stat_card_container_classes(@size)]}>
       <dt :if={@title} class={stat_card_title_classes(@size)}>{@title}</dt>
+
       <dd class="mt-1">
         <div class={stat_card_value_classes(@size)}>{@value}</div>
+
         <div :if={@description} class={stat_card_desc_classes(@size)}>{@description}</div>
       </dd>
     </div>
@@ -280,6 +287,7 @@ defmodule CraftplanWeb.Components.DataVis do
     ~H"""
     <div class={["rounded border border-stone-200 bg-white p-4", @class]}>
       <h3 class="mb-5 text-base font-medium text-stone-600">{@title}</h3>
+
       <div>
         {render_slot(@inner_block)}
       </div>

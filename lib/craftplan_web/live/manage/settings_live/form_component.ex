@@ -23,10 +23,12 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
               <h3 id="general-settings-title" class="text-base font-semibold text-stone-800">
                 General
               </h3>
+
               <p class="mt-1 text-sm text-stone-600">
                 Define la moneda predeterminada utilizada en pedidos, facturas e informes.
               </p>
             </div>
+
             <div class="space-y-4 p-4">
               <.input
                 field={@form[:currency]}
@@ -46,10 +48,12 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
               <h3 id="email-sender-settings-title" class="text-base font-semibold text-stone-800">
                 Remitente de correo
               </h3>
+
               <p class="mt-1 text-sm text-stone-600">
                 Configura el nombre y la dirección del remitente utilizados para los correos salientes.
               </p>
             </div>
+
             <div class="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2">
               <.input
                 field={@form[:email_from_name]}
@@ -75,10 +79,12 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
               <h3 id="forecasting-settings-title" class="text-base font-semibold text-stone-800">
                 Pronóstico de inventario
               </h3>
+
               <p class="mt-1 text-sm text-stone-600">
                 Ajusta cómo el planificador de reabastecimiento calcula el stock de seguridad, los puntos de reorden y las cantidades sugeridas.
               </p>
             </div>
+
             <div class="space-y-6 p-4">
               <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <.input
@@ -106,6 +112,7 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
                   placeholder="10"
                 />
               </div>
+
               <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <.input
                   field={@form[:forecast_actual_weight]}
@@ -135,6 +142,7 @@ defmodule CraftplanWeb.SettingsLive.FormComponent do
                   placeholder="0.95"
                 />
               </div>
+
               <p class="text-xs text-stone-500">
                 Los pesos real y planificado deben sumar 1. Niveles de servicio más altos aumentan el stock de seguridad.
               </p>

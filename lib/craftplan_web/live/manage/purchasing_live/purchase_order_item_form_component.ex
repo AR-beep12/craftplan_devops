@@ -33,6 +33,7 @@ defmodule CraftplanWeb.PurchasingLive.PurchaseOrderItemFormComponent do
             min="0"
           />
         </div>
+
         <:actions>
           <.button variant={:primary} phx-disable-with="Agregando...">Agregar artículo</.button>
         </:actions>

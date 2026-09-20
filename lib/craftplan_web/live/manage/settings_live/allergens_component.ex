@@ -32,6 +32,7 @@ defmodule CraftplanWeb.SettingsLive.AllergensComponent do
                 <label class="sr-only text-sm font-medium text-stone-700" for="allergen-filter-query">
                   Buscar alérgenos
                 </label>
+
                 <input
                   id="allergen-filter-query"
                   name="query"
@@ -47,6 +48,7 @@ defmodule CraftplanWeb.SettingsLive.AllergensComponent do
             <div class="-mt-10 p-4">
               <.table id="allergens" rows={@visible_allergens} wrapper_class="mt-0">
                 <:col :let={allergen} label="Nombre">{allergen.name}</:col>
+
                 <:action :let={allergen}>
                   <.link
                     phx-click={JS.push("delete", value: %{id: allergen.id}, target: @myself)}
@@ -57,6 +59,7 @@ defmodule CraftplanWeb.SettingsLive.AllergensComponent do
                     </.button>
                   </.link>
                 </:action>
+
                 <:empty>
                   <div class="py-6 text-center text-sm text-stone-500">
                     {if String.trim(@search_query) == "" do
@@ -74,9 +77,11 @@ defmodule CraftplanWeb.SettingsLive.AllergensComponent do
         <aside class="lg:w-80">
           <div class="space-y-4 rounded-md border border-gray-200 bg-white p-4">
             <h3 class="text-sm font-semibold text-stone-800">Gestionar</h3>
+
             <p class="text-sm text-stone-600">
               Crea nuevos alérgenos o elimina los que ya no necesites rastrear. Los cambios se aplican de inmediato en todo Craftplan.
             </p>
+
             <.button
               type="button"
               variant={:primary}

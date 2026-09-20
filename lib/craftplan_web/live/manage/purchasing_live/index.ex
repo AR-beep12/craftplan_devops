@@ -32,9 +32,13 @@ defmodule CraftplanWeb.PurchasingLive.Index do
         <:col :let={po} label="Referencia">
           <.kbd>{po.reference}</.kbd>
         </:col>
+
         <:col :let={po} label="Proveedor">{po.supplier.name}</:col>
+
         <:col :let={po} label="Estado">{po_status_label(po.status)}</:col>
+
         <:col :let={po} label="Fecha de pedido">{format_time(po.ordered_at, @time_zone)}</:col>
+
         <:col :let={po} label="Fecha de recepción">{format_time(po.received_at, @time_zone)}</:col>
 
         <:action :let={po}>
@@ -158,6 +162,8 @@ defmodule CraftplanWeb.PurchasingLive.Index do
   defp po_status_label(:draft), do: "Borrador"
   defp po_status_label(:ordered), do: "Pedido"
   defp po_status_label(:received), do: "Recibido"
+
   defp po_status_label(status) when is_binary(status), do: status |> String.to_existing_atom() |> po_status_label()
+
   defp po_status_label(status), do: to_string(status)
 end

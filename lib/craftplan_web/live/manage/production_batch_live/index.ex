@@ -73,14 +73,17 @@ defmodule CraftplanWeb.ProductionBatchLive.Index do
         <:header>
           <div class="space-y-1">
             <h2 class="text-sm font-semibold text-stone-900">Filtrar lotes</h2>
+
             <p class="text-sm text-stone-500">
               Reduce la lista por estado o producto.
             </p>
           </div>
         </:header>
+
         <:actions>
           <Page.filter_reset />
         </:actions>
+
         <form id="filters-form" phx-change="apply_filters">
           <Page.form_grid columns={2} class="max-w-full">
             <div class="min-w-[12rem]">
@@ -120,14 +123,17 @@ defmodule CraftplanWeb.ProductionBatchLive.Index do
                 Ningún lote coincide con los filtros actuales.
               </div>
             </:empty>
+
             <:col :let={batch} label="Lote">
               <.link navigate={~p"/manage/production/batches/#{batch.batch_code}"}>
                 <.kbd>{batch.batch_code}</.kbd>
               </.link>
             </:col>
+
             <:col :let={batch} label="Producto">
               {(batch.product && batch.product.name) || "—"}
             </:col>
+
             <:col :let={batch} label="Estado">
               <.badge
                 text={batch_status_text(batch.status)}
@@ -140,15 +146,19 @@ defmodule CraftplanWeb.ProductionBatchLive.Index do
                 ]}
               />
             </:col>
+
             <:col :let={batch} label="Cant. planificada">
               {Decimal.to_string(batch.planned_qty)}
             </:col>
+
             <:col :let={batch} label="Cant. producida">
               {if batch.status == :completed, do: Decimal.to_string(batch.produced_qty), else: "—"}
             </:col>
+
             <:col :let={batch} label="Creado">
               {format_time(batch.inserted_at, @time_zone)}
             </:col>
+
             <:action :let={batch}>
               <.link navigate={~p"/manage/production/batches/#{batch.batch_code}"}>
                 <.button size={:sm} variant={:outline}>Ver</.button>

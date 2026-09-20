@@ -12,12 +12,17 @@ defmodule CraftplanWeb.ProductLive.Label do
       <div class="mb-4 flex items-start justify-between print:mb-2">
         <div>
           <h1 class="text-2xl font-semibold print:text-xl">Etiqueta del producto</h1>
+
           <div class="text-sm text-stone-600">ID: {@product.id}</div>
         </div>
+
         <div class="text-right text-sm">
           <div class="text-stone-600">Fecha</div>
+
           <div class="font-medium">{format_date(@today, format: "%Y-%m-%d")}</div>
+
           <div class="mt-2 text-stone-600">Lote</div>
+
           <div class="font-medium">{batch_code(@today, @product.id)}</div>
         </div>
       </div>
@@ -28,6 +33,7 @@ defmodule CraftplanWeb.ProductLive.Label do
 
       <div :if={@ingredients != []} class="mb-4">
         <div class="mb-1 text-sm font-medium text-stone-700">Ingredientes</div>
+
         <ul class="list-inside list-disc text-sm">
           <li :for={name <- @ingredients}>{name}</li>
         </ul>
@@ -35,6 +41,7 @@ defmodule CraftplanWeb.ProductLive.Label do
 
       <div :if={@allergens != []} class="mb-4">
         <div class="mb-1 text-sm font-medium text-stone-700">Alérgenos</div>
+
         <div class="flex flex-wrap gap-2 text-sm">
           <.badge :for={a <- @allergens} text={a.name} />
         </div>
@@ -44,6 +51,7 @@ defmodule CraftplanWeb.ProductLive.Label do
         <div class="mb-1 text-sm font-medium text-stone-700">
           Declaración nutricional por {nutrition_basis_label(@nutrition_facts)}
         </div>
+
         <table class="w-full border-collapse text-sm">
           <tbody>
             <tr :for={fact <- @nutrition_facts} class="border-b border-stone-200">
@@ -52,6 +60,7 @@ defmodule CraftplanWeb.ProductLive.Label do
                   {nutrient_label(fact)}
                 </span>
               </td>
+
               <td class="py-1 text-right">{format_amount(fact.unit, fact.amount)}</td>
             </tr>
           </tbody>

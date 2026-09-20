@@ -34,6 +34,7 @@ defmodule CraftplanWeb.SettingsLive.CategoriesComponent do
                 <label class="sr-only text-sm font-medium text-stone-700" for="category-filter-query">
                   Buscar categorías
                 </label>
+
                 <input
                   id="category-filter-query"
                   name="query"
@@ -75,8 +76,10 @@ defmodule CraftplanWeb.SettingsLive.CategoriesComponent do
                     ]}>
                       {category.name}
                     </p>
+
                     <p class="truncate text-xs text-stone-500">{category.slug}</p>
                   </div>
+
                   <span class={[
                     "inline-flex rounded-full px-2 py-0.5 text-xs font-medium",
                     if(category.active,
@@ -86,6 +89,7 @@ defmodule CraftplanWeb.SettingsLive.CategoriesComponent do
                   ]}>
                     {if category.active, do: "Activa", else: "Oculta"}
                   </span>
+
                   <.link
                     phx-click={JS.push("delete", value: %{id: category.id}, target: @myself)}
                     data-confirm="¿Eliminar categoría '#{category.name}'? Los productos con esta categoría quedarán sin categoría."
@@ -107,9 +111,11 @@ defmodule CraftplanWeb.SettingsLive.CategoriesComponent do
         <aside class="lg:w-80">
           <div class="space-y-4 rounded-md border border-gray-200 bg-white p-4">
             <h3 class="text-sm font-semibold text-stone-800">Gestionar</h3>
+
             <p class="text-sm text-stone-600">
               Crea nuevas categorías o gestiona las existentes. Solo las categorías activas aparecen en el selector del popup de producto.
             </p>
+
             <.button
               type="button"
               variant={:primary}

@@ -35,6 +35,7 @@ defmodule CraftplanWeb.SettingsLive.ApiKeysComponent do
             <p class="text-sm font-semibold text-green-800">
               Clave API creada — cópiala ahora, no se volverá a mostrar
             </p>
+
             <div class="mt-2 flex items-center gap-2">
               <code
                 id="raw-key-display"
@@ -42,6 +43,7 @@ defmodule CraftplanWeb.SettingsLive.ApiKeysComponent do
               >
                 {@raw_key}
               </code>
+
               <.button
                 type="button"
                 size={:sm}
@@ -63,19 +65,23 @@ defmodule CraftplanWeb.SettingsLive.ApiKeysComponent do
         <div class="p-4">
           <.table id="api-keys" rows={@api_keys} wrapper_class="mt-0">
             <:col :let={key} label="Nombre">{key.name}</:col>
+
             <:col :let={key} label="Prefijo">
               <code class="text-xs">{key.prefix}...</code>
             </:col>
+
             <:col :let={key} label="Alcances">
               <span class="text-xs text-stone-600">
                 {format_scopes_summary(key.scopes)}
               </span>
             </:col>
+
             <:col :let={key} label="Último uso">
               {if key.last_used_at,
                 do: Calendar.strftime(key.last_used_at, "%Y-%m-%d %H:%M"),
                 else: "Nunca"}
             </:col>
+
             <:col :let={key} label="Estado">
               <span
                 :if={key.revoked_at}
@@ -83,6 +89,7 @@ defmodule CraftplanWeb.SettingsLive.ApiKeysComponent do
               >
                 Revocada
               </span>
+
               <span
                 :if={is_nil(key.revoked_at)}
                 class="ring-green-600/20 inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset"
@@ -90,6 +97,7 @@ defmodule CraftplanWeb.SettingsLive.ApiKeysComponent do
                 Activa
               </span>
             </:col>
+
             <:action :let={key}>
               <.button
                 :if={is_nil(key.revoked_at)}
@@ -101,6 +109,7 @@ defmodule CraftplanWeb.SettingsLive.ApiKeysComponent do
                 Revocar
               </.button>
             </:action>
+
             <:empty>
               <div class="py-6 text-center text-sm text-stone-500">
                 Aún no hay claves API. Crea una usando el botón de arriba.
@@ -125,8 +134,12 @@ defmodule CraftplanWeb.SettingsLive.ApiKeysComponent do
           phx-change="validate_key"
           phx-submit="create_key"
         >
-          <.input field={@form[:name]} type="text" label="Nombre de la clave" placeholder="ej. Sincronización con Shopify" />
-
+          <.input
+            field={@form[:name]}
+            type="text"
+            label="Nombre de la clave"
+            placeholder="ej. Sincronización con Shopify"
+          />
           <div class="mt-4">
             <label class="text-sm font-medium text-stone-700">Permisos de recursos</label>
             <p class="mb-3 text-xs text-stone-500">
@@ -146,6 +159,7 @@ defmodule CraftplanWeb.SettingsLive.ApiKeysComponent do
                       class="rounded border-stone-300"
                     /> Lectura
                   </label>
+
                   <label class="flex items-center gap-1 text-xs text-stone-600">
                     <input
                       type="checkbox"

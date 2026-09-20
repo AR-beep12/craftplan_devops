@@ -16,16 +16,16 @@ defmodule CraftplanWeb.CustomerLive.Show do
     <.header>
       {@customer.full_name}
     </.header>
-
     <.sub_nav links={@tabs_links} />
-
     <div class="p mt-4 space-y-6">
       <.tabs_content :if={@live_action in [:details, :show]}>
         <div class="mt-8 space-y-8">
           <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
             <.list>
               <:item title="Nombre">{@customer.full_name}</:item>
+
               <:item title="Correo electrónico">{@customer.email}</:item>
+
               <:item title="Teléfono">{@customer.phone}</:item>
             </.list>
           </div>
@@ -36,6 +36,7 @@ defmodule CraftplanWeb.CustomerLive.Show do
         <div class="mt-6 space-y-4">
           <div class="flex items-center justify-between">
             <h3 class="text-lg font-semibold">Historial de pedidos</h3>
+
             <.link navigate={~p"/manage/orders/new?customer_id=#{@customer.reference}"}>
               <.button variant={:primary}>Nuevo pedido</.button>
             </.link>
@@ -49,6 +50,7 @@ defmodule CraftplanWeb.CustomerLive.Show do
             <:col :let={order} label="Referencia">
               <.kbd>{order.reference}</.kbd>
             </:col>
+
             <:col :let={order} label="Estado">
               <.badge
                 text={order_status_label(order.status)}
@@ -59,12 +61,15 @@ defmodule CraftplanWeb.CustomerLive.Show do
                 ]}
               />
             </:col>
+
             <:col :let={order} label="Creado">
               {format_time(order.inserted_at, @time_zone)}
             </:col>
+
             <:col :let={order} label="Fecha de entrega">
               {format_time(order.delivery_date, @time_zone)}
             </:col>
+
             <:col :let={order} label="Total">
               {format_money(@settings.currency, order.total_cost)}
             </:col>
@@ -76,7 +81,6 @@ defmodule CraftplanWeb.CustomerLive.Show do
         <div class="mt-6 space-y-8">
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <.stat_card title="Total de pedidos" value={@customer.total_orders} />
-
             <.stat_card
               title="Total gastado"
               value={format_money(@settings.currency, @customer.total_orders_value)}

@@ -18,31 +18,37 @@ defmodule CraftplanWeb.PurchasingLive.Show do
         <.link patch={~p"/manage/purchasing/#{@po.reference}/add_item"}>
           <.button variant={:outline}>Agregar artículo</.button>
         </.link>
+
         <.link :if={@po.status != :received} phx-click={JS.push("receive", value: %{id: @po.id})}>
           <.button variant={:primary}>Marcar como recibido</.button>
         </.link>
       </:actions>
     </.header>
-
     <.sub_nav links={@tabs_links} />
-
     <div class="mt-4 space-y-4">
       <.tabs_content :if={@live_action in [:show]}>
         <.list>
           <:item title="Referencia">
             <.kbd>{@po.reference}</.kbd>
           </:item>
+
           <:item title="Proveedor">{@po.supplier.name}</:item>
+
           <:item title="Estado">{po_status_label(@po.status)}</:item>
+
           <:item title="Fecha de pedido">{format_time(@po.ordered_at, @time_zone)}</:item>
+
           <:item title="Fecha de recepción">{format_time(@po.received_at, @time_zone)}</:item>
         </.list>
       </.tabs_content>
+
       <.tabs_content :if={@live_action not in [:show]}>
         <div>
           <.table id="po-items" rows={@po.items}>
             <:col :let={i} label="Material">{i.material.name}</:col>
+
             <:col :let={i} label="Cantidad">{format_amount(i.material.unit, i.quantity)}</:col>
+
             <:col :let={i} label="Precio unitario">
               {format_money(@settings.currency, i.unit_price || Decimal.new(0))}
             </:col>
@@ -178,6 +184,8 @@ defmodule CraftplanWeb.PurchasingLive.Show do
   defp po_status_label(:draft), do: "Borrador"
   defp po_status_label(:ordered), do: "Pedido"
   defp po_status_label(:received), do: "Recibido"
+
   defp po_status_label(status) when is_binary(status), do: status |> String.to_existing_atom() |> po_status_label()
+
   defp po_status_label(status), do: to_string(status)
 end

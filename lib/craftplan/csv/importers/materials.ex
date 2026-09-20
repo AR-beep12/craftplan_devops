@@ -173,7 +173,9 @@ defmodule Craftplan.CSV.Importers.Materials do
     unit_str = fields |> fetch_field(header_map, "unit") |> to_string() |> String.trim()
     color = fields |> fetch_field(header_map, "color") |> to_string() |> String.trim()
     quantity_str = fields |> fetch_field(header_map, "quantity") |> to_string() |> String.trim()
-    extra_description = fields |> fetch_field(header_map, "extra_description") |> to_string() |> String.trim()
+
+    extra_description =
+      fields |> fetch_field(header_map, "extra_description") |> to_string() |> String.trim()
 
     # Legacy support: sku/price may still appear in old CSVs but are ignored
     with :ok <- present?(name, "name"),

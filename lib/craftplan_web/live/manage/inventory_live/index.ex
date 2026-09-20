@@ -29,7 +29,6 @@ defmodule CraftplanWeb.InventoryLive.Index do
     <Page.page>
       <.header>
         Inventario
-
         <:actions :if={@live_action in [:index, :forecast]}>
           <.link patch={~p"/manage/inventory/new"}>
             <.button variant={:primary}>Nuevo material</.button>
@@ -91,6 +90,7 @@ defmodule CraftplanWeb.InventoryLive.Index do
             </.link>
           </:action>
         </.table>
+
         <div
           :if={@materials_empty?}
           class="rounded-md border border-dashed border-stone-200 bg-stone-50 py-10 text-center text-sm text-stone-500"
@@ -523,11 +523,7 @@ defmodule CraftplanWeb.InventoryLive.Index do
   end
 
   @impl true
-  def handle_event(
-        "view_material_details",
-        %{"date" => date_str, "material" => material_id},
-        socket
-      ) do
+  def handle_event("view_material_details", %{"date" => date_str, "material" => material_id}, socket) do
     date = Date.from_iso8601!(date_str)
     material = Inventory.get_material_by_id!(material_id, actor: socket.assigns.current_user)
 
@@ -702,8 +698,7 @@ defmodule CraftplanWeb.InventoryLive.Index do
   defp forecast_status_chip(:shortage), do: "border border-rose-300 bg-rose-50 text-rose-700"
   defp forecast_status_chip(:watch), do: "border border-amber-300 bg-amber-50 text-amber-700"
 
-  defp forecast_status_chip(:balanced),
-    do: "border border-emerald-300 bg-emerald-50 text-emerald-700"
+  defp forecast_status_chip(:balanced), do: "border border-emerald-300 bg-emerald-50 text-emerald-700"
 
   defp forecast_status_chip(_), do: "border border-stone-200 bg-stone-50 text-stone-500"
 
@@ -745,8 +740,7 @@ defmodule CraftplanWeb.InventoryLive.Index do
 
   defp format_quantity(nil), do: "0"
 
-  defp format_quantity(%Decimal{} = qty),
-    do: qty |> Decimal.normalize() |> Decimal.to_string(:normal)
+  defp format_quantity(%Decimal{} = qty), do: qty |> Decimal.normalize() |> Decimal.to_string(:normal)
 
   defp format_quantity(qty) when is_number(qty), do: to_string(qty)
   defp format_quantity(qty), do: to_string(qty)

@@ -21,6 +21,7 @@ defmodule CraftplanWeb.PurchasingLive.Suppliers do
         </.link>
       </:actions>
     </.header>
+
     <div class="mt-4">
       <.table
         id="suppliers"
@@ -28,9 +29,13 @@ defmodule CraftplanWeb.PurchasingLive.Suppliers do
         row_click={fn sup -> JS.patch(~p"/manage/purchasing/suppliers/#{sup.id}/edit") end}
       >
         <:col :let={s} label="Nombre">{s.name}</:col>
+
         <:col :let={s} label="Contacto">{s.contact_name}</:col>
+
         <:col :let={s} label="Correo electrónico">{s.contact_email}</:col>
+
         <:col :let={s} label="Teléfono">{s.contact_phone}</:col>
+
         <:action :let={s}>
           <.link patch={~p"/manage/purchasing/suppliers/#{s.id}/edit"}>
             <.button size={:sm} variant={:outline}>Editar</.button>

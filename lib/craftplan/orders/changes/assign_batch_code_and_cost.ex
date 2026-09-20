@@ -222,4 +222,3 @@ defmodule Craftplan.Orders.Changes.AssignBatchCodeAndCost do
 
   defp to_integer(_, default), do: default
 end
-

@@ -45,7 +45,8 @@ defmodule Craftplan.Production.Batching do
           {bom, version, cmap}
       end
 
-    _code = generate_batch_code(product.sku, actor)
+    short = product.id |> to_string() |> String.slice(0, 8)
+    _code = generate_batch_code(short, actor)
 
     params = %{
       product_id: product.id,
@@ -58,9 +59,9 @@ defmodule Craftplan.Production.Batching do
     |> Ash.create(actor: actor)
   end
 
-  def generate_batch_code(sku, actor) do
+  def generate_batch_code(sku_or_short, actor) do
     date = Calendar.strftime(Date.utc_today(), "%Y%m%d")
-    prefix = "B-#{date}-#{sku}"
+    prefix = "B-#{date}-#{sku_or_short}"
 
     {:ok, latest} =
       ProductionBatch
@@ -333,3 +334,4 @@ defmodule Craftplan.Production.Batching do
   defp normalize(val) when is_float(val), do: D.from_float(val)
   defp normalize(val) when is_binary(val), do: D.new(val)
 end
+

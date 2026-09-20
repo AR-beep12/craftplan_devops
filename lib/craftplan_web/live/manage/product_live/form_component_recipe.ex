@@ -9,30 +9,33 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
 
   @impl true
   def render(assigns) do
-    assigns = assign_new(assigns, :show_modal, fn -> false end)
+    assigns =
+      assigns |> assign_new(:show_modal, fn -> false end) |> assign_new(:compact, fn -> false end)
 
     ~H"""
     <div>
-      <div class="mb-4 flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between md:gap-0">
+      <div
+        :if={!@compact}
+        class="mb-4 flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between md:gap-0"
+      >
         <div class="flex items-center gap-2">
           <div
             :if={@bom.version != nil}
             class="flex flex-wrap items-center gap-2 text-sm text-stone-700"
           >
             <span>Versión <span>v{@bom.version}</span></span>
-
             <%= if latest_version(@boms) == @bom.version do %>
               <span class="text-[11px] rounded bg-green-100 px-1 py-0.5 font-medium text-green-700">
                 Más reciente
               </span>
             <% end %>
-            <span> · </span>
-            <span>Modificado el</span>
+            <span> · </span> <span>Modificado el</span>
             <span class="underline decoration-stone-400 decoration-dashed">
               {@bom.published_at && format_date(@bom.published_at)}
             </span>
           </div>
         </div>
+
         <div :if={@bom.version != nil} class="flex items-center gap-2">
           <.link
             phx-click={JS.push("show_history", target: @myself)}
@@ -42,21 +45,26 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
           </.link>
         </div>
       </div>
-      <%= if Enum.any?(@boms || []) and @bom && @bom.id && latest_version(@boms) != @bom.version do %>
-        <div class="mb-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-          Estás viendo una versión anterior (v{@bom.version}). La más reciente es v{latest_version(@boms)}.
-          <.button
-            class="ml-2"
-            size={:sm}
-            variant={:outline}
-            phx-click="switch_version"
-            phx-target={@myself}
-            phx-value-bom_version={latest_version(@boms)}
-          >
-            Ir a la más reciente
-          </.button>
-        </div>
-      <% end %>
+
+      <div :if={!@compact}>
+        <%= if Enum.any?(@boms || []) and @bom && @bom.id && latest_version(@boms) != @bom.version do %>
+          <div class="mb-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+            Estás viendo una versión anterior (v{@bom.version}). La más reciente es v{latest_version(
+              @boms
+            )}.
+            <.button
+              class="ml-2"
+              size={:sm}
+              variant={:outline}
+              phx-click="switch_version"
+              phx-target={@myself}
+              phx-value-bom_version={latest_version(@boms)}
+            >
+              Ir a la más reciente
+            </.button>
+          </div>
+        <% end %>
+      </div>
 
       <.simple_form
         for={@form}
@@ -67,12 +75,13 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
       >
         <div class="">
           <.input field={@form[:product_id]} type="hidden" value={@product.id} />
-
           <div id="recipe-materials-list">
             <h3 class="text-lg font-medium">Materiales</h3>
+
             <p class="mb-2 text-sm text-stone-500">
               Agrega los materiales necesarios para este producto
             </p>
+
             <div
               id="recipe"
               class="mt-2 w-full text-sm leading-6 text-stone-700"
@@ -80,25 +89,20 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
               <!-- Desktop Header -->
               <div
                 role="row"
-                class="hidden border-b border-stone-300 text-left text-sm leading-6 text-stone-500 md:grid md:grid-cols-4"
+                class="hidden border-b border-stone-300 text-left text-sm leading-6 text-stone-500 md:grid md:grid-cols-3"
               >
                 <div class="border-r border-stone-200 p-0 pr-6 pb-4 font-normal last:border-r-0 ">
                   Material
                 </div>
+
                 <div class="border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0 md:border-r">
                   Cantidad
                 </div>
-                <div class="hidden border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0 md:block">
-                  <span>Costo total</span>
-                  <span class="text-stone-700">
-                    ({format_money(@settings.currency, @materials_total || D.new(0))})
-                  </span>
-                </div>
+
                 <div class="hidden border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0 md:block">
                   <span class="opacity-0">Acciones</span>
                 </div>
               </div>
-
               <!-- Empty State -->
               <div role="row" class="hidden py-4 text-stone-400 last:block">
                 <div>
@@ -107,19 +111,16 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
               </div>
 
               <.inputs_for :let={components_form} field={@form[:components]}>
-                <% component_type = get_component_type(components_form) %>
-                <% material =
+                <% component_type = get_component_type(components_form) %> <% material =
                   if component_type == :material,
                     do: material_for_form(@materials_map, components_form),
-                    else: nil %>
-                <% product =
+                    else: nil %> <% product =
                   if component_type == :product,
                     do: product_for_form(@products_map, components_form),
                     else: nil %>
-
                 <div
                   role="row"
-                  class="group relative border-b border-stone-200 py-3 last:border-b-0 hover:bg-stone-200/40 md:grid md:grid-cols-4 md:border-none md:p-0"
+                  class="group relative border-b border-stone-200 py-3 last:border-b-0 hover:bg-stone-200/40 md:grid md:grid-cols-3 md:border-none md:p-0"
                 >
                   <!-- 1. Name Column (Desktop: Col 1, Mobile: Row 1 Left) -->
                   <div class="relative border-stone-200 p-0 last:border-r-0 md:h-full md:border-r">
@@ -134,6 +135,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                             >
                               {material.name}
                             </.link>
+
                             <span :if={!material} class="text-stone-400">
                               Seleccionar material
                             </span>
@@ -141,23 +143,24 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                             <span class="flex items-center gap-2">
                               <.link
                                 :if={product}
-                                navigate={~p"/manage/products/#{product.sku}"}
+                                navigate={~p"/manage/products/#{product.id}"}
                                 class="hover:text-blue-800 hover:underline"
                               >
                                 {product.name}
                               </.link>
+
                               <span
                                 :if={product}
                                 class="text-[10px] rounded bg-blue-100 px-1.5 py-0.5 font-medium text-blue-700"
                               >
                                 Producto
                               </span>
+
                               <span :if={!product} class="text-stone-400">
                                 Seleccionar producto
                               </span>
                             </span>
                           <% end %>
-
                           <!-- Shared Hidden Inputs -->
                           <.input
                             field={components_form[:material_id]}
@@ -175,24 +178,21 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                             type="hidden"
                           />
                         </span>
-
                         <!-- Mobile Remove Button -->
                         <%= if latest_version(@boms) == @bom.version do %>
-                          <label class="-mt-1 -mr-2 cursor-pointer p-1 text-stone-400 hover:text-stone-700 md:hidden">
-                            <input
-                              type="checkbox"
-                              phx-click="remove_form"
-                              phx-target={@myself}
-                              phx-value-path={components_form.name}
-                              class="hidden"
-                            />
+                          <button
+                            type="button"
+                            phx-click="remove_form"
+                            phx-target={@myself}
+                            phx-value-path={components_form.name}
+                            class="-mt-1 -mr-2 p-1 text-stone-400 hover:text-stone-700 md:hidden"
+                          >
                             <.icon name="hero-x-mark" class="h-5 w-5" />
-                          </label>
+                          </button>
                         <% end %>
                       </div>
                     </div>
                   </div>
-
                   <!-- Quantity Column (Col 2) -->
                   <div class="relative mt-1.5 border-stone-200 p-0 last:border-r-0 md:mt-0 md:border-r md:pl-4">
                     <label class="mb-0.5 block text-xs text-stone-500 md:hidden">Cantidad</label>
@@ -213,40 +213,21 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                       </span>
                     </div>
                   </div>
-
-                  <!-- Cost Column (Col 3) -->
-                  <div class="relative hidden border-stone-200 p-0 last:border-r-0 md:block md:border-r md:pl-4">
-                    <div class="md:block md:py-4 md:pr-6">
-                      <span class="text-sm text-stone-900">
-                        {format_component_cost(
-                          @settings.currency,
-                          component_type,
-                          material,
-                          product,
-                          components_form[:quantity].value
-                        )}
-                      </span>
-                    </div>
-                  </div>
-
-                  <!-- 4. Action Column (Desktop: Col 4, Mobile: Hidden) -->
+                  <!-- 3. Action Column (Desktop: Col 3, Mobile: Hidden) -->
                   <div class="relative hidden border-stone-200 p-0 pl-4 last:border-r-0 md:block md:border-r">
                     <div class="block py-4 pr-6">
                       <%= if latest_version(@boms) != @bom.version do %>
                         <span class="text-stone-400">Solo lectura</span>
                       <% else %>
-                        <label class="cursor-pointer">
-                          <input
-                            type="checkbox"
-                            phx-click="remove_form"
-                            phx-target={@myself}
-                            phx-value-path={components_form.name}
-                            class="hidden"
-                          />
-                          <span class="font-semibold leading-6 text-stone-900 hover:text-stone-700">
-                            Quitar
-                          </span>
-                        </label>
+                        <button
+                          type="button"
+                          phx-click="remove_form"
+                          phx-target={@myself}
+                          phx-value-path={components_form.name}
+                          class="font-semibold leading-6 text-stone-900 hover:text-stone-700"
+                        >
+                          Quitar
+                        </button>
                       <% end %>
                     </div>
                   </div>
@@ -269,7 +250,9 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                 >
                   <.icon name="hero-plus" class="mr-2 h-4 w-4" /> Agregar material
                 </button>
+
                 <button
+                  :if={!@compact}
                   type="button"
                   phx-click="show_add_product_modal"
                   phx-target={@myself}
@@ -286,243 +269,240 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
             </div>
           </div>
 
-          <hr class="my-10 text-stone-300" />
+          <div :if={!@compact}>
+            <hr class="my-10 text-stone-300" />
+            <div class="">
+              <h3 class="text-lg font-medium">Pasos de mano de obra</h3>
 
-          <div class="">
-            <h3 class="text-lg font-medium">Pasos de mano de obra</h3>
-            <p class="mb-2 text-sm text-stone-500">
-              Registra cada paso que consume tiempo pagado. Anula la tarifa por hora en cada paso para ajustar los costos.
-            </p>
-            <div class="mt-4 rounded-md border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-600">
-              <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p>
-                    Tarifa por hora: {format_money(@settings.currency, @settings.labor_hourly_rate)} · Gastos generales: {format_percentage(
-                      @settings.labor_overhead_percent
-                    )}%
-                  </p>
+              <p class="mb-2 text-sm text-stone-500">
+                Registra cada paso que consume tiempo pagado. Anula la tarifa por hora en cada paso para ajustar los costos.
+              </p>
+
+              <div class="mt-4 rounded-md border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-600">
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p>
+                      Tarifa por hora: {format_money(@settings.currency, @settings.labor_hourly_rate)} · Gastos generales: {format_percentage(
+                        @settings.labor_overhead_percent
+                      )}%
+                    </p>
+                  </div>
+
+                  <.link
+                    navigate={~p"/manage/settings/general"}
+                    class="text-sm font-medium text-blue-700 hover:underline"
+                  >
+                    Actualizar en configuración
+                  </.link>
                 </div>
-                <.link
-                  navigate={~p"/manage/settings/general"}
-                  class="text-sm font-medium text-blue-700 hover:underline"
-                >
-                  Actualizar en configuración
-                </.link>
               </div>
-            </div>
 
-            <div id="recipe-labor-list">
-              <div
-                id="labor"
-                class="mt-2 text-sm leading-6 text-stone-700"
-              >
-                <!-- Desktop Header -->
+              <div id="recipe-labor-list">
                 <div
-                  role="row"
-                  class="hidden grid-cols-6 border-b border-stone-300 text-left text-sm leading-6 text-stone-500 md:grid"
+                  id="labor"
+                  class="mt-2 text-sm leading-6 text-stone-700"
                 >
-                  <div class="border-r border-stone-200 p-0 pr-6 pb-4 font-normal last:border-r-0">
-                    Paso
-                  </div>
-                  <div class="border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0">
-                    Minutos
-                    <span class="text-stone-700">
-                      ({Decimal.to_string(@labor_total_minutes || D.new(0))})
-                    </span>
-                  </div>
-                  <div class="border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0">
-                    Unidades por lote
-                  </div>
-                  <div class="border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0">
-                    Anulación de tarifa por hora
-                  </div>
-                  <div class="border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0">
-                    Costo por unidad
-                    <span class="text-stone-700">
-                      ({format_money(@settings.currency, @labor_per_unit_cost || D.new(0))})
-                    </span>
-                  </div>
-                  <div class="border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0">
-                    <span class="opacity-0">Acciones</span>
-                  </div>
-                </div>
-
-                <div role="row" class="hidden py-4 text-stone-400 last:block">
-                  <div>Aún no hay pasos de mano de obra</div>
-                </div>
-
-                <.inputs_for :let={labor_form} field={@form[:labor_steps]}>
-                  <!-- Unified Mobile/Desktop Structure for Labor Steps -->
+                  <!-- Desktop Header -->
                   <div
                     role="row"
-                    class="group relative border-b border-stone-200 py-3 last:border-b-0 hover:bg-stone-200/40 md:grid md:grid-cols-6 md:border-none md:p-0"
+                    class="hidden grid-cols-6 border-b border-stone-300 text-left text-sm leading-6 text-stone-500 md:grid"
                   >
-                    <!-- 1. Name/Step (Desktop: Col 1, Mobile: Row 1) -->
-                    <div class="relative border-stone-200 p-0 last:border-r-0 md:h-full md:border-r md:pr-6">
-                      <div class="block md:py-4">
-                        <div class="md:border-b md:border-dashed md:border-stone-300">
+                    <div class="border-r border-stone-200 p-0 pr-6 pb-4 font-normal last:border-r-0">
+                      Paso
+                    </div>
+
+                    <div class="border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0">
+                      Minutos
+                      <span class="text-stone-700">
+                        ({Decimal.to_string(@labor_total_minutes || D.new(0))})
+                      </span>
+                    </div>
+
+                    <div class="border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0">
+                      Unidades por lote
+                    </div>
+
+                    <div class="border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0">
+                      Anulación de tarifa por hora
+                    </div>
+
+                    <div class="border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0">
+                      Costo por unidad
+                      <span class="text-stone-700">
+                        ({format_money(@settings.currency, @labor_per_unit_cost || D.new(0))})
+                      </span>
+                    </div>
+
+                    <div class="border-r border-stone-200 p-0 pr-6 pb-4 pl-4 font-normal last:border-r-0">
+                      <span class="opacity-0">Acciones</span>
+                    </div>
+                  </div>
+
+                  <div role="row" class="hidden py-4 text-stone-400 last:block">
+                    <div>Aún no hay pasos de mano de obra</div>
+                  </div>
+
+                  <.inputs_for :let={labor_form} field={@form[:labor_steps]}>
+                    <!-- Unified Mobile/Desktop Structure for Labor Steps -->
+                    <div
+                      role="row"
+                      class="group relative border-b border-stone-200 py-3 last:border-b-0 hover:bg-stone-200/40 md:grid md:grid-cols-6 md:border-none md:p-0"
+                    >
+                      <!-- 1. Name/Step (Desktop: Col 1, Mobile: Row 1) -->
+                      <div class="relative border-stone-200 p-0 last:border-r-0 md:h-full md:border-r md:pr-6">
+                        <div class="block md:py-4">
+                          <div class="md:border-b md:border-dashed md:border-stone-300">
+                            <.input
+                              flat={true}
+                              field={labor_form[:name]}
+                              type="text"
+                              placeholder="p. ej. Mezclar masa"
+                              disabled={latest_version(@boms) != @bom.version}
+                              class="font-medium md:font-normal"
+                            />
+                          </div>
+
                           <.input
-                            flat={true}
-                            field={labor_form[:name]}
-                            type="text"
-                            placeholder="p. ej. Mezclar masa"
-                            disabled={latest_version(@boms) != @bom.version}
-                            class="font-medium md:font-normal"
+                            field={labor_form[:sequence]}
+                            type="hidden"
+                            value={labor_form[:sequence].value}
                           />
                         </div>
-                        <.input
-                          field={labor_form[:sequence]}
-                          type="hidden"
-                          value={labor_form[:sequence].value}
-                        />
                       </div>
-                    </div>
+                      <!-- Mobile/Desktop: Compact grid for numeric fields -->
+                      <div class="mt-2 grid grid-cols-2 gap-x-2 gap-y-2 md:contents">
+                        <!-- 2. Minutes -->
+                        <div class="md:relative md:border-r md:border-stone-200 md:p-0 md:pl-4 md:last:border-r-0">
+                          <label class="mb-0.5 block text-xs text-stone-500 md:hidden">Duración</label>
+                          <div class="block md:py-4 md:pr-6">
+                            <div class="md:border-b md:border-dashed md:border-stone-300">
+                              <.input
+                                flat={true}
+                                field={labor_form[:duration_minutes]}
+                                type="number"
+                                min="0"
+                                step="1"
+                                phx-debounce="10"
+                                inline_label="min"
+                                disabled={latest_version(@boms) != @bom.version}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <!-- 3. Units Per Run -->
+                        <div class="md:relative md:border-r md:border-stone-200 md:p-0 md:pl-4 md:last:border-r-0">
+                          <label class="mb-0.5 block text-xs text-stone-500 md:hidden">Unid./Lote</label>
+                          <div class="block md:py-4 md:pr-6">
+                            <div class="md:border-b md:border-dashed md:border-stone-300">
+                              <.input
+                                flat={true}
+                                field={labor_form[:units_per_run]}
+                                type="number"
+                                min="1"
+                                step="0.01"
+                                phx-debounce="10"
+                                placeholder="Predeterminado 1"
+                                disabled={latest_version(@boms) != @bom.version}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <!-- 4. Rate Override -->
+                        <div class="md:relative md:border-r md:border-stone-200 md:p-0 md:pl-4 md:last:border-r-0">
+                          <label class="mb-0.5 block text-xs text-stone-500 md:hidden">
+                            Anulación de tarifa
+                          </label>
 
-                    <!-- Mobile/Desktop: Compact grid for numeric fields -->
-                    <div class="mt-2 grid grid-cols-2 gap-x-2 gap-y-2 md:contents">
-                      <!-- 2. Minutes -->
-                      <div class="md:relative md:border-r md:border-stone-200 md:p-0 md:pl-4 md:last:border-r-0">
-                        <label class="mb-0.5 block text-xs text-stone-500 md:hidden">Duración</label>
-                        <div class="block md:py-4 md:pr-6">
-                          <div class="md:border-b md:border-dashed md:border-stone-300">
-                            <.input
-                              flat={true}
-                              field={labor_form[:duration_minutes]}
-                              type="number"
-                              min="0"
-                              step="1"
-                              phx-debounce="10"
-                              inline_label="min"
-                              disabled={latest_version(@boms) != @bom.version}
-                            />
+                          <div class="block md:py-4 md:pr-6">
+                            <div class="md:border-b md:border-dashed md:border-stone-300">
+                              <.input
+                                flat={true}
+                                field={labor_form[:rate_override]}
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                phx-debounce="10"
+                                placeholder="Usa el valor predeterminado si está vacío"
+                                disabled={latest_version(@boms) != @bom.version}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <!-- 5. Cost -->
+                        <div class="md:relative md:border-r md:border-stone-200 md:p-0 md:pl-4 md:last:border-r-0">
+                          <label class="mb-0.5 block text-xs text-stone-500 md:hidden">Costo</label>
+                          <div class="block text-sm text-stone-800 md:py-4 md:pr-6">
+                            <span>
+                              {format_money(
+                                @settings.currency,
+                                Map.get(@labor_row_costs || %{}, labor_form.name, D.new(0))
+                              )}
+                            </span>
                           </div>
                         </div>
                       </div>
-
-                      <!-- 3. Units Per Run -->
-                      <div class="md:relative md:border-r md:border-stone-200 md:p-0 md:pl-4 md:last:border-r-0">
-                        <label class="mb-0.5 block text-xs text-stone-500 md:hidden">Unid./Lote</label>
-                        <div class="block md:py-4 md:pr-6">
-                          <div class="md:border-b md:border-dashed md:border-stone-300">
-                            <.input
-                              flat={true}
-                              field={labor_form[:units_per_run]}
-                              type="number"
-                              min="1"
-                              step="0.01"
-                              phx-debounce="10"
-                              placeholder="Predeterminado 1"
-                              disabled={latest_version(@boms) != @bom.version}
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- 4. Rate Override -->
-                      <div class="md:relative md:border-r md:border-stone-200 md:p-0 md:pl-4 md:last:border-r-0">
-                        <label class="mb-0.5 block text-xs text-stone-500 md:hidden">
-                          Anulación de tarifa
-                        </label>
-                        <div class="block md:py-4 md:pr-6">
-                          <div class="md:border-b md:border-dashed md:border-stone-300">
-                            <.input
-                              flat={true}
-                              field={labor_form[:rate_override]}
-                              type="number"
-                              min="0"
-                              step="0.01"
-                              phx-debounce="10"
-                              placeholder="Usa el valor predeterminado si está vacío"
-                              disabled={latest_version(@boms) != @bom.version}
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- 5. Cost -->
-                      <div class="md:relative md:border-r md:border-stone-200 md:p-0 md:pl-4 md:last:border-r-0">
-                        <label class="mb-0.5 block text-xs text-stone-500 md:hidden">Costo</label>
-                        <div class="block text-sm text-stone-800 md:py-4 md:pr-6">
-                          <span>
-                            {format_money(
-                              @settings.currency,
-                              Map.get(@labor_row_costs || %{}, labor_form.name, D.new(0))
-                            )}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Mobile Remove Button (positioned at top-right of card) -->
-                    <%= if latest_version(@boms) == @bom.version do %>
-                      <label class="absolute top-3 right-2 cursor-pointer text-stone-400 hover:text-stone-700 md:hidden">
-                        <input
-                          type="checkbox"
+                      <!-- Mobile Remove Button (positioned at top-right of card) -->
+                      <%= if latest_version(@boms) == @bom.version do %>
+                        <button
+                          type="button"
                           phx-click="remove_form"
                           phx-target={@myself}
                           phx-value-path={labor_form.name}
-                          class="hidden"
-                        />
-                        <.icon name="hero-x-mark" class="h-5 w-5" />
-                      </label>
-                    <% end %>
-
-                    <!-- 6. Remove (Desktop: Col 6) -->
-                    <div class="hidden border-stone-200 p-0 last:border-r-0 md:block md:border-r md:pl-4">
-                      <div class="block md:py-4 md:pr-6">
-                        <%= if latest_version(@boms) != @bom.version do %>
-                          <span class="text-stone-400">Solo lectura</span>
-                        <% else %>
-                          <label class="cursor-pointer">
-                            <input
-                              type="checkbox"
+                          class="absolute top-3 right-2 p-1 text-stone-400 hover:text-stone-700 md:hidden"
+                        >
+                          <.icon name="hero-x-mark" class="h-5 w-5" />
+                        </button>
+                      <% end %>
+                      <!-- 6. Remove (Desktop: Col 6) -->
+                      <div class="hidden border-stone-200 p-0 last:border-r-0 md:block md:border-r md:pl-4">
+                        <div class="block md:py-4 md:pr-6">
+                          <%= if latest_version(@boms) != @bom.version do %>
+                            <span class="text-stone-400">Solo lectura</span>
+                          <% else %>
+                            <button
+                              type="button"
                               phx-click="remove_form"
                               phx-target={@myself}
                               phx-value-path={labor_form.name}
-                              class="hidden"
-                            />
-                            <span class="font-semibold leading-6 text-stone-900 hover:text-stone-700">
+                              class="font-semibold leading-6 text-stone-900 hover:text-stone-700"
+                            >
                               Quitar
-                            </span>
-                          </label>
-                        <% end %>
+                            </button>
+                          <% end %>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </.inputs_for>
+                  </.inputs_for>
 
-                <div role="row" class="py-4">
-                  <button
-                    type="button"
-                    phx-click="add_labor_step"
-                    phx-target={@myself}
-                    class={[
-                      "inline-flex cursor-pointer items-center rounded-md border border-stone-300 bg-white px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50",
-                      latest_version(@boms) != @bom.version && "cursor-not-allowed opacity-50"
-                    ]}
-                    disabled={latest_version(@boms) != @bom.version}
-                  >
-                    <.icon name="hero-plus" class="mr-2 h-4 w-4" /> Agregar paso de mano de obra
-                  </button>
+                  <div role="row" class="py-4">
+                    <button
+                      type="button"
+                      phx-click="add_labor_step"
+                      phx-target={@myself}
+                      class={[
+                        "inline-flex cursor-pointer items-center rounded-md border border-stone-300 bg-white px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50",
+                        latest_version(@boms) != @bom.version && "cursor-not-allowed opacity-50"
+                      ]}
+                      disabled={latest_version(@boms) != @bom.version}
+                    >
+                      <.icon name="hero-plus" class="mr-2 h-4 w-4" /> Agregar paso de mano de obra
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
+            <hr class="my-10 text-stone-300" />
+            <h3 class="text-lg font-medium">Notas generales</h3>
+
+            <.input
+              class="field-sizing-content mt-6"
+              field={@form[:notes]}
+              type="textarea"
+              disabled={latest_version(@boms) != @bom.version}
+            />
           </div>
-
-          <hr class="my-10 text-stone-300" />
-
-          <h3 class="text-lg font-medium">Notas generales</h3>
-
-          <.input
-            class="field-sizing-content mt-6"
-            field={@form[:notes]}
-            type="textarea"
-            disabled={latest_version(@boms) != @bom.version}
-          />
         </div>
-
-        <hr class="my-10 text-stone-300" />
-
+        <hr :if={!@compact} class="my-10 text-stone-300" />
         <:actions>
           <.button
             :if={latest_version(@boms) == @bom.version}
@@ -535,7 +515,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
             }
             phx-disable-with="Guardando..."
           >
-            Guardar receta
+            {if @compact, do: "Guardar Cambios", else: "Guardar receta"}
           </.button>
         </:actions>
       </.simple_form>
@@ -574,7 +554,9 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                   class="col-span-3 grid grid-cols-3 border-b border-stone-300 text-left text-sm leading-6 text-stone-500"
                 >
                   <div class="border-r border-stone-200 p-0 pr-6 pb-1 font-normal">Nombre</div>
+
                   <div class="border-r border-stone-200 p-0 pr-6 pb-1 pl-4 font-normal">SKU</div>
+
                   <div class="p-0 pr-6 pb-1 pl-4 font-normal">Precio</div>
                 </div>
 
@@ -597,9 +579,10 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                     <div class="relative border-r border-b border-stone-200 p-0 pl-4">
                       <div class="block py-3 text-xs text-stone-600">{material.color || "—"}</div>
                     </div>
+
                     <div class="relative border-b border-stone-200 p-0 pl-4">
                       <div class="block py-3 text-sm text-stone-800">
-                        {material.quantity && Decimal.to_string(material.quantity) || "0"}
+                        {(material.quantity && Decimal.to_string(material.quantity)) || "0"}
                       </div>
                     </div>
                   </button>
@@ -648,7 +631,11 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                   class="col-span-3 grid grid-cols-3 border-b border-stone-300 text-left text-sm leading-6 text-stone-500"
                 >
                   <div class="border-r border-stone-200 p-0 pr-6 pb-1 font-normal">Nombre</div>
-                  <div class="border-r border-stone-200 p-0 pr-6 pb-1 pl-4 font-normal">SKU</div>
+
+                  <div class="border-r border-stone-200 p-0 pr-6 pb-1 pl-4 font-normal">
+                    Categoría
+                  </div>
+
                   <div class="p-0 pr-6 pb-1 pl-4 font-normal">Costo unitario</div>
                 </div>
 
@@ -669,8 +656,11 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                     </div>
 
                     <div class="relative border-r border-b border-stone-200 p-0 pl-4">
-                      <div class="font-mono block py-3 text-xs text-stone-600">{product.sku}</div>
+                      <div class="block py-3 text-xs text-stone-600">
+                        {(product.category && product.category.name) || "-"}
+                      </div>
                     </div>
+
                     <div class="relative border-b border-stone-200 p-0 pl-4">
                       <div class="block py-3 text-sm text-stone-800">
                         {format_money(@settings.currency, product.bom_unit_cost || D.new(0))} por unidad
@@ -700,16 +690,20 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
       >
         <.table id="bom-history-modal-table" rows={@boms || []}>
           <:col :let={b} label="Versión">v{b.version}</:col>
+
           <:col :let={b} label="Estado">{bom_status_label(b.status)}</:col>
+
           <:col :let={b} label="Publicado">
             {if b.published_at, do: format_date(b.published_at, format: :short), else: "-"}
           </:col>
+
           <:col :let={b} label="Costo unitario">
             {case b.rollup do
               %{} = r -> format_money(@settings.currency, r.unit_cost || Decimal.new(0))
               _ -> "-"
             end}
           </:col>
+
           <:action :let={b}>
             <.button
               size={:sm}
@@ -722,6 +716,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
             </.button>
           </:action>
         </.table>
+
         <div class="mt-4 flex justify-end">
           <.button variant={:outline} phx-click="hide_history" phx-target={@myself}>Cerrar</.button>
         </div>
@@ -830,7 +825,13 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
      socket
      |> assign(:selected_version, new_bom.version)
      |> assign_form()
-     |> put_flash(:info, "Receta guardada correctamente")
+     |> put_flash(
+       :info,
+       if(socket.assigns[:compact],
+         do: "Material guardado exitosamente",
+         else: "Receta guardada correctamente"
+       )
+     )
      |> push_patch(to: socket.assigns.patch)}
   end
 
@@ -1254,7 +1255,9 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
   defp bom_status_label(:draft), do: "Borrador"
   defp bom_status_label(:active), do: "Activo"
   defp bom_status_label(:archived), do: "Archivado"
+
   defp bom_status_label(status) when is_binary(status), do: status |> String.to_existing_atom() |> bom_status_label()
+
   defp bom_status_label(status), do: to_string(status)
 
   defp get_component_type(components_form) do
@@ -1318,8 +1321,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
     else
       Enum.filter(products, fn p ->
         name = String.downcase(p.name || "")
-        sku = String.downcase(p.sku || "")
-        String.contains?(name, q) or String.contains?(sku, q)
+        String.contains?(name, q)
       end)
     end
   end

@@ -29,7 +29,7 @@ defmodule Craftplan.Production do
     :consumed_at,
     :inserted_at,
     :bom,
-    product: [:name, :sku],
+    product: [:name],
     order: [
       :reference,
       :delivery_date,
@@ -42,7 +42,7 @@ defmodule Craftplan.Production do
         :expiry_date,
         :received_at,
         :current_stock,
-        material: [:name, :sku, :unit],
+        material: [:name, :unit],
         supplier: [:name]
       ]
     ]
@@ -67,11 +67,7 @@ defmodule Craftplan.Production do
         :consumed_at,
         :batch_code,
         :production_batch_id,
-        product: [
-          :name,
-          :max_daily_quantity,
-          active_bom: [:rollup]
-        ]
+        product: [:name, active_bom: [:rollup]]
       ]
     ]
 
@@ -132,7 +128,7 @@ defmodule Craftplan.Production do
       |> Enum.group_by(fn {_d, p, _i} -> p end, fn {_d, _p, i} -> i end)
       |> Enum.map(fn {product, groups} ->
         qty = groups |> List.flatten() |> total_quantity()
-        %{day: day, product: product, qty: qty, max: product.max_daily_quantity || 0}
+        %{day: day, product: product, qty: qty, max: 0}
       end)
     end)
   end

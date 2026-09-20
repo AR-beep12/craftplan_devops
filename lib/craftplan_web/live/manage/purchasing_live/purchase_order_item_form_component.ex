@@ -25,7 +25,13 @@ defmodule CraftplanWeb.PurchasingLive.PurchaseOrderItemFormComponent do
         />
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <.input field={@form[:quantity]} type="number" label="Cantidad" step="0.001" min="0" />
-          <.input field={@form[:unit_price]} type="number" label="Precio unitario" step="0.001" min="0" />
+          <.input
+            field={@form[:unit_price]}
+            type="number"
+            label="Precio unitario"
+            step="0.001"
+            min="0"
+          />
         </div>
         <:actions>
           <.button variant={:primary} phx-disable-with="Agregando...">Agregar artículo</.button>

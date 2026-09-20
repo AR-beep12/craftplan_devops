@@ -73,7 +73,7 @@ defmodule CraftplanWeb.Layouts do
 
         <aside
           id="mobile-sidebar-panel"
-          class="fixed inset-y-0 left-0 z-50 w-72 -translate-x-full transform bg-gradient-to-b from-primary-50/50 via-stone-50 to-stone-50 shadow-lg transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400"
+          class="from-primary-50/50 ease-[cubic-bezier(0.16,1,0.3,1)] fixed inset-y-0 left-0 z-50 w-72 -translate-x-full transform bg-gradient-to-b via-stone-50 to-stone-50 shadow-lg transition-transform duration-300 focus-visible:ring-primary-400 focus-visible:outline-none focus-visible:ring-2"
           aria-label="Navegación principal"
         >
           <div class="flex h-16 items-center justify-between border-b border-stone-200 px-4">
@@ -102,7 +102,7 @@ defmodule CraftplanWeb.Layouts do
 
       <div class="flex min-h-screen bg-stone-50 text-stone-800">
         <aside
-          class="hidden border-r border-stone-200 bg-gradient-to-b from-primary-50/40 via-stone-50/90 to-stone-50/90 backdrop-blur md:fixed md:inset-y-0 md:flex md:w-72 md:flex-col"
+          class="from-primary-50/40 via-stone-50/90 to-stone-50/90 hidden border-r border-stone-200 bg-gradient-to-b backdrop-blur md:fixed md:inset-y-0 md:flex md:w-72 md:flex-col"
           aria-label="Navegación principal"
         >
           <div class="min-h-14 flex items-center border-b border-stone-200 px-6">
@@ -222,9 +222,6 @@ defmodule CraftplanWeb.Layouts do
     ~H"""
     <nav class="h-[calc(100vh-4rem)] flex flex-col justify-between overflow-y-auto px-4 pt-6 pb-6 md:h-full md:pb-8">
       <div>
-        <p class="text-xs font-semibold uppercase tracking-wide text-stone-400">
-          {(@is_manage? && "Gestionar") || "Explorar"}
-        </p>
 
         <% primary_links = if @is_manage?, do: @manage_links, else: @shop_links %>
         <ul class="mt-3 space-y-1">
@@ -236,10 +233,7 @@ defmodule CraftplanWeb.Layouts do
             >
               <.nav_icon
                 name={link.icon}
-                class={
-                  "transition-transform duration-150 group-hover:translate-x-0.5" <>
-                    if(link.active, do: " text-primary-600", else: "")
-                }
+                class={"transition-transform duration-150 group-hover:translate-x-0.5" <> if link.active, do: " text-primary-600", else: ""}
               />
               <span>{link.label}</span>
             </.link>
@@ -265,7 +259,7 @@ defmodule CraftplanWeb.Layouts do
                       <.nav_icon
                         :if={sub[:icon]}
                         name={sub.icon}
-                        class={"h-3.5 w-3.5 " <> if(sub.active, do: "text-primary-600", else: "text-stone-500")}
+                        class={"h-3.5 w-3.5 " <> if sub.active, do: "text-primary-600", else: "text-stone-500"}
                       />
                       <span>{sub.label}</span>
                     </span>
@@ -282,12 +276,12 @@ defmodule CraftplanWeb.Layouts do
 
       <div
         :if={!@is_manage?}
-        class="mt-6 rounded-lg border border-primary-100 bg-primary-50/40 p-4 text-sm text-stone-600"
+        class="border-primary-100 bg-primary-50/40 mt-6 rounded-lg border p-4 text-sm text-stone-600"
       >
         <div :if={@current_user} class="space-y-3">
           <.link
             navigate={~p"/manage/orders"}
-            class="group flex items-center justify-between rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium text-stone-600 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-primary-200 hover:text-primary-700 hover:shadow-md"
+            class="group shadow-xs flex items-center justify-between rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium text-stone-600 transition-all duration-200 hover:border-primary-200 hover:text-primary-700 hover:-translate-y-0.5 hover:shadow-md"
           >
             <span>Ir a gestión</span>
             <.nav_icon
@@ -301,7 +295,7 @@ defmodule CraftplanWeb.Layouts do
           <p>¿Listo para gestionar tu flujo de producción?</p>
           <.link
             href={~p"/sign-in"}
-            class="inline-flex items-center gap-2 rounded-md bg-primary-600 px-3 py-2 text-sm font-medium text-white shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-500 hover:shadow-md"
+            class="bg-primary-600 shadow-xs inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-primary-500 hover:-translate-y-0.5 hover:shadow-md"
           >
             <.nav_icon name={:login} class="text-white" /> Iniciar sesión
           </.link>
@@ -611,7 +605,8 @@ defmodule CraftplanWeb.Layouts do
     end)
   end
 
-  defp nav_active?(current_path, nav_section, %{nav_section: section} = link) when not is_nil(section) do
+  defp nav_active?(current_path, nav_section, %{nav_section: section} = link)
+       when not is_nil(section) do
     nav_section == section or String.starts_with?(current_path, Map.get(link, :prefix, ""))
   end
 

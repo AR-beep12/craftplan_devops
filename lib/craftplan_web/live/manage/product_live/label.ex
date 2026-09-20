@@ -12,13 +12,13 @@ defmodule CraftplanWeb.ProductLive.Label do
       <div class="mb-4 flex items-start justify-between print:mb-2">
         <div>
           <h1 class="text-2xl font-semibold print:text-xl">Etiqueta del producto</h1>
-          <div class="text-sm text-stone-600">SKU: {@product.sku}</div>
+          <div class="text-sm text-stone-600">ID: {@product.id}</div>
         </div>
         <div class="text-right text-sm">
           <div class="text-stone-600">Fecha</div>
           <div class="font-medium">{format_date(@today, format: "%Y-%m-%d")}</div>
           <div class="mt-2 text-stone-600">Lote</div>
-          <div class="font-medium">{batch_code(@today, @product.sku)}</div>
+          <div class="font-medium">{batch_code(@today, @product.id)}</div>
         </div>
       </div>
 
@@ -66,13 +66,12 @@ defmodule CraftplanWeb.ProductLive.Label do
   end
 
   @impl true
-  def mount(%{"sku" => sku}, _session, socket) do
+  def mount(%{"id" => id}, _session, socket) do
     product =
-      Catalog.get_product_by_sku!(
-        sku,
+      Catalog.get_product_by_id!(
+        id,
         load: [
           :name,
-          :sku,
           :allergens,
           :nutritional_facts,
           active_bom: [components: [:component_type, material: [:name]]]
@@ -134,8 +133,9 @@ defmodule CraftplanWeb.ProductLive.Label do
      |> assign(:today, Date.utc_today())}
   end
 
-  defp batch_code(date, sku) do
-    "B-" <> format_date(date, format: "%Y%m%d") <> "-" <> sku
+  defp batch_code(date, id) do
+    short = id |> to_string() |> String.slice(0, 8)
+    "B-" <> format_date(date, format: "%Y%m%d") <> "-" <> short
   end
 
   # no recipe fallback

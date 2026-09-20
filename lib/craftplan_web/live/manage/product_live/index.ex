@@ -3,6 +3,7 @@ defmodule CraftplanWeb.ProductLive.Index do
   use CraftplanWeb, :live_view
 
   alias Craftplan.Catalog
+  alias CraftplanWeb.Components.Page
   alias Craftplan.Catalog.Product.Photo
 
   @impl true
@@ -19,70 +20,49 @@ defmodule CraftplanWeb.ProductLive.Index do
         </.link>
       </:actions>
     </.header>
+    <Page.surface>
+      <.table
+        id="products"
+        rows={@streams.products}
+        row_click={fn {_, product} -> JS.navigate(~p"/manage/products/#{product.id}") end}
+        row_id={fn {dom_id, _} -> dom_id end}
+      >
+        <:col :let={{_, product}} label="Nombre">
+          <div class="flex items-center space-x-2">
+            <img
+              :if={product.featured_photo != nil}
+              src={CraftplanWeb.PhotoUrl.signed(Photo, :thumb, {product.featured_photo, product})}
+              alt={product.name}
+              class="h-5 w-5"
+            />
+            <span>
+              {product.name}
+            </span>
+          </div>
+        </:col>
+        <:col :let={{_, product}} label="Categoría">
+          {(product.category && product.category.name) || "-"}
+        </:col>
+        <:col :let={{_, product}} label="Precio">
+          {format_money(@settings.currency, product.price)}
+        </:col>
 
-    <.table
-      id="products"
-      rows={@streams.products}
-      row_click={fn {_, product} -> JS.navigate(~p"/manage/products/#{product.sku}") end}
-      row_id={fn {dom_id, _} -> dom_id end}
-    >
-      <:empty>
-        <div class="block py-4 pr-6">
-          <span class={["relative"]}>
-            No se encontraron productos
-          </span>
-        </div>
-      </:empty>
-      <:col :let={{_, product}} label="Nombre">
-        <div class="flex items-center space-x-2">
-          <img
-            :if={product.featured_photo != nil}
-            src={Photo.url({product.featured_photo, product}, :thumb, signed: true)}
-            alt={product.name}
-            class="h-5 w-5"
-          />
-          <span>
-            {product.name}
-          </span>
-        </div>
-      </:col>
-      <:col :let={{_, product}} label="SKU">
-        <.kbd>
-          {product.sku}
-        </.kbd>
-      </:col>
-      <:col :let={{_, product}} label="Estado">
-        <.badge
-          text={product_status_label(product.status)}
-          colors={[
-            {product.status,
-             "#{product_status_color(product.status)} #{product_status_bg(product.status)}"}
-          ]}
-        />
-      </:col>
-      <:col :let={{_, product}} label="Precio">
-        {format_money(@settings.currency, product.price)}
-      </:col>
+        <:action :let={{_, product}}>
+          <.link
+            phx-click={JS.push("delete", value: %{id: product.id}) |> hide("#product-#{product.id}")}
+            data-confirm="¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer."
+          >
+            <.button size={:sm} variant={:danger}>
+              Eliminar
+            </.button>
+          </.link>
+        </:action>
+      </.table>
 
-      <:col :let={{_, product}} label="Costo de materiales">
-        {format_money(@settings.currency, product.materials_cost)}
-      </:col>
-
-      <:col :let={{_, product}} label="Ganancia bruta">
-        {format_money(@settings.currency, product.gross_profit)}
-      </:col>
-
-      <:action :let={{_, product}}>
-        <.link
-          phx-click={JS.push("delete", value: %{id: product.id}) |> hide("#product-#{product.id}")}
-          data-confirm="¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer."
-        >
-          <.button size={:sm} variant={:danger}>
-            Eliminar
-          </.button>
-        </.link>
-      </:action>
-    </.table>
+      <div :if={@products_count == 0} class="py-8 text-center text-sm text-stone-500">
+        No se encontraron productos
+      </div>
+    </Page.surface>
 
     <.modal
       :if={@live_action in [:new, :edit]}
@@ -115,7 +95,8 @@ defmodule CraftplanWeb.ProductLive.Index do
           :materials_cost,
           :bom_unit_cost,
           :markup_percentage,
-          :gross_profit
+          :gross_profit,
+          :category
         ]
       )
 
@@ -131,6 +112,8 @@ defmodule CraftplanWeb.ProductLive.Index do
       |> assign(:breadcrumbs, [
         %{label: "Productos", path: ~p"/manage/products", current?: true}
       ])
+      |> assign(:products_count, length(results))
+      |> assign(:product_ids, MapSet.new(Enum.map(results, & &1.id)))
       |> stream(:products, results)
 
     {:ok, socket}
@@ -155,39 +138,65 @@ defmodule CraftplanWeb.ProductLive.Index do
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    case id
-         |> Catalog.get_product_by_id!(actor: socket.assigns.current_user)
-         |> Catalog.destroy_product(actor: socket.assigns.current_user) do
+    import Ecto.Query
+
+    alias Craftplan.Repo
+
+    product =
+      Catalog.get_product_by_id!(id, actor: socket.assigns.current_user, load: [:category])
+
+    bom_ids =
+      case Catalog.list_boms_for_product(%{product_id: product.id},
+             actor: socket.assigns.current_user,
+             authorize?: false
+           ) do
+        {:ok, boms} -> Enum.map(boms, & &1.id)
+        _ -> []
+      end
+
+    if bom_ids != [] do
+      Repo.delete_all(from c in Craftplan.Catalog.BOMComponent, where: c.bom_id in ^bom_ids)
+      Repo.delete_all(from r in Craftplan.Catalog.BOMRollup, where: r.bom_id in ^bom_ids)
+      Repo.delete_all(from l in Craftplan.Catalog.LaborStep, where: l.bom_id in ^bom_ids)
+      Repo.delete_all(from b in Craftplan.Catalog.BOM, where: b.id in ^bom_ids)
+    end
+
+    case Catalog.destroy_product(product, actor: socket.assigns.current_user) do
       :ok ->
+        new_ids = MapSet.delete(socket.assigns.product_ids, id)
+
         {:noreply,
          socket
          |> put_flash(:info, "Producto eliminado correctamente")
+         |> assign(:product_ids, new_ids)
+         |> assign(:products_count, MapSet.size(new_ids))
          |> stream_delete(:products, %{id: id})}
 
-      {:error, _error} ->
-        {:noreply, put_flash(socket, :error, "No se pudo eliminar el producto.")}
+      {:error, error} ->
+        require Logger
+
+        Logger.error("Failed to delete product #{id}: #{inspect(error)}")
+
+        {:noreply,
+         put_flash(socket, :error, "No se pudo eliminar el producto: #{inspect(error)}")}
     end
   end
 
   @impl true
   def handle_info({CraftplanWeb.ProductLive.FormComponent, {:saved, product}}, socket) do
     product =
-      Ash.load!(product, [:materials_cost, :bom_unit_cost, :markup_percentage, :gross_profit],
+      Ash.load!(
+        product,
+        [:materials_cost, :bom_unit_cost, :markup_percentage, :gross_profit, :category],
         actor: socket.assigns.current_user
       )
 
-    {:noreply, stream_insert(socket, :products, product)}
+    new_ids = MapSet.put(socket.assigns.product_ids, product.id)
+
+    {:noreply,
+     socket
+     |> assign(:product_ids, new_ids)
+     |> assign(:products_count, MapSet.size(new_ids))
+     |> stream_insert(:products, product)}
   end
-
-  defp product_status_label(:draft), do: "Borrador"
-  defp product_status_label(:testing), do: "En prueba"
-  defp product_status_label(:active), do: "Activo"
-  defp product_status_label(:paused), do: "Pausado"
-  defp product_status_label(:discontinued), do: "Descontinuado"
-  defp product_status_label(:archived), do: "Archivado"
-
-  defp product_status_label(status) when is_binary(status),
-    do: status |> String.to_existing_atom() |> product_status_label()
-
-  defp product_status_label(status), do: to_string(status)
 end

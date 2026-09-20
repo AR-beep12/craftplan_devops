@@ -16,6 +16,7 @@ defmodule Craftplan.Orders do
     resource Order do
       define :get_order_by_id, action: :read, get_by: [:id]
       define :get_order_by_reference, action: :read, get_by: [:reference]
+      define :update_order_status, action: :update_status
       define :list_orders, action: :list
       define :list_orders_with_keyset, action: :keyset
       define :destroy_order, action: :destroy

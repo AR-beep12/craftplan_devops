@@ -384,11 +384,8 @@ defmodule CraftplanWeb.HtmlHelpers do
   # Status color functions
   @status_colors %{
     order: %{
-      unconfirmed: "text-orange-700 border-orange-600",
-      confirmed: "text-emerald-700 border-emerald-600",
+      pending: "text-orange-700 border-orange-600",
       in_progress: "text-indigo-700 border-indigo-600",
-      ready: "text-emerald-700 border-emerald-600",
-      delivered: "text-emerald-700 border-emerald-600",
       completed: "text-emerald-700 border-emerald-600",
       cancelled: "text-rose-700 border-rose-600",
       default: "text-slate-700 border-slate-600"
@@ -426,22 +423,16 @@ defmodule CraftplanWeb.HtmlHelpers do
 
   @status_backgrounds %{
     order: %{
-      unconfirmed: "bg-yellow-50",
-      confirmed: "bg-green-50",
+      pending: "bg-orange-50",
       in_progress: "bg-indigo-50",
-      ready: "bg-green-50",
-      delivered: "bg-green-50",
-      completed: "bg-green-50",
+      completed: "bg-emerald-50",
       cancelled: "bg-red-50",
       default: "bg-slate-50"
     },
     order_dot: %{
-      unconfirmed: "bg-yellow-400",
-      confirmed: "bg-green-400",
+      pending: "bg-orange-400",
       in_progress: "bg-indigo-400",
-      ready: "bg-green-400",
-      delivered: "bg-green-400",
-      completed: "bg-green-400",
+      completed: "bg-emerald-400",
       cancelled: "bg-red-400",
       default: "bg-slate-400"
     },
@@ -486,12 +477,9 @@ defmodule CraftplanWeb.HtmlHelpers do
   @doc """
   Return appropriate CSS classes for status columns in kanban view
   """
-  def status_color_class("unconfirmed"), do: "bg-orange-100"
-  def status_color_class("confirmed"), do: "bg-blue-100"
+  def status_color_class("pending"), do: "bg-orange-100"
   def status_color_class("in_progress"), do: "bg-purple-100"
-  def status_color_class("ready"), do: "bg-green-100"
-  def status_color_class("delivered"), do: "bg-sky-100"
-  def status_color_class("completed"), do: "bg-teal-100"
+  def status_color_class("completed"), do: "bg-green-100"
   def status_color_class("cancelled"), do: "bg-red-100"
   def status_color_class(_), do: "bg-gray-100"
 
@@ -499,18 +487,9 @@ defmodule CraftplanWeb.HtmlHelpers do
   Status color mapping for calendar events
   """
   # Darker orange
-  def get_status_color_hex(:unconfirmed), do: "#f97316"
-  # Brighter blue
-  def get_status_color_hex(:confirmed), do: "#60a5fa"
-  # Brighter purple
+  def get_status_color_hex(:pending), do: "#f97316"
   def get_status_color_hex(:in_progress), do: "#a78bfa"
-  # Brighter green
-  def get_status_color_hex(:ready), do: "#34d399"
-  # Brighter sky blue
-  def get_status_color_hex(:delivered), do: "#38bdf8"
-  # Brighter teal
   def get_status_color_hex(:completed), do: "#2dd4bf"
-  # Brighter red
   def get_status_color_hex(:cancelled), do: "#f87171"
   # Darker gray
 

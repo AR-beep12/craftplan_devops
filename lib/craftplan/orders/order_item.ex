@@ -38,13 +38,17 @@ defmodule Craftplan.Orders.OrderItem do
   postgres do
     table "orders_items"
     repo Craftplan.Repo
+
+    references do
+      reference :order, on_delete: :delete
+    end
   end
 
   @plan_load [
     :quantity,
     :planned_qty_sum,
     :completed_qty_sum,
-    product: [:name, :sku],
+    product: [:name],
     order: [:reference, :delivery_date, customer: [:full_name]]
   ]
 
@@ -223,3 +227,4 @@ defmodule Craftplan.Orders.OrderItem do
     sum :completed_qty_sum, :allocations, :completed_qty
   end
 end
+

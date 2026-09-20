@@ -10,6 +10,10 @@ defmodule Craftplan.Orders.OrderItemBatchAllocation do
     table "orders_item_batch_allocations"
     repo Craftplan.Repo
 
+    references do
+      reference :order_item, on_delete: :delete
+    end
+
     custom_indexes do
       index [:production_batch_id, :order_item_id],
         unique: true,

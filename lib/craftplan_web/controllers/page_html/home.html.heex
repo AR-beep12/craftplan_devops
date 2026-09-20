@@ -16,7 +16,7 @@
       <.button
         variant={:primary}
         size={:lg}
-        class="group w-full justify-center gap-2 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md sm:w-auto sm:min-w-[14rem]"
+        class="group shadow-xs w-full justify-center gap-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md sm:min-w-[14rem] sm:w-auto"
       >
         <span>{if @current_user, do: "Ir a gestión", else: "Iniciar sesión"}</span>
         <span class="transition-transform duration-150 group-hover:translate-x-1">→</span>
@@ -26,9 +26,9 @@
     <div class="grid w-full grid-cols-2 gap-4 text-left sm:grid-cols-4">
       <div
         :for={mod <- landing_modules()}
-        class="group rounded-lg border border-stone-200 bg-white p-4 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-primary-200 hover:shadow-md"
+        class="group shadow-xs rounded-lg border border-stone-200 bg-white p-4 transition-all duration-200 hover:border-primary-200 hover:-translate-y-0.5 hover:shadow-md"
       >
-        <div class="mb-2 inline-flex h-9 w-9 items-center justify-center rounded-md bg-primary-50 text-primary-600 transition-transform duration-150 group-hover:scale-105">
+        <div class="bg-primary-50 text-primary-600 mb-2 inline-flex h-9 w-9 items-center justify-center rounded-md transition-transform duration-150 group-hover:scale-105">
           <.icon name={mod.icon} class="h-5 w-5" />
         </div>
         <p class="text-sm font-semibold text-stone-900">{mod.label}</p>

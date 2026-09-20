@@ -29,9 +29,6 @@ defmodule CraftplanWeb.InventoryLive.Index do
     <Page.page>
       <.header>
         Inventario
-        <:subtitle>
-          Revisa el uso de los materiales y ajusta los niveles de stock según corresponda.
-        </:subtitle>
 
         <:actions :if={@live_action in [:index, :forecast]}>
           <.link patch={~p"/manage/inventory/new"}>
@@ -40,68 +37,67 @@ defmodule CraftplanWeb.InventoryLive.Index do
         </:actions>
       </.header>
 
+      <Page.surface>
+        <.table
+          id="materials"
+          rows={@streams.materials}
+          row_id={fn {dom_id, _} -> dom_id end}
+          row_click={fn {_, material} -> JS.navigate(~p"/manage/inventory/#{material.id}") end}
+        >
+          <:col :let={{_, material}} label="">
+            <span
+              :if={out_of_stock?(material.current_stock)}
+              class="inline-flex items-center justify-center"
+              title="Out of stock"
+            >
+              <.icon name="hero-exclamation-triangle" class="h-5 w-5 text-rose-500" />
+            </span>
+          </:col>
 
-        <Page.surface>
-          <.table
-            id="materials"
-            rows={@streams.materials}
-            row_id={fn {dom_id, _} -> dom_id end}
-            row_click={fn {_, material} -> JS.navigate(~p"/manage/inventory/#{material.id}") end}
-          >
-            <:col :let={{_, material}} label="">
-              <span
-                :if={out_of_stock?(material.current_stock)}
-                class="inline-flex items-center justify-center"
-                title="Out of stock"
-              >
-                <.icon name="hero-exclamation-triangle" class="h-5 w-5 text-rose-500" />
-              </span>
-            </:col>
+          <:col :let={{_, material}} label="Material">{material.name}</:col>
 
-            <:col :let={{_, material}} label="Material">{material.name}</:col>
+          <:col :let={{_, material}} label="ID">
+            <.kbd>{String.slice(material.id, 0, 8)}</.kbd>
+          </:col>
 
-            <:col :let={{_, material}} label="ID">
-              <.kbd>{String.slice(material.id, 0, 8)}</.kbd>
-            </:col>
+          <:col :let={{_, material}} label="Color">
+            {material.color || "—"}
+          </:col>
 
-            <:col :let={{_, material}} label="Color">
-              {material.color || "—"}
-            </:col>
+          <:col :let={{_, material}} label="Cantidad">
+            {format_quantity(material.current_stock)}
+          </:col>
 
-            <:col :let={{_, material}} label="Cantidad">
-              {format_quantity(material.current_stock)}
-            </:col>
+          <:col :let={{_, material}} label="Descripción">
+            <span class="max-w-[20ch] block truncate" title={material.extra_description}>
+              {material.extra_description || "—"}
+            </span>
+          </:col>
 
-            <:col :let={{_, material}} label="Descripción">
-              <span class="max-w-[20ch] block truncate" title={material.extra_description}>
-                {material.extra_description || "—"}
-              </span>
-            </:col>
+          <:action :let={{_, material}}>
+            <div class="sr-only">
+              <.link navigate={~p"/manage/inventory/#{material.id}"}>Ver</.link>
+            </div>
+          </:action>
 
-            <:action :let={{_, material}}>
-              <div class="sr-only">
-                <.link navigate={~p"/manage/inventory/#{material.id}"}>Ver</.link>
-              </div>
-            </:action>
-
-            <:action :let={{_, material}}>
-              <.link
-                phx-click={
-                  JS.push("delete", value: %{id: material.id}) |> hide("##{material.id}")
-                }
-                data-confirm="¿Estás seguro?"
-              >
-                <.button size={:sm} variant={:danger}>
-                  Eliminar
-                </.button>
-              </.link>
-            </:action>
-          </.table>
-          <div :if={@materials_empty?} class="rounded-md border border-dashed border-stone-200 bg-stone-50 py-10 text-center text-sm text-stone-500">
-            No se encontraron materiales. Agrega tu primer ingrediente para comenzar a registrar el stock.
-          </div>
-        </Page.surface>
-
+          <:action :let={{_, material}}>
+            <.link
+              phx-click={JS.push("delete", value: %{id: material.id}) |> hide("##{material.id}")}
+              data-confirm="¿Estás seguro?"
+            >
+              <.button size={:sm} variant={:danger}>
+                Eliminar
+              </.button>
+            </.link>
+          </:action>
+        </.table>
+        <div
+          :if={@materials_empty?}
+          class="rounded-md border border-dashed border-stone-200 bg-stone-50 py-10 text-center text-sm text-stone-500"
+        >
+          No se encontraron materiales. Agrega tu primer ingrediente para comenzar a registrar el stock.
+        </div>
+      </Page.surface>
 
       <Page.section :if={@live_action == :forecast}>
         <Page.surface padding="p-5">
@@ -194,156 +190,176 @@ defmodule CraftplanWeb.InventoryLive.Index do
                 </div>
               </:header>
 
-                <:actions>
-                  <div class="flex items-center overflow-hidden rounded-md border border-stone-300">
-                    <button
-                      type="button"
-                      phx-click="today"
-                      class="flex items-center gap-2 border-r border-stone-300 bg-white px-3 py-1 text-xs font-medium tracking-wide text-stone-600 transition hover:bg-stone-50"
+              <:actions>
+                <div class="flex items-center overflow-hidden rounded-md border border-stone-300">
+                  <button
+                    type="button"
+                    phx-click="today"
+                    class="flex items-center gap-2 border-r border-stone-300 bg-white px-3 py-1 text-xs font-medium tracking-wide text-stone-600 transition hover:bg-stone-50"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
-                      Hoy
-                    </button>
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    Hoy
+                  </button>
 
-                    <button
-                      type="button"
-                      phx-click="next_week"
-                      class="flex items-center gap-2 bg-white px-3 py-1 text-xs font-medium tracking-wide text-stone-600 transition hover:bg-stone-50"
+                  <button
+                    type="button"
+                    phx-click="next_week"
+                    class="flex items-center gap-2 bg-white px-3 py-1 text-xs font-medium tracking-wide text-stone-600 transition hover:bg-stone-50"
+                  >
+                    Próximos 7 días
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2"
                     >
-                      Próximos 7 días
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M13 7l5 5m0 0l-5 5m5-5H6"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                </:actions>
-              </Page.surface>
-            </div>
-
-            <Page.surface full_bleed padding="p-0">
-              <.scroll_table
-                id="usage-forecast-table"
-                min_width="w-[1300px]"
-                aria_label="Cuadrícula de pronóstico de uso"
-              >
-                <table class="w-full table-fixed border-collapse text-sm">
-                  <thead class="bg-stone-50 text-left text-xs font-semibold tracking-wide text-stone-500">
-                    <tr>
-                      <th class="sticky left-0 z-20 w-48 border-r border-stone-200 bg-white p-3 text-left">
-                        Material
-                      </th>
-
-                      <th
-                        :for={{day, _index} <- Enum.with_index(@days_range)}
-                        class={["w-1/5 border-r border-stone-200 p-3 font-normal last:border-r-0", is_today?(day) && "bg-indigo-50"] |> Enum.reject(&is_nil/1)}
-                      >
-                        <div class="flex items-center justify-center">
-                          <div class={["inline-flex items-center justify-center space-x-1 rounded px-2", is_today?(day) && "bg-indigo-500 text-white"]}>
-                            <div>{format_day_name(day)}</div>
-
-                            <div>{format_short_date(day, @time_zone)}</div>
-                          </div>
-                        </div>
-                      </th>
-
-                      <th class="w-1/5 border-stone-200 p-3 text-left font-normal">
-                        Balance final
-                      </th>
-                    </tr>
-                  </thead>
-
-                  <tbody class="text-stone-700">
-                    <tr
-                      :for={{material, material_data} <- @materials_requirements}
-                      class="border-t border-stone-200"
-                    >
-                      <td class="sticky left-0 z-10 border-r border-stone-200 bg-white px-3 py-2 text-left font-medium shadow-sm">
-                        {material.name}
-                      </td>
-
-                      <td
-                        :for={
-                          {
-                            {day_quantity, day},
-                            index
-                          } <- Enum.with_index(material_data.quantities)
-                        }
-                        class="relative border-t border-r border-t-stone-200 border-r-stone-200 p-3 text-left align-top"
-                      >
-                        <% day_balance = Enum.at(material_data.balance_cells, index) %> <% status =
-                          forecast_status(day_quantity, day_balance) %>
-                        <div class="group relative mt-3 inline-flex">
-                          <button
-                            type="button"
-                            phx-click="view_material_details"
-                            phx-value-date={Date.to_iso8601(day)}
-                            phx-value-material={material.id}
-                            class={["inline-flex w-full items-center gap-1 px-2 py-0.5 text-xs font-medium transition focus-visible:ring-primary-400 focus-visible:outline-none focus-visible:ring-2", forecast_status_chip(status)]}
-                          >
-                            <div class="grid-row-2 grid">
-                              <div class="grid-row-2 grid">
-                                <div>{format_amount(material.unit, day_balance)}</div>
-                              </div>
-                            </div>
-                          </button>
-
-                          <div class={["min-w-[11rem] max-w-[14rem] text-[11px] pointer-events-none absolute top-0 left-0 z-10 z-30 hidden -translate-y-full flex-col gap-1 rounded-md border bg-white p-3 shadow-lg ring-1 group-focus-within:flex group-hover:flex", forecast_popover_class(status)]}>
-                            <p class="text-stone-600">
-                              Balance proyectado
-                              <span class="font-bold">
-                                {format_amount(material.unit, day_balance)}
-                              </span>
-                            </p>
-
-                            <p class="text-stone-600">
-                              Requerido
-                              <span class="font-bold">
-                                {format_amount(material.unit, day_quantity)}
-                              </span>
-                            </p>
-                            <hr class="text-stone-300" />
-                            <p class={[forecast_popover_label_class(status)]}>
-                              {popover_label(status, material.unit, day_quantity, day_balance)}
-                            </p>
-                          </div>
-                        </div>
-                      </td>
-
-                      <td class={["border-t border-t-stone-200 p-2 text-right", forecast_status_chip(if Decimal.gt?(0, material_data.final_balance),
-      do: :shortage,
-      else: :balanced)]}>
-                        {format_amount(material.unit, material_data.final_balance)}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </.scroll_table>
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M13 7l5 5m0 0l-5 5m5-5H6"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </:actions>
             </Page.surface>
           </div>
+
+          <Page.surface full_bleed padding="p-0">
+            <.scroll_table
+              id="usage-forecast-table"
+              min_width="w-[1300px]"
+              aria_label="Cuadrícula de pronóstico de uso"
+            >
+              <table class="w-full table-fixed border-collapse text-sm">
+                <thead class="bg-stone-50 text-left text-xs font-semibold tracking-wide text-stone-500">
+                  <tr>
+                    <th class="sticky left-0 z-20 w-48 border-r border-stone-200 bg-white p-3 text-left">
+                      Material
+                    </th>
+
+                    <th
+                      :for={{day, _index} <- Enum.with_index(@days_range)}
+                      class={
+                        [
+                          "w-1/5 border-r border-stone-200 p-3 font-normal last:border-r-0",
+                          is_today?(day) && "bg-indigo-50"
+                        ]
+                        |> Enum.reject(&is_nil/1)
+                      }
+                    >
+                      <div class="flex items-center justify-center">
+                        <div class={[
+                          "inline-flex items-center justify-center space-x-1 rounded px-2",
+                          is_today?(day) && "bg-indigo-500 text-white"
+                        ]}>
+                          <div>{format_day_name(day)}</div>
+
+                          <div>{format_short_date(day, @time_zone)}</div>
+                        </div>
+                      </div>
+                    </th>
+
+                    <th class="w-1/5 border-stone-200 p-3 text-left font-normal">
+                      Balance final
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody class="text-stone-700">
+                  <tr
+                    :for={{material, material_data} <- @materials_requirements}
+                    class="border-t border-stone-200"
+                  >
+                    <td class="sticky left-0 z-10 border-r border-stone-200 bg-white px-3 py-2 text-left font-medium shadow-sm">
+                      {material.name}
+                    </td>
+
+                    <td
+                      :for={
+                        {
+                          {day_quantity, day},
+                          index
+                        } <- Enum.with_index(material_data.quantities)
+                      }
+                      class="relative border-t border-r border-t-stone-200 border-r-stone-200 p-3 text-left align-top"
+                    >
+                      <% day_balance = Enum.at(material_data.balance_cells, index) %> <% status =
+                        forecast_status(day_quantity, day_balance) %>
+                      <div class="group relative mt-3 inline-flex">
+                        <button
+                          type="button"
+                          phx-click="view_material_details"
+                          phx-value-date={Date.to_iso8601(day)}
+                          phx-value-material={material.id}
+                          class={[
+                            "inline-flex w-full items-center gap-1 px-2 py-0.5 text-xs font-medium transition focus-visible:ring-primary-400 focus-visible:outline-none focus-visible:ring-2",
+                            forecast_status_chip(status)
+                          ]}
+                        >
+                          <div class="grid-row-2 grid">
+                            <div class="grid-row-2 grid">
+                              <div>{format_amount(material.unit, day_balance)}</div>
+                            </div>
+                          </div>
+                        </button>
+
+                        <div class={[
+                          "min-w-[11rem] max-w-[14rem] text-[11px] pointer-events-none absolute top-0 left-0 z-10 z-30 hidden -translate-y-full flex-col gap-1 rounded-md border bg-white p-3 shadow-lg ring-1 group-focus-within:flex group-hover:flex",
+                          forecast_popover_class(status)
+                        ]}>
+                          <p class="text-stone-600">
+                            Balance proyectado
+                            <span class="font-bold">
+                              {format_amount(material.unit, day_balance)}
+                            </span>
+                          </p>
+
+                          <p class="text-stone-600">
+                            Requerido
+                            <span class="font-bold">
+                              {format_amount(material.unit, day_quantity)}
+                            </span>
+                          </p>
+                          <hr class="text-stone-300" />
+                          <p class={[forecast_popover_label_class(status)]}>
+                            {popover_label(status, material.unit, day_quantity, day_balance)}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td class={[
+                      "border-t border-t-stone-200 p-2 text-right",
+                      forecast_status_chip(
+                        if Decimal.gt?(0, material_data.final_balance),
+                          do: :shortage,
+                          else: :balanced
+                      )
+                    ]}>
+                      {format_amount(material.unit, material_data.final_balance)}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </.scroll_table>
+          </Page.surface>
+        </div>
       </Page.section>
 
       <.modal
@@ -470,11 +486,8 @@ defmodule CraftplanWeb.InventoryLive.Index do
   defp apply_action(socket, :index, _params) do
     # Reload materials when returning to index
     materials =
-      Inventory.list_materials!(
-        actor: socket.assigns[:current_user],
-        stream?: true,
-        load: [:current_stock]
-      )
+      [actor: socket.assigns[:current_user], stream?: true, load: [:current_stock]]
+      |> Inventory.list_materials!()
       |> Enum.to_list()
 
     socket
@@ -510,7 +523,11 @@ defmodule CraftplanWeb.InventoryLive.Index do
   end
 
   @impl true
-  def handle_event("view_material_details", %{"date" => date_str, "material" => material_id}, socket) do
+  def handle_event(
+        "view_material_details",
+        %{"date" => date_str, "material" => material_id},
+        socket
+      ) do
     date = Date.from_iso8601!(date_str)
     material = Inventory.get_material_by_id!(material_id, actor: socket.assigns.current_user)
 
@@ -630,10 +647,8 @@ defmodule CraftplanWeb.InventoryLive.Index do
           socket = stream_delete(socket, :materials, %{id: id})
 
           remaining =
-            Inventory.list_materials!(
-              actor: socket.assigns.current_user,
-              load: [:current_stock]
-            )
+            [actor: socket.assigns.current_user, load: [:current_stock]]
+            |> Inventory.list_materials!()
             |> Enum.to_list()
 
           {:noreply,
@@ -687,7 +702,8 @@ defmodule CraftplanWeb.InventoryLive.Index do
   defp forecast_status_chip(:shortage), do: "border border-rose-300 bg-rose-50 text-rose-700"
   defp forecast_status_chip(:watch), do: "border border-amber-300 bg-amber-50 text-amber-700"
 
-  defp forecast_status_chip(:balanced), do: "border border-emerald-300 bg-emerald-50 text-emerald-700"
+  defp forecast_status_chip(:balanced),
+    do: "border border-emerald-300 bg-emerald-50 text-emerald-700"
 
   defp forecast_status_chip(_), do: "border border-stone-200 bg-stone-50 text-stone-500"
 
@@ -728,7 +744,10 @@ defmodule CraftplanWeb.InventoryLive.Index do
   defp out_of_stock?(_), do: false
 
   defp format_quantity(nil), do: "0"
-  defp format_quantity(%Decimal{} = qty), do: qty |> Decimal.normalize() |> Decimal.to_string(:normal)
+
+  defp format_quantity(%Decimal{} = qty),
+    do: qty |> Decimal.normalize() |> Decimal.to_string(:normal)
+
   defp format_quantity(qty) when is_number(qty), do: to_string(qty)
   defp format_quantity(qty), do: to_string(qty)
 end

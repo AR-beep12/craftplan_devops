@@ -41,7 +41,7 @@ defmodule Craftplan.Production.BatchSheet do
     %{
       "batch_code" => report.batch_code,
       "product_name" => (product && product.name) || "Unknown",
-      "product_sku" => (product && product.sku) || "",
+      "product_sku" => (product && product.id |> to_string() |> String.slice(0, 8)) || "",
       "status" => format_status(batch),
       "planned_qty" => format_decimal((batch && batch.planned_qty) || D.new(0)),
       "produced_at" => format_datetime(report.produced_at),
@@ -153,3 +153,4 @@ defmodule Craftplan.Production.BatchSheet do
 
   defp format_money(currency, _), do: format_money(currency, D.new(0))
 end
+

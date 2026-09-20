@@ -79,7 +79,12 @@ defmodule CraftplanWeb.ImportModalComponent do
           >
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <.input type="text" name="delimiter" label="Delimitador" value={@csv_delimiter || ","} />
-              <.input type="checkbox" name="dry_run" label="Ejecución de prueba (vista previa)" checked />
+              <.input
+                type="checkbox"
+                name="dry_run"
+                label="Ejecución de prueba (vista previa)"
+                checked
+              />
               <div class="sm:col-span-2">
                 <.input type="textarea" name="csv_content" label="Pegar CSV" value="" />
               </div>
@@ -323,12 +328,20 @@ defmodule CraftplanWeb.ImportModalComponent do
 
           :error ->
             {:noreply,
-             put_flash(socket, :info, "Sube un archivo o pega contenido CSV para la ejecución de prueba.")}
+             put_flash(
+               socket,
+               :info,
+               "Sube un archivo o pega contenido CSV para la ejecución de prueba."
+             )}
         end
 
       true ->
         {:noreply,
-         put_flash(socket, :info, "Sube un archivo o pega contenido CSV para la ejecución de prueba.")}
+         put_flash(
+           socket,
+           :info,
+           "Sube un archivo o pega contenido CSV para la ejecución de prueba."
+         )}
     end
   end
 
@@ -367,7 +380,8 @@ defmodule CraftplanWeb.ImportModalComponent do
 
         case importer.import(csv, delimiter: delimiter, mapping: mapping, actor: actor) do
           {:ok, %{inserted: ins, updated: upd, errors: errors}} ->
-            msg = "Se importaron #{ins + upd} (#{ins} nuevos#{(upd > 0 && ", #{upd} actualizados") || ""})."
+            msg =
+              "Se importaron #{ins + upd} (#{ins} nuevos#{(upd > 0 && ", #{upd} actualizados") || ""})."
 
             {:noreply,
              socket
@@ -498,18 +512,14 @@ defmodule CraftplanWeb.ImportModalComponent do
       key: "products",
       label: "Productos",
       importer: Craftplan.CSV.Importers.Products,
-      instructions: ["Requerido: name, sku, price. Opcional: status."],
+      instructions: ["Requerido: name, price."],
       fields: [
         %{name: "name", label: "Nombre", required: true},
-        %{name: "sku", label: "SKU", required: true},
-        %{name: "price", label: "Precio", required: true},
-        %{name: "status", label: "Estado", required: false}
+        %{name: "price", label: "Precio", required: true}
       ],
       default_candidates: %{
         "name" => ["name", "product name"],
-        "sku" => ["sku", "code"],
-        "price" => ["price", "cost", "amount"],
-        "status" => ["status"]
+        "price" => ["price", "cost", "amount"]
       }
     }
   end

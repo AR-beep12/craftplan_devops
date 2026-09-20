@@ -81,7 +81,7 @@ defmodule CraftplanWeb.CommandPaletteSearch do
     |> Enum.map(fn p ->
       %{
         label: p.name,
-        sublabel: p.category && p.category.name || "",
+        sublabel: (p.category && p.category.name) || "",
         path: "/manage/products/#{p.id}",
         icon: :products
       }
@@ -153,4 +153,3 @@ defmodule CraftplanWeb.CommandPaletteSearch do
     Calendar.strftime(date, "%b %d, %Y")
   end
 end
-

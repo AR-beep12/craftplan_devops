@@ -4,10 +4,12 @@ defmodule Craftplan.CSV.Importers.Products do
   Expected headers: name, price (optional: selling_availability, category).
   """
 
-  require Ash.Query
   import Ash.Expr
 
+  alias Craftplan.Catalog.Product
   alias NimbleCSV.RFC4180, as: CSV
+
+  require Ash.Query
 
   @type row :: %{name: String.t(), price: Decimal.t()}
   @type error :: %{row: non_neg_integer(), message: String.t()}
@@ -117,7 +119,7 @@ defmodule Craftplan.CSV.Importers.Products do
   defp get_by_name(name, actor) do
     require Ash.Query
 
-    Craftplan.Catalog.Product
+    Product
     |> Ash.Query.filter(expr(name == ^name))
     |> Ash.read_one(actor: actor)
   end
@@ -129,7 +131,7 @@ defmodule Craftplan.CSV.Importers.Products do
   end
 
   defp do_upsert_product(_, attrs, actor) do
-    with {:ok, _} <- Ash.create(Craftplan.Catalog.Product, attrs, actor: actor) do
+    with {:ok, _} <- Ash.create(Product, attrs, actor: actor) do
       {:ok, :inserted}
     end
   end

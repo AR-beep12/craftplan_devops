@@ -2,14 +2,14 @@ defmodule CraftplanWeb.ProductionBatchLive.Show do
   @moduledoc false
   use CraftplanWeb, :live_view
 
+  import CraftplanWeb.OrderLive.Helpers, only: [order_item_status_label: 1]
+
   alias Ash.Error.Invalid
   alias Craftplan.Orders
   alias Craftplan.Production
   alias CraftplanWeb.Components.Page
   alias CraftplanWeb.Navigation
   alias Decimal, as: D
-
-  import CraftplanWeb.OrderLive.Helpers, only: [order_item_status_label: 1]
 
   @impl true
   def mount(_params, _session, socket) do
@@ -107,7 +107,9 @@ defmodule CraftplanWeb.ProductionBatchLive.Show do
                 <div class="text-xs text-stone-500">Unidades totales en este lote</div>
               </.summary_card>
               <.summary_card label="Producido el" value={format_batch_time(@produced_at, @time_zone)}>
-                <div class="text-xs text-stone-500">Capturado a partir de eventos de finalización</div>
+                <div class="text-xs text-stone-500">
+                  Capturado a partir de eventos de finalización
+                </div>
               </.summary_card>
               <.summary_card
                 label="Costo unitario promedio"

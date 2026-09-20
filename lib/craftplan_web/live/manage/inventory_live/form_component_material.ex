@@ -70,9 +70,12 @@ defmodule CraftplanWeb.InventoryLive.FormComponentMaterial do
                 other -> Decimal.new(to_string(other))
               end
 
-            if Decimal.compare(qty_decimal, Decimal.new(0)) != :eq do
+            if Decimal.compare(qty_decimal, Decimal.new(0)) == :eq do
+              material
               # Crear movimiento inicial
-              case Ash.Changeset.for_create(Inventory.Movement, :adjust_stock, %{
+            else
+              case Inventory.Movement
+                   |> Ash.Changeset.for_create(:adjust_stock, %{
                      material_id: material.id,
                      quantity: qty_decimal,
                      reason: "Stock inicial"
@@ -84,8 +87,6 @@ defmodule CraftplanWeb.InventoryLive.FormComponentMaterial do
                 {:error, _} ->
                   material
               end
-            else
-              material
             end
           else
             material
@@ -112,8 +113,7 @@ defmodule CraftplanWeb.InventoryLive.FormComponentMaterial do
 
   defp format_quantity(nil), do: "0"
 
-  defp format_quantity(%Decimal{} = qty),
-    do: qty |> Decimal.normalize() |> Decimal.to_string(:normal)
+  defp format_quantity(%Decimal{} = qty), do: qty |> Decimal.normalize() |> Decimal.to_string(:normal)
 
   defp format_quantity(qty) when is_number(qty), do: to_string(qty)
   defp format_quantity(qty), do: to_string(qty)

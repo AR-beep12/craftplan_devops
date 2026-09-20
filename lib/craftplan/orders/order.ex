@@ -53,6 +53,7 @@ defmodule Craftplan.Orders.Order do
         :status,
         :customer_id,
         :delivery_date,
+        :description,
         :invoice_number,
         :invoice_status,
         :invoiced_at,
@@ -76,6 +77,7 @@ defmodule Craftplan.Orders.Order do
         :status,
         :customer_id,
         :delivery_date,
+        :description,
         :invoice_number,
         :invoice_status,
         :invoiced_at,
@@ -93,6 +95,12 @@ defmodule Craftplan.Orders.Order do
       change manage_relationship(:items, type: :direct_control)
       change {CalculateTotals, []}
       change {ValidateConstraints, []}
+    end
+
+    update :update_status do
+      description "Status-only update that skips capacity/lead-time re-validation"
+
+      accept [:status]
     end
 
     read :list do
@@ -261,6 +269,10 @@ defmodule Craftplan.Orders.Order do
       allow_nil? false
     end
 
+    attribute :description, :string do
+      allow_nil? true
+    end
+
     # Invoicing / payments / discounts
     attribute :invoice_number, :string do
       allow_nil? true
@@ -300,7 +312,7 @@ defmodule Craftplan.Orders.Order do
 
     attribute :status, Status do
       allow_nil? false
-      default :unconfirmed
+      default :pending
     end
 
     attribute :payment_status, PaymentStatus do

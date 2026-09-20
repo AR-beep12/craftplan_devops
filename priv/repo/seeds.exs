@@ -226,11 +226,15 @@ if System.get_env("SEED_DATA") == "true" or (Code.ensure_loaded?(Mix) and Mix.en
   end
 
   seed_product = fn name, price, category ->
-    Ash.Seed.seed!(Catalog.Product, %{
-      name: name,
-      price: Decimal.new(price),
-      category_id: category && category.id
-    }, identity: :name)
+    Ash.Seed.seed!(
+      Catalog.Product,
+      %{
+        name: name,
+        price: Decimal.new(price),
+        category_id: category && category.id
+      },
+      identity: :name
+    )
   end
 
   # No recipe helpers (BOM-only seeding)
@@ -378,7 +382,14 @@ if System.get_env("SEED_DATA") == "true" or (Code.ensure_loaded?(Mix) and Mix.en
     flour: seed_material.("All Purpose Flour", :gram, "beige", "5000", "All Purpose Flour - demo"),
     whole_wheat: seed_material.("Whole Wheat Flour", :gram, "beige", "3000", "Whole Wheat Flour - demo"),
     rye_flour: seed_material.("Rye Flour", :gram, "beige", "2000", "Rye Flour - demo"),
-    gluten_free_mix: seed_material.("Gluten-Free Flour Mix", :gram, "beige", "1000", "Gluten-Free Flour Mix - demo"),
+    gluten_free_mix:
+      seed_material.(
+        "Gluten-Free Flour Mix",
+        :gram,
+        "beige",
+        "1000",
+        "Gluten-Free Flour Mix - demo"
+      ),
     oats: seed_material.("Rolled Oats", :gram, "khaki", "2000", "Rolled Oats - demo"),
     almonds: seed_material.("Whole Almonds", :gram, "tan", "2000", "Whole Almonds - demo"),
     walnuts: seed_material.("Walnuts", :gram, "saddlebrown", "1500", "Walnuts - demo"),
@@ -389,7 +400,14 @@ if System.get_env("SEED_DATA") == "true" or (Code.ensure_loaded?(Mix) and Mix.en
     sugar: seed_material.("White Sugar", :gram, "white", "3000", "White Sugar - demo"),
     brown_sugar: seed_material.("Brown Sugar", :gram, "white", "2000", "Brown Sugar - demo"),
     chocolate: seed_material.("Dark Chocolate", :gram, "brown", "2000", "Dark Chocolate - demo"),
-    vanilla: seed_material.("Vanilla Extract", :milliliter, "lemonchiffon", "500", "Vanilla Extract - demo"),
+    vanilla:
+      seed_material.(
+        "Vanilla Extract",
+        :milliliter,
+        "lemonchiffon",
+        "500",
+        "Vanilla Extract - demo"
+      ),
     cinnamon: seed_material.("Ground Cinnamon", :gram, "cinnamon", "300", "Ground Cinnamon - demo"),
     yeast: seed_material.("Active Dry Yeast", :gram, "lightyellow", "500", "Active Dry Yeast - demo"),
     salt: seed_material.("Sea Salt", :gram, "white", "1000", "Sea Salt - demo")
@@ -712,7 +730,9 @@ if System.get_env("SEED_DATA") == "true" or (Code.ensure_loaded?(Mix) and Mix.en
     })
 
   demo_batch_code =
-    "B-" <> Calendar.strftime(Date.utc_today(), "%Y%m%d") <> "-" <> String.slice(to_string(products.bread.id), 0, 8) <> "-DEV"
+    "B-" <>
+      Calendar.strftime(Date.utc_today(), "%Y%m%d") <>
+      "-" <> String.slice(to_string(products.bread.id), 0, 8) <> "-DEV"
 
   bread_batch =
     Ash.Seed.seed!(Orders.ProductionBatch, %{

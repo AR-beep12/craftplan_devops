@@ -1,4 +1,5 @@
 defmodule CraftplanWeb.PhotoUrl do
+  @moduledoc false
   alias ExAws.S3
   alias Waffle.Storage.S3, as: WaffleS3
 

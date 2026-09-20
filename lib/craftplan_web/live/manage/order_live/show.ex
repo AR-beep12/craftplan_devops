@@ -2,31 +2,19 @@ defmodule CraftplanWeb.OrderLive.Show do
   @moduledoc false
   use CraftplanWeb, :live_view
 
-  import Ash.Expr
   import CraftplanWeb.OrderLive.Helpers
 
   alias Craftplan.Catalog
   alias Craftplan.Catalog.Product.Photo
   alias Craftplan.CRM
   alias Craftplan.Orders
-  alias Craftplan.Orders.OrderItemBatchAllocation
   alias CraftplanWeb.Navigation
-
-  require Ash.Query
 
   @default_order_load [
     :total_cost,
     items: [
       :cost,
       :status,
-      :consumed_at,
-      :batch_code,
-      :planned_qty_sum,
-      :completed_qty_sum,
-      :material_cost,
-      :labor_cost,
-      :overhead_cost,
-      :unit_cost,
       product: [:name]
     ],
     customer: [:full_name]
@@ -41,12 +29,25 @@ defmodule CraftplanWeb.OrderLive.Show do
     <.header>
       {@order.reference}
       <:actions>
-        <.link patch={~p"/manage/orders/#{@order.reference}/edit"} phx-click={JS.push_focus()}>
-          <.button variant={:primary}>Editar pedido</.button>
-        </.link>
-        <.link href={~p"/manage/orders/#{@order.reference}/invoice.pdf"} target="_blank">
-          <.button variant={:outline}>Ver factura</.button>
-        </.link>
+        <div class="flex flex-wrap items-center gap-3">
+          <.link patch={~p"/manage/orders/#{@order.reference}/edit"} phx-click={JS.push_focus()}>
+            <.button variant={:primary}>Editar pedido</.button>
+          </.link>
+          <form phx-change="change_status" class="w-44">
+            <.input
+              name="new_status"
+              type="select"
+              value={Atom.to_string(@order.status)}
+              options={[
+                {"Pendiente", "pending"},
+                {"En progreso", "in_progress"},
+                {"Completado", "completed"},
+                {"Cancelado", "cancelled"}
+              ]}
+              class="w-auto text-sm"
+            />
+          </form>
+        </div>
       </:actions>
     </.header>
 
@@ -62,13 +63,15 @@ defmodule CraftplanWeb.OrderLive.Show do
           </:item>
 
           <:item title="Estado">
-            <.badge
-              text={order_status_label(@order.status)}
-              colors={[
-                {@order.status,
-                 "#{order_status_color(@order.status)} #{order_status_bg(@order.status)}"}
-              ]}
-            />
+            <div class="flex items-center gap-2">
+              <.badge
+                text={order_status_label(@order.status)}
+                colors={[
+                  {@order.status,
+                   "#{order_status_color(@order.status)} #{order_status_bg(@order.status)}"}
+                ]}
+              />
+            </div>
           </:item>
 
           <:item title="Cliente">
@@ -85,11 +88,15 @@ defmodule CraftplanWeb.OrderLive.Show do
           </:item>
 
           <:item title="Fecha de entrega">
-            {format_time(@order.delivery_date, @time_zone)}
+            {format_date(@order.delivery_date, @time_zone)}
+          </:item>
+
+          <:item title="Descripción">
+            {@order.description || "—"}
           </:item>
 
           <:item title="Creado el">
-            {format_time(@order.inserted_at, @time_zone)}
+            {format_date(@order.inserted_at, @time_zone)}
           </:item>
         </.list>
       </.tabs_content>
@@ -104,7 +111,13 @@ defmodule CraftplanWeb.OrderLive.Show do
               <div class="flex items-center space-x-2">
                 <img
                   :if={item.product.featured_photo != nil}
-                  src={CraftplanWeb.PhotoUrl.signed(Photo, :thumb, {item.product.featured_photo, item.product})}
+                  src={
+                    CraftplanWeb.PhotoUrl.signed(
+                      Photo,
+                      :thumb,
+                      {item.product.featured_photo, item.product}
+                    )
+                  }
                   alt={item.product.name}
                   class="h-5 w-5"
                 />
@@ -122,16 +135,8 @@ defmodule CraftplanWeb.OrderLive.Show do
             {format_money(@settings.currency, item.cost)}
           </:col>
           <:col :let={item} label="Estado">
-            <% _planned = item.planned_qty_sum || Decimal.new(0) %>
-            <% completed = item.completed_qty_sum || Decimal.new(0) %>
-            <% status =
-              cond do
-                Decimal.compare(completed, item.quantity) != :lt -> :done
-                Decimal.compare(completed, Decimal.new(0)) == :gt -> :in_progress
-                true -> :todo
-              end %>
             <.badge
-              text={order_item_status_label(status)}
+              text={order_item_status_label(item.status)}
               colors={[
                 {:todo, "#{order_item_status_bg(:todo)} #{order_item_status_color(:todo)}"},
                 {:in_progress,
@@ -140,41 +145,27 @@ defmodule CraftplanWeb.OrderLive.Show do
               ]}
             />
           </:col>
-          <:col :let={item} label="Asignaciones">
-            <div class="flex items-center gap-2 text-xs">
-              <span class="inline-flex items-center rounded bg-stone-100 px-2 py-0.5">
-                Planificado: {item.planned_qty_sum || Decimal.new(0)}
-              </span>
-              <span class="inline-flex items-center rounded bg-stone-100 px-2 py-0.5">
-                Completado: {item.completed_qty_sum || Decimal.new(0)}
-              </span>
-            </div>
-          </:col>
           <:action :let={item}>
-            <.button
-              size={:sm}
-              variant={:outline}
-              phx-click="open_add_to_batch"
+            <button
+              type="button"
+              phx-click="update_item_status"
               phx-value-item_id={item.id}
+              title={if item.status == :done, do: "Marcar como pendiente", else: "Marcar como listo"}
+              class="inline-flex items-center gap-2"
             >
-              Agregar al lote…
-            </.button>
+              <span class={[
+                "relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition",
+                item.status == :done && "bg-emerald-500",
+                item.status != :done && "bg-stone-300"
+              ]}>
+                <span class={[
+                  "inline-block h-4 w-4 transform rounded-full bg-white shadow transition",
+                  item.status == :done && "translate-x-4",
+                  item.status != :done && "translate-x-0.5"
+                ]} />
+              </span>
+            </button>
           </:action>
-          <:col :let={item} label="Lote">
-            <%= if item.batch_code do %>
-              <.link
-                navigate={~p"/manage/production/batches/#{item.batch_code}"}
-                class="text-xs text-blue-700 hover:underline"
-              >
-                {item.batch_code}
-              </.link>
-            <% else %>
-              <span class="text-xs text-stone-600">-</span>
-            <% end %>
-          </:col>
-          <:col :let={item} label="Costo unitario">
-            {format_money(@settings.currency, item.unit_cost || Decimal.new(0))}
-          </:col>
         </.table>
       </.tabs_content>
     </div>
@@ -207,6 +198,7 @@ defmodule CraftplanWeb.OrderLive.Show do
       id="order-modal"
       show
       title={@page_title}
+      max_width="max-w-xl"
       on_cancel={JS.patch(~p"/manage/orders/#{@order.reference}")}
     >
       <.live_component
@@ -221,41 +213,6 @@ defmodule CraftplanWeb.OrderLive.Show do
         settings={@settings}
         patch={~p"/manage/orders/#{@order.reference}"}
       />
-    </.modal>
-
-    <.modal
-      :if={@add_to_batch_item}
-      id="add-to-batch-modal"
-      show
-      title="Agregar artículo al lote"
-      on_cancel={JS.push("cancel_add_to_batch")}
-    >
-      <.form id="add-to-batch-form" for={%{}} phx-submit="save_add_to_batch">
-        <div class="space-y-3">
-          <div class="text-sm text-stone-700">
-            Producto: <span class="font-medium">{@add_to_batch_item.product.name}</span>
-          </div>
-          <.input
-            type="select"
-            name="batch_id"
-            label="Lote abierto"
-            options={for b <- @open_batches, do: {b.batch_code, b.id}}
-            value={@selected_batch_id}
-          />
-          <.input
-            type="number"
-            name="planned_qty"
-            label="Cantidad planificada"
-            min="0"
-            step="any"
-            value={@default_planned_qty}
-          />
-          <div class="flex items-center justify-end gap-2">
-            <.button type="button" variant={:outline} phx-click="cancel_add_to_batch">Cancelar</.button>
-            <.button type="submit" variant={:primary}>Agregar</.button>
-          </div>
-        </div>
-      </.form>
     </.modal>
     """
   end
@@ -272,10 +229,6 @@ defmodule CraftplanWeb.OrderLive.Show do
      assign(socket,
        products: products,
        customers: customers,
-       add_to_batch_item: nil,
-       open_batches: [],
-       default_planned_qty: Decimal.new(0),
-       selected_batch_id: nil,
        pending_consumption_item_id: nil,
        pending_consumption_recap: []
      )}
@@ -314,7 +267,30 @@ defmodule CraftplanWeb.OrderLive.Show do
   end
 
   @impl true
-  def handle_event("update_item_status", _params, socket), do: {:noreply, socket}
+  def handle_event("update_item_status", %{"item_id" => item_id}, socket) do
+    actor = socket.assigns.current_user
+    item = Enum.find(socket.assigns.order.items, &(&1.id == item_id))
+
+    next_status =
+      case item.status do
+        :done -> :todo
+        _ -> :done
+      end
+
+    case Orders.update_item(item, %{status: next_status}, actor: actor) do
+      {:ok, _item} ->
+        order =
+          Orders.get_order_by_id!(socket.assigns.order.id,
+            load: @default_order_load,
+            actor: actor
+          )
+
+        {:noreply, assign(socket, :order, order)}
+
+      {:error, error} ->
+        {:noreply, put_flash(socket, :error, "No se pudo actualizar el estado: #{Exception.message(error)}")}
+    end
+  end
 
   @impl true
   def handle_event("confirm_consume", _params, socket), do: {:noreply, socket}
@@ -323,104 +299,23 @@ defmodule CraftplanWeb.OrderLive.Show do
   def handle_event("cancel_consume", _params, socket), do: {:noreply, socket}
 
   @impl true
-  def handle_event("open_add_to_batch", %{"item_id" => item_id}, socket) do
-    actor = socket.assigns.current_user
+  def handle_event("change_status", %{"new_status" => new_status}, socket) do
+    status_atom = String.to_existing_atom(new_status)
 
-    item =
-      Orders.get_order_item_by_id!(item_id,
-        actor: actor,
-        load: [:quantity, :planned_qty_sum, product: [:name]]
-      )
+    case Orders.update_order_status(
+           socket.assigns.order,
+           %{status: status_atom},
+           actor: socket.assigns.current_user
+         ) do
+      {:ok, order} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Estado actualizado a #{order_status_label(status_atom)}")
+         |> assign(:order, order)}
 
-    open_batches =
-      Orders.list_open_batches_for_product!(%{product_id: item.product_id}, actor: actor)
-
-    remaining = Decimal.sub(item.quantity, item.planned_qty_sum || Decimal.new(0))
-
-    selected =
-      open_batches
-      |> List.first()
-      |> case do
-        nil -> nil
-        b -> b.id
-      end
-
-    {:noreply,
-     socket
-     |> assign(:add_to_batch_item, item)
-     |> assign(:open_batches, open_batches)
-     |> assign(:default_planned_qty, remaining)
-     |> assign(:selected_batch_id, selected)}
-  end
-
-  @impl true
-  def handle_event(
-        "save_add_to_batch",
-        %{"batch_id" => batch_id, "planned_qty" => planned_qty},
-        socket
-      ) do
-    actor = socket.assigns.current_user
-    item = socket.assigns.add_to_batch_item
-    qty = Decimal.new(planned_qty)
-
-    existing =
-      OrderItemBatchAllocation
-      |> Ash.Query.new()
-      |> Ash.Query.filter(expr(order_item_id == ^item.id and production_batch_id == ^batch_id))
-      |> Ash.read_one(actor: actor)
-
-    case existing do
-      {:ok, %{} = alloc} ->
-        _ =
-          Orders.update_order_item_batch_allocation!(
-            alloc,
-            %{planned_qty: Decimal.add(alloc.planned_qty || Decimal.new(0), qty)},
-            actor: actor
-          )
-
-        :ok
-
-      _ ->
-        _ =
-          Orders.create_order_item_batch_allocation!(
-            %{
-              order_item_id: item.id,
-              production_batch_id: batch_id,
-              planned_qty: qty,
-              completed_qty: Decimal.new(0)
-            },
-            actor: actor
-          )
-
-        :ok
+      {:error, error} ->
+        {:noreply, put_flash(socket, :error, "No se pudo actualizar el estado: #{Exception.message(error)}")}
     end
-
-    order =
-      Orders.get_order_by_id!(socket.assigns.order.id,
-        load: @default_order_load,
-        actor: actor
-      )
-
-    {:noreply,
-     socket
-     |> assign(:order, order)
-     |> assign(:add_to_batch_item, nil)
-     |> assign(:open_batches, [])
-     |> assign(:selected_batch_id, nil)
-     |> put_flash(:info, "Asignación agregada")}
-  rescue
-    e ->
-      {:noreply,
-       put_flash(socket, :error, "No se pudo agregar la asignación: #{Exception.message(e)}")}
-  end
-
-  @impl true
-  def handle_event("cancel_add_to_batch", _params, socket) do
-    {:noreply,
-     socket
-     |> assign(:add_to_batch_item, nil)
-     |> assign(:open_batches, [])
-     |> assign(:selected_batch_id, nil)}
   end
 
   @impl true
@@ -449,7 +344,11 @@ defmodule CraftplanWeb.OrderLive.Show do
     {:noreply,
      socket
      |> put_flash(:info, "Pedido actualizado correctamente")
-     |> assign(:order, order)}
+     |> assign(:order, order)
+     |> assign(
+       :customers,
+       CRM.list_customers!(actor: socket.assigns[:current_user], load: [:full_name])
+     )}
   end
 
   defp page_title(:show), do: "Ver pedido"

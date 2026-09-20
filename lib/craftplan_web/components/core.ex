@@ -136,8 +136,19 @@ defmodule CraftplanWeb.Components.Core do
                 <.icon name="hero-x-mark-solid" class="h-5 w-5" />
               </button>
 
-              <div class="flex flex-col p-6">
-                <div :if={@title || @description} class="mb-4 space-y-1.5">
+              <div class={[
+                if(@fullscreen,
+                  do: "h-[calc(100vh-3.5rem)] flex flex-col",
+                  else: "max-h-[calc(100vh-10rem)] flex flex-col"
+                )
+              ]}>
+                <div
+                  :if={@title || @description}
+                  class={[
+                    "flex-none space-y-1.5",
+                    if(@fullscreen, do: "px-6 pt-6", else: "px-6 pt-6 pb-4")
+                  ]}
+                >
                   <h2
                     :if={@title}
                     id={"#{@id}-title"}
@@ -153,10 +164,9 @@ defmodule CraftplanWeb.Components.Core do
                 <div
                   id={"#{@id}-content"}
                   class={[
-                    @fullscreen && "h-[calc(100vh-3.5rem)] overflow-auto",
-                    not @fullscreen &&
-                      "max-h-[calc(100vh-10rem)] overflow-y-auto sm:max-h-none sm:overflow-visible",
-                    "py-1"
+                    @fullscreen && "overflow-auto",
+                    not @fullscreen && "grow overflow-y-auto",
+                    "min-h-0 px-6 pb-6"
                   ]}
                 >
                   {render_slot(@inner_block)}
@@ -164,7 +174,7 @@ defmodule CraftplanWeb.Components.Core do
 
                 <div
                   :if={@footer != []}
-                  class="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end"
+                  class="flex flex-none flex-col-reverse gap-2 px-6 pt-4 pb-6 sm:flex-row sm:justify-end"
                 >
                   {render_slot(@footer)}
                 </div>

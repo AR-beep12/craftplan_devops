@@ -67,9 +67,7 @@ defmodule Craftplan.Production do
         :consumed_at,
         :batch_code,
         :production_batch_id,
-        product: [:name,
-          active_bom: [:rollup]
-        ]
+        product: [:name, active_bom: [:rollup]]
       ]
     ]
 
@@ -609,4 +607,3 @@ defmodule Craftplan.Production do
     Enum.reduce(items, D.new(0), fn item, acc -> D.add(acc, item.quantity) end)
   end
 end
-

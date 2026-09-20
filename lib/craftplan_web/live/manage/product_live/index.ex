@@ -40,7 +40,7 @@ defmodule CraftplanWeb.ProductLive.Index do
         </div>
       </:col>
       <:col :let={{_, product}} label="Categoría">
-        {product.category && product.category.name || "-"}
+        {(product.category && product.category.name) || "-"}
       </:col>
       <:col :let={{_, product}} label="Precio">
         {format_money(@settings.currency, product.price)}
@@ -136,11 +136,12 @@ defmodule CraftplanWeb.ProductLive.Index do
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    product =
-      Catalog.get_product_by_id!(id, actor: socket.assigns.current_user, load: [:category])
+    import Ecto.Query
 
     alias Craftplan.Repo
-    import Ecto.Query
+
+    product =
+      Catalog.get_product_by_id!(id, actor: socket.assigns.current_user, load: [:category])
 
     bom_ids =
       case Catalog.list_boms_for_product(%{product_id: product.id},
@@ -171,10 +172,10 @@ defmodule CraftplanWeb.ProductLive.Index do
 
       {:error, error} ->
         require Logger
+
         Logger.error("Failed to delete product #{id}: #{inspect(error)}")
 
-        {:noreply,
-         put_flash(socket, :error, "No se pudo eliminar el producto: #{inspect(error)}")}
+        {:noreply, put_flash(socket, :error, "No se pudo eliminar el producto: #{inspect(error)}")}
     end
   end
 

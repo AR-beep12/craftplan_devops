@@ -18,27 +18,28 @@ defmodule CraftplanWeb.CustomerLive.Index do
       </:actions>
     </.header>
 
-      <Page.surface>
-        <.table
-          id="customers"
-          rows={@streams.customers}
-          row_click={fn {_id, customer} -> JS.navigate(~p"/manage/customers/#{customer.reference}") end}
-        >
-          <:col :let={{_id, customer}} label="Nombre">{customer.full_name}</:col>
-          <:col :let={{_id, customer}} label="ID">
-            <.kbd>
-              {format_reference(customer.reference)}
-            </.kbd>
-          </:col>
-          <:col :let={{_id, customer}} label="Correo electrónico">{customer.email}</:col>
-          <:col :let={{_id, customer}} label="Teléfono">{customer.phone}</:col>
-        </.table>
-        <div :if={@customers_empty?} class="rounded-md border border-dashed border-stone-200 bg-stone-50 py-10 text-center text-sm text-stone-500">
-          No se encontraron clientes
-        </div>
-      </Page.surface>
-
-
+    <Page.surface>
+      <.table
+        id="customers"
+        rows={@streams.customers}
+        row_click={fn {_id, customer} -> JS.navigate(~p"/manage/customers/#{customer.reference}") end}
+      >
+        <:col :let={{_id, customer}} label="Nombre">{customer.full_name}</:col>
+        <:col :let={{_id, customer}} label="ID">
+          <.kbd>
+            {format_reference(customer.reference)}
+          </.kbd>
+        </:col>
+        <:col :let={{_id, customer}} label="Correo electrónico">{customer.email}</:col>
+        <:col :let={{_id, customer}} label="Teléfono">{customer.phone}</:col>
+      </.table>
+      <div
+        :if={@customers_empty?}
+        class="rounded-md border border-dashed border-stone-200 bg-stone-50 py-10 text-center text-sm text-stone-500"
+      >
+        No se encontraron clientes
+      </div>
+    </Page.surface>
 
     <.modal
       :if={@live_action in [:new, :edit]}

@@ -141,6 +141,13 @@ defmodule Craftplan.Catalog.Product do
       description "Customer-facing availability: available, preorder, or off"
     end
 
+    attribute :max_daily_quantity, :integer do
+      public? true
+      allow_nil? false
+      default 0
+      description "Maximum quantity that can be sold per day for this product (0 = unlimited)"
+    end
+
     timestamps()
   end
 

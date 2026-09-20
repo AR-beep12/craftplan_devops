@@ -15,7 +15,6 @@ defmodule CraftplanWeb.OrderLive.Index do
 
   @type filter_options :: %{
           status: list(String.t()) | nil,
-          payment_status: list(String.t()) | nil,
           delivery_date_start: DateTime.t() | nil,
           delivery_date_end: DateTime.t() | nil,
           customer_name: String.t() | nil
@@ -33,7 +32,6 @@ defmodule CraftplanWeb.OrderLive.Index do
 
     %{
       "status" => [],
-      "payment_status" => [],
       "delivery_date_start" => Date.to_iso8601(Date.add(today, -@window_past_days)),
       "delivery_date_end" => Date.to_iso8601(Date.add(today, @window_future_days)),
       "customer_name" => ""
@@ -59,14 +57,17 @@ defmodule CraftplanWeb.OrderLive.Index do
         <:header>
           <div class="space-y-1">
             <h2 class="text-sm font-semibold text-stone-900">Filtrar pedidos</h2>
+
             <p class="text-sm text-stone-500">
               Reduce la lista por cliente, estado de cumplimiento o ventana de entrega.
             </p>
           </div>
         </:header>
+
         <:actions>
           <Page.filter_reset />
         </:actions>
+
         <form id="filters-form" phx-change="apply_filters">
           <Page.form_grid columns={4} class="max-w-full">
             <.input
@@ -77,7 +78,6 @@ defmodule CraftplanWeb.OrderLive.Index do
               label="Nombre del cliente"
               placeholder="Luca Georgino"
             />
-
             <div class="min-w-[12rem]">
               <.input
                 label="Estado"
@@ -87,11 +87,8 @@ defmodule CraftplanWeb.OrderLive.Index do
                 value={@filters["status"]}
                 multiple={true}
                 options={[
-                  {"Sin confirmar", "unconfirmed"},
-                  {"Confirmado", "confirmed"},
+                  {"Pendiente", "pending"},
                   {"En progreso", "in_progress"},
-                  {"Listo", "ready"},
-                  {"Entregado", "delivered"},
                   {"Completado", "completed"},
                   {"Cancelado", "cancelled"}
                 ]}
@@ -100,36 +97,20 @@ defmodule CraftplanWeb.OrderLive.Index do
 
             <div class="min-w-[12rem]">
               <.input
-                type="checkdrop"
-                name="filters[payment_status][]"
-                id="payment_status"
-                value={@filters["payment_status"]}
-                multiple={true}
-                label="Estado de pago"
-                options={[
-                  {"Pagado", "paid"},
-                  {"Pendiente", "pending"},
-                  {"Por reembolsar", "to_be_refunded"},
-                  {"Reembolsado", "refunded"}
-                ]}
+                type="date"
+                name="filters[delivery_date_start]"
+                id="delivery_date_start"
+                value={@filters["delivery_date_start"]}
+                label="Fecha de entrega después de"
+              />
+              <.input
+                type="date"
+                name="filters[delivery_date_end]"
+                id="delivery_date_end"
+                value={@filters["delivery_date_end"]}
+                label="Fecha de entrega antes de"
               />
             </div>
-
-            <.input
-              type="date"
-              name="filters[delivery_date_start]"
-              id="delivery_date_start"
-              value={@filters["delivery_date_start"]}
-              label="Fecha de entrega después de"
-            />
-
-            <.input
-              type="date"
-              name="filters[delivery_date_end]"
-              id="delivery_date_end"
-              value={@filters["delivery_date_end"]}
-              label="Fecha de entrega antes de"
-            />
           </Page.form_grid>
         </form>
       </Page.surface>
@@ -168,7 +149,7 @@ defmodule CraftplanWeb.OrderLive.Index do
             </:col>
 
             <:col :let={{_id, order}} label="Fecha de entrega">
-              {format_time(order.delivery_date, @time_zone)}
+              {format_date(order.delivery_date, @time_zone)}
             </:col>
 
             <:col :let={{_id, order}} label="Costo total">
@@ -184,11 +165,8 @@ defmodule CraftplanWeb.OrderLive.Index do
                 ]}
               />
             </:col>
-
-            <:col :let={{_id, order}} label="Pago">
-              <.badge text={"#{emoji_for_payment(order.payment_status)} #{payment_status_label(order.payment_status)}"} />
-            </:col>
           </.table>
+
           <div class="mt-4 flex items-center justify-between text-sm text-stone-600">
             <span>{page_label(@page_offset, @page_size, @page_count)}</span>
             <div class="flex items-center gap-2">
@@ -199,6 +177,7 @@ defmodule CraftplanWeb.OrderLive.Index do
               >
                 Anterior
               </.button>
+
               <.button
                 variant={:outline}
                 phx-click="next_page"
@@ -220,6 +199,7 @@ defmodule CraftplanWeb.OrderLive.Index do
               {format_date(List.first(@days_range), format: "%B %Y")}
             </div>
           </:header>
+
           <:actions>
             <div class="flex items-center">
               <button
@@ -242,6 +222,7 @@ defmodule CraftplanWeb.OrderLive.Index do
                   />
                 </svg>
               </button>
+
               <button
                 type="button"
                 phx-click="today"
@@ -249,6 +230,7 @@ defmodule CraftplanWeb.OrderLive.Index do
               >
                 Hoy
               </button>
+
               <button
                 type="button"
                 phx-click="next_week"
@@ -293,12 +275,14 @@ defmodule CraftplanWeb.OrderLive.Index do
                         is_today?(day) && "bg-indigo-500 text-white"
                       ]}>
                         <div>{format_day_name(day)}</div>
+
                         <div>{format_short_date(day, @time_zone)}</div>
                       </div>
                     </div>
                   </th>
                 </tr>
               </thead>
+
               <tbody>
                 <tr class="h-[60vh]">
                   <td
@@ -333,12 +317,15 @@ defmodule CraftplanWeb.OrderLive.Index do
                           title={order_status_label(order.status)}
                         >
                         </div>
+
                         <div class="truncate text-xs font-medium" title={order.customer.full_name}>
                           {order.customer.full_name}
                         </div>
+
                         <div class="text-xs text-stone-500">
-                          {format_hour(order.delivery_date, @time_zone)}
+                          {format_date(order.delivery_date, @time_zone)}
                         </div>
+
                         <div class="text-xs text-stone-500">
                           {format_money(@settings.currency, order.total_cost)}
                         </div>
@@ -363,7 +350,7 @@ defmodule CraftplanWeb.OrderLive.Index do
       :if={@live_action in [:new, :edit]}
       id="order-modal"
       title={@page_title}
-      max_width="max-w-2xl"
+      max_width="max-w-xl"
       show
       on_cancel={JS.patch(~p"/manage/orders")}
     >
@@ -396,8 +383,8 @@ defmodule CraftplanWeb.OrderLive.Index do
               {@selected_order.customer.full_name}
             </:item>
 
-            <:item title="Hora de entrega">
-              {format_time(@selected_order.delivery_date, @time_zone)}
+            <:item title="Fecha de entrega">
+              {format_date(@selected_order.delivery_date, @time_zone)}
             </:item>
 
             <:item title="Estado">
@@ -408,10 +395,6 @@ defmodule CraftplanWeb.OrderLive.Index do
                    "#{order_status_color(@selected_order.status)} #{order_status_bg(@selected_order.status)}"}
                 ]}
               />
-            </:item>
-
-            <:item title="Estado de pago">
-              <.badge text={"#{emoji_for_payment(@selected_order.payment_status)} #{payment_status_label(@selected_order.payment_status)}"} />
             </:item>
 
             <:item title="Total">
@@ -429,6 +412,7 @@ defmodule CraftplanWeb.OrderLive.Index do
         >
           Ver detalles del pedido
         </.button>
+
         <.button variant={:outline} phx-click="close_event_modal">
           Cerrar
         </.button>
@@ -636,7 +620,14 @@ defmodule CraftplanWeb.OrderLive.Index do
   @impl true
   def handle_info({CraftplanWeb.OrderLive.FormComponent, {:saved, _order}}, socket) do
     filter_opts = parse_filters(socket.assigns.filters)
-    {:noreply, load_view_data(socket, socket.assigns.view_mode, filter_opts)}
+
+    {:noreply,
+     socket
+     |> assign(
+       :customers,
+       CRM.list_customers!(actor: socket.assigns[:current_user], load: [:full_name])
+     )
+     |> load_view_data(socket.assigns.view_mode, filter_opts)}
   end
 
   # Private helper functions
@@ -744,7 +735,6 @@ defmodule CraftplanWeb.OrderLive.Index do
   defp parse_filters(filters) do
     %{
       status: parse_list(filters["status"]),
-      payment_status: parse_list(filters["payment_status"]),
       delivery_date_start: parse_date(filters["delivery_date_start"], ~T[00:00:00]),
       delivery_date_end: parse_date(filters["delivery_date_end"], ~T[23:59:59]),
       customer_name: filters["customer_name"]

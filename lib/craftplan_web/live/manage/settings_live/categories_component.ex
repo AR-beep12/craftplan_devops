@@ -56,22 +56,34 @@ defmodule CraftplanWeb.SettingsLive.CategoriesComponent do
                   end}
                 </div>
 
-                <div :for={category <- @visible_categories} class="flex items-center gap-3 border-b border-stone-100 px-4 py-3 last:border-b-0 hover:bg-stone-50">
+                <div
+                  :for={category <- @visible_categories}
+                  class="flex items-center gap-3 border-b border-stone-100 px-4 py-3 last:border-b-0 hover:bg-stone-50"
+                >
                   <input
                     type="checkbox"
                     checked={category.active}
                     phx-click="toggle_active"
                     phx-value-id={category.id}
                     phx-target={@myself}
-                    class="h-4 w-4 rounded border-stone-300 text-primary-600 focus:ring-primary-500"
+                    class="text-primary-600 h-4 w-4 rounded border-stone-300 focus:ring-primary-500"
                   />
-                  <div class="flex-1 min-w-0">
-                    <p class={["text-sm font-medium truncate", if(category.active, do: "text-stone-900", else: "text-stone-400 line-through")]}>
+                  <div class="min-w-0 flex-1">
+                    <p class={[
+                      "truncate text-sm font-medium",
+                      if(category.active, do: "text-stone-900", else: "text-stone-400 line-through")
+                    ]}>
                       {category.name}
                     </p>
-                    <p class="text-xs text-stone-500 truncate">{category.slug}</p>
+                    <p class="truncate text-xs text-stone-500">{category.slug}</p>
                   </div>
-                  <span class={["inline-flex rounded-full px-2 py-0.5 text-xs font-medium", if(category.active, do: "bg-green-100 text-green-700", else: "bg-stone-200 text-stone-600")]}>
+                  <span class={[
+                    "inline-flex rounded-full px-2 py-0.5 text-xs font-medium",
+                    if(category.active,
+                      do: "bg-green-100 text-green-700",
+                      else: "bg-stone-200 text-stone-600"
+                    )
+                  ]}>
                     {if category.active, do: "Activa", else: "Oculta"}
                   </span>
                   <.link
@@ -126,7 +138,12 @@ defmodule CraftplanWeb.SettingsLive.CategoriesComponent do
           phx-change="validate"
           phx-submit="save"
         >
-          <.input field={@form[:name]} type="text" label="Nombre de la categoría" placeholder="Ej: Sticker, Camisetas..." />
+          <.input
+            field={@form[:name]}
+            type="text"
+            label="Nombre de la categoría"
+            placeholder="Ej: Sticker, Camisetas..."
+          />
           <:actions>
             <.button variant={:primary} phx-disable-with="Guardando...">Guardar categoría</.button>
           </:actions>
@@ -138,7 +155,11 @@ defmodule CraftplanWeb.SettingsLive.CategoriesComponent do
 
   @impl true
   def update(assigns, socket) do
-    categories = Catalog.list_categories!(actor: assigns[:current_user] || nil) |> Enum.sort_by(& &1.name)
+    categories =
+      [actor: assigns[:current_user] || nil]
+      |> Catalog.list_categories!()
+      |> Enum.sort_by(& &1.name)
+
     form = new_category_form(assigns.current_user)
     search_query = Map.get(socket.assigns, :search_query, "")
 
@@ -162,12 +183,18 @@ defmodule CraftplanWeb.SettingsLive.CategoriesComponent do
   def handle_event("save", %{"category" => params}, socket) do
     case AshPhoenix.Form.submit(socket.assigns.form, params: params) do
       {:ok, _category} ->
-        categories = Catalog.list_categories!(actor: socket.assigns.current_user) |> Enum.sort_by(& &1.name)
+        categories =
+          [actor: socket.assigns.current_user]
+          |> Catalog.list_categories!()
+          |> Enum.sort_by(& &1.name)
 
         {:noreply,
          socket
          |> assign(:categories, categories)
-         |> assign(:visible_categories, filter_categories(categories, socket.assigns.search_query))
+         |> assign(
+           :visible_categories,
+           filter_categories(categories, socket.assigns.search_query)
+         )
          |> assign(:form, new_category_form(socket.assigns.current_user))
          |> assign(:show_modal, false)
          |> put_flash(:info, "Categoría agregada correctamente")}
@@ -189,12 +216,18 @@ defmodule CraftplanWeb.SettingsLive.CategoriesComponent do
 
     case Ash.destroy(category, actor: socket.assigns.current_user) do
       :ok ->
-        categories = Catalog.list_categories!(actor: socket.assigns.current_user) |> Enum.sort_by(& &1.name)
+        categories =
+          [actor: socket.assigns.current_user]
+          |> Catalog.list_categories!()
+          |> Enum.sort_by(& &1.name)
 
         {:noreply,
          socket
          |> assign(:categories, categories)
-         |> assign(:visible_categories, filter_categories(categories, socket.assigns.search_query))
+         |> assign(
+           :visible_categories,
+           filter_categories(categories, socket.assigns.search_query)
+         )
          |> put_flash(:info, "Categoría eliminada correctamente")}
 
       {:error, error} ->
@@ -208,12 +241,18 @@ defmodule CraftplanWeb.SettingsLive.CategoriesComponent do
 
     case Catalog.update_category(category, %{active: !category.active}, actor: socket.assigns.current_user) do
       {:ok, _} ->
-        categories = Catalog.list_categories!(actor: socket.assigns.current_user) |> Enum.sort_by(& &1.name)
+        categories =
+          [actor: socket.assigns.current_user]
+          |> Catalog.list_categories!()
+          |> Enum.sort_by(& &1.name)
 
         {:noreply,
          socket
          |> assign(:categories, categories)
-         |> assign(:visible_categories, filter_categories(categories, socket.assigns.search_query))}
+         |> assign(
+           :visible_categories,
+           filter_categories(categories, socket.assigns.search_query)
+         )}
 
       {:error, _} ->
         {:noreply, put_flash(socket, :error, "No se pudo actualizar la categoría")}
@@ -233,7 +272,11 @@ defmodule CraftplanWeb.SettingsLive.CategoriesComponent do
   @impl true
   def handle_event("filter_categories", params, socket) do
     query = params |> Map.get("query", "") |> String.trim()
-    {:noreply, socket |> assign(:search_query, query) |> assign(:visible_categories, filter_categories(socket.assigns.categories, query))}
+
+    {:noreply,
+     socket
+     |> assign(:search_query, query)
+     |> assign(:visible_categories, filter_categories(socket.assigns.categories, query))}
   end
 
   defp new_category_form(user) do
@@ -248,7 +291,8 @@ defmodule CraftplanWeb.SettingsLive.CategoriesComponent do
     down = String.downcase(query)
 
     Enum.filter(categories, fn c ->
-      String.contains?(String.downcase(c.name), down) or String.contains?(String.downcase(c.slug), down)
+      String.contains?(String.downcase(c.name), down) or
+        String.contains?(String.downcase(c.slug), down)
     end)
   end
 end

@@ -8,18 +8,22 @@ This is a fork of the upstream Craftplan project, customized for a specific loca
 
 ## Build & Development Commands
 
+Elixir/Erlang are managed by **mise** (see `mise.toml`) and `mix` is not on `PATH` directly in this environment. Prefix every `mix` command with `mise exec --`, or use the equivalent `mise run <task>` (tasks are defined in `mise.toml`).
+
 ```bash
-mix setup              # Full setup: deps, ash.setup, assets, seeds
-mix phx.server         # Start dev server at localhost:4000
-mix test               # Run all tests (runs ash.setup --quiet first)
-mix test path/to/test.exs            # Run a single test file
-mix test path/to/test.exs:42         # Run a specific test at line
-mix format             # Format all code (Styler, Spark, Tailwind, HEEx)
-mix dialyzer           # Static type analysis
-mix ash.setup          # Run migrations + Ash introspection
-mix ash.reset          # Drop, create, migrate, seed
-docker-compose up -d   # Start PostgreSQL 16 + MinIO (S3-compatible storage)
+mise exec -- mix setup              # Full setup: deps, ash.setup, assets, seeds
+mise exec -- mix phx.server         # Start dev server at localhost:4000
+mise exec -- mix test               # Run all tests (runs ash.setup --quiet first)
+mise exec -- mix test path/to/test.exs            # Run a single test file
+mise exec -- mix test path/to/test.exs:42         # Run a specific test at line
+mise exec -- mix format             # Format all code (Styler, Spark, Tailwind, HEEx)
+mise exec -- mix dialyzer           # Static type analysis
+mise exec -- mix ash.setup          # Run migrations + Ash introspection
+mise exec -- mix ash.reset          # Drop, create, migrate, seed
+docker-compose up -d                # Start PostgreSQL 16 + MinIO (S3-compatible storage)
 ```
+
+> **Note (Windows dev machines):** `mise exec -- mix test` may fail to compile `bcrypt_elixir`'s native NIF with `"nmake" not found in the path` if MSVC Build Tools (C++ workload) aren't installed. `mise exec -- mix compile` and `mise exec -- mix format --check-formatted` don't need it and are reliable smoke checks when this happens. Confirm test runs in Docker/WSL if the native toolchain isn't available locally.
 
 ## Architecture
 

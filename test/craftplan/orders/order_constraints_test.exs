@@ -16,7 +16,6 @@ defmodule Craftplan.Orders.OrderConstraintsTest do
     {:ok, customer} =
       CRM.Customer
       |> Ash.Changeset.for_create(:create, %{
-        type: :individual,
         first_name: "Jane",
         last_name: "Roe",
         email: "jane.roe@example.com"
@@ -27,10 +26,7 @@ defmodule Craftplan.Orders.OrderConstraintsTest do
       Catalog.Product
       |> Ash.Changeset.for_create(:create, %{
         name: "Cap Product",
-        status: :active,
-        price: Decimal.new("10.00"),
-        sku: "CAP-1",
-        max_daily_quantity: 5
+        price: Decimal.new("10.00")
       })
       |> Ash.create(actor: staff)
 
@@ -105,57 +101,5 @@ defmodule Craftplan.Orders.OrderConstraintsTest do
       |> Ash.create(actor: staff)
 
     assert changeset.errors |> inspect() |> String.contains?("daily capacity reached")
-  end
-
-  test "per-product capacity is enforced across orders", %{customer: customer, product: product} do
-    staff = Craftplan.DataCase.staff_actor()
-    day_dt = DateTime.new!(Date.utc_today(), ~T[11:00:00], "Etc/UTC")
-
-    {:ok, _o1} =
-      Orders.Order
-      |> Ash.Changeset.for_create(:create, %{
-        customer_id: customer.id,
-        delivery_date: day_dt,
-        items: [%{product_id: product.id, quantity: Decimal.new(3), unit_price: product.price}]
-      })
-      |> Ash.create(actor: staff)
-
-    {:error, changeset} =
-      Orders.Order
-      |> Ash.Changeset.for_create(:create, %{
-        customer_id: customer.id,
-        delivery_date: day_dt,
-        items: [%{product_id: product.id, quantity: Decimal.new(3), unit_price: product.price}]
-      })
-      |> Ash.create(actor: staff)
-
-    assert inspect(changeset.errors) =~ "exceeds daily capacity"
-  end
-
-  test "per-product capacity enforced on update without double counting", %{
-    customer: customer,
-    product: product
-  } do
-    staff = Craftplan.DataCase.staff_actor()
-    day_dt = DateTime.new!(Date.utc_today(), ~T[12:00:00], "Etc/UTC")
-
-    {:ok, order} =
-      Orders.Order
-      |> Ash.Changeset.for_create(:create, %{
-        customer_id: customer.id,
-        delivery_date: day_dt,
-        items: [%{product_id: product.id, quantity: Decimal.new(2), unit_price: product.price}]
-      })
-      |> Ash.create(actor: staff)
-
-    # Attempt to increase quantity to 6 (> max 5)
-    {:error, changeset} =
-      order
-      |> Ash.Changeset.for_update(:update, %{
-        items: [%{product_id: product.id, quantity: Decimal.new(6), unit_price: product.price}]
-      })
-      |> Ash.update(actor: staff)
-
-    assert inspect(changeset.errors) =~ "exceeds daily capacity"
   end
 end

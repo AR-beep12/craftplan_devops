@@ -40,8 +40,6 @@ defmodule CraftplanWeb.ManageProductLabelLiveTest do
       Product
       |> Ash.Changeset.for_create(:create, %{
         name: "Sourdough Bread",
-        sku: Base.encode16("SKU-" <> :crypto.strong_rand_bytes(4), case: :lower),
-        status: :active,
         price: Decimal.new("6.50")
       })
       |> Ash.create!(actor: staff)
@@ -66,15 +64,15 @@ defmodule CraftplanWeb.ManageProductLabelLiveTest do
   test "renders product label with ingredients and allergens", %{conn: conn} do
     product = create_product_with_recipe!()
 
-    {:ok, _view, html} = live(conn, ~p"/manage/products/#{product.sku}/label")
+    {:ok, _view, html} = live(conn, ~p"/manage/products/#{product.id}/label")
 
-    assert html =~ "Product Label"
+    assert html =~ "Etiqueta del producto"
     assert html =~ product.name
     # Ingredient name from recipe component
     assert html =~ "Flour"
     # Allergen badge text
     assert html =~ "Gluten"
     # Batch code prefix
-    assert html =~ "Batch"
+    assert html =~ "Lote"
   end
 end

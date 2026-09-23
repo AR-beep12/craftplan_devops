@@ -13,9 +13,7 @@ defmodule CraftplanWeb.ManageProductsRecipeEmptyQuantityLiveTest do
     Product
     |> Ash.Changeset.for_create(:create, %{
       name: "P-#{System.unique_integer()}",
-      sku: "SKU-#{System.unique_integer()}",
-      price: Decimal.new("5.00"),
-      status: :active
+      price: Decimal.new("5.00")
     })
     |> Ash.create!(actor: staff())
   end
@@ -37,7 +35,6 @@ defmodule CraftplanWeb.ManageProductsRecipeEmptyQuantityLiveTest do
       BOM
       |> Ash.Changeset.for_create(:create, %{
         product_id: p.id,
-        status: :active,
         components: [%{component_type: :material, material_id: m.id, quantity: Decimal.new(1)}]
       })
       |> Ash.create!(actor: staff())
@@ -50,7 +47,7 @@ defmodule CraftplanWeb.ManageProductsRecipeEmptyQuantityLiveTest do
 
     @tag role: :staff
     test "empty quantity on validate does not crash", %{conn: conn, product: p, material: m} do
-      {:ok, view, _html} = live(conn, ~p"/manage/products/#{p.sku}/recipe")
+      {:ok, view, _html} = live(conn, ~p"/manage/products/#{p.id}/details")
 
       view
       |> element("#recipe-form")
@@ -67,7 +64,7 @@ defmodule CraftplanWeb.ManageProductsRecipeEmptyQuantityLiveTest do
       product: p,
       material: m
     } do
-      {:ok, view, _html} = live(conn, ~p"/manage/products/#{p.sku}/recipe")
+      {:ok, view, _html} = live(conn, ~p"/manage/products/#{p.id}/details")
 
       view
       |> element("#recipe-form")
@@ -80,7 +77,7 @@ defmodule CraftplanWeb.ManageProductsRecipeEmptyQuantityLiveTest do
 
     @tag role: :staff
     test "valid quantity still works after fix", %{conn: conn, product: p, material: m} do
-      {:ok, view, _html} = live(conn, ~p"/manage/products/#{p.sku}/recipe")
+      {:ok, view, _html} = live(conn, ~p"/manage/products/#{p.id}/details")
 
       view
       |> element("#recipe-form")
@@ -94,7 +91,7 @@ defmodule CraftplanWeb.ManageProductsRecipeEmptyQuantityLiveTest do
         "recipe" => %{"components" => %{"0" => %{"material_id" => m.id, "quantity" => "2.5"}}}
       })
 
-      assert render(view) =~ "Recipe saved successfully"
+      assert render(view) =~ "Material guardado exitosamente"
     end
   end
 end

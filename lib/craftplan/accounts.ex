@@ -10,6 +10,7 @@ defmodule Craftplan.Accounts do
       define :list_admin_users, action: :list_admins
       define :list_members, action: :list_members
       define :invite_member, action: :invite
+      define :create_member, action: :create_member
       define :update_user_role, action: :update_role
       define :remove_member, action: :remove_member
     end

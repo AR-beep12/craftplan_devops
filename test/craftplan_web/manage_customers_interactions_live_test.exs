@@ -42,7 +42,7 @@ defmodule CraftplanWeb.ManageCustomersInteractionsLiveTest do
     |> element("#customer-form")
     |> render_submit(params)
 
-    assert render(view) =~ "Customer created successfully"
+    assert render(view) =~ "Cliente creado correctamente"
     assert render(view) =~ email
   end
 

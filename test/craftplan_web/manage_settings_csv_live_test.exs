@@ -59,6 +59,6 @@ defmodule CraftplanWeb.ManageSettingsCSVLiveTest do
       }
     })
 
-    assert render(view) =~ "Dry run: 1 rows valid, 0 errors"
+    assert render(view) =~ "Ejecución de prueba: 1 filas válidas, 0 errores"
   end
 end

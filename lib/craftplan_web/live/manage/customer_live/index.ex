@@ -37,6 +37,12 @@ defmodule CraftplanWeb.CustomerLive.Index do
         <:col :let={{_, customer}} label="Teléfono">{customer.phone}</:col>
 
         <:action :let={{_, customer}}>
+          <.link patch={~p"/manage/customers/#{customer.reference}/edit"}>
+            <.button size={:sm} variant={:secondary}>
+              Editar
+            </.button>
+          </.link>
+
           <.link
             phx-click={
               JS.push("delete", value: %{id: customer.id}) |> hide("#customer-#{customer.id}")

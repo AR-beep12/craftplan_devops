@@ -95,9 +95,7 @@ defmodule CraftplanWeb.ProductionBatchLive.Show do
         <Page.section class="mt-6">
           <Page.surface>
             <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              <.summary_card label="Producto" value={@product && @product.name}>
-                <div class="text-xs text-stone-500">{@product && @product.sku}</div>
-              </.summary_card>
+              <.summary_card label="Producto" value={@product && @product.name} />
 
               <.summary_card
                 label="Estado"

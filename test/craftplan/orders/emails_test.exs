@@ -14,7 +14,6 @@ defmodule Craftplan.Orders.EmailsTest do
     {:ok, customer} =
       CRM.Customer
       |> Ash.Changeset.for_create(:create, %{
-        type: :individual,
         first_name: "Pat",
         last_name: "Buyer",
         email: "buyer@example.com"
@@ -25,9 +24,7 @@ defmodule Craftplan.Orders.EmailsTest do
       Catalog.Product
       |> Ash.Changeset.for_create(:create, %{
         name: "Email Test Product",
-        status: :active,
-        price: Decimal.new("9.99"),
-        sku: "EMAIL-1"
+        price: Decimal.new("9.99")
       })
       |> Ash.create(actor: staff)
 

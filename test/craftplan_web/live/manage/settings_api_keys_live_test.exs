@@ -22,7 +22,7 @@ defmodule CraftplanWeb.SettingsApiKeysLiveTest do
 
       {:ok, view, _html} = live(conn, ~p"/manage/settings/api_keys")
 
-      assert has_element?(view, "header", "API Keys")
+      assert has_element?(view, "header", "Claves API")
     end
 
     test "renders empty state when no keys exist", %{conn: conn} do
@@ -30,7 +30,7 @@ defmodule CraftplanWeb.SettingsApiKeysLiveTest do
 
       {:ok, view, _html} = live(conn, ~p"/manage/settings/api_keys")
 
-      assert has_element?(view, "div", "No API keys yet")
+      assert has_element?(view, "div", "Aún no hay claves API")
     end
 
     test "lists existing keys with name and prefix", %{conn: conn} do
@@ -55,7 +55,7 @@ defmodule CraftplanWeb.SettingsApiKeysLiveTest do
 
       {:ok, view, _html} = live(conn, ~p"/manage/settings/api_keys")
 
-      view |> element("button", "Create API Key") |> render_click()
+      view |> element("button", "Crear clave API") |> render_click()
 
       assert has_element?(view, "#create-api-key-modal")
       assert has_element?(view, "#api-key-form")
@@ -66,7 +66,7 @@ defmodule CraftplanWeb.SettingsApiKeysLiveTest do
 
       {:ok, view, _html} = live(conn, ~p"/manage/settings/api_keys")
 
-      view |> element("button", "Create API Key") |> render_click()
+      view |> element("button", "Crear clave API") |> render_click()
 
       view
       |> form("#api-key-form", %{"api_key" => %{"name" => "New Key"}})
@@ -79,7 +79,7 @@ defmodule CraftplanWeb.SettingsApiKeysLiveTest do
       assert has_element?(view, "#raw-key-display")
       html = render(view)
       assert html =~ "cpk_"
-      assert html =~ "copy it now"
+      assert html =~ "Copiar"
     end
 
     test "new key appears in table", %{conn: conn} do
@@ -87,7 +87,7 @@ defmodule CraftplanWeb.SettingsApiKeysLiveTest do
 
       {:ok, view, _html} = live(conn, ~p"/manage/settings/api_keys")
 
-      view |> element("button", "Create API Key") |> render_click()
+      view |> element("button", "Crear clave API") |> render_click()
 
       view
       |> form("#api-key-form", %{"api_key" => %{"name" => "Listed Key"}})
@@ -112,11 +112,11 @@ defmodule CraftplanWeb.SettingsApiKeysLiveTest do
 
       {:ok, view, _html} = live(conn, ~p"/manage/settings/api_keys")
 
-      assert has_element?(view, "span", "Active")
+      assert has_element?(view, "span", "Activa")
 
-      view |> element("button", "Revoke") |> render_click()
+      view |> element("button", "Revocar") |> render_click()
 
-      assert has_element?(view, "span", "Revoked")
+      assert has_element?(view, "span", "Revocada")
     end
   end
 end

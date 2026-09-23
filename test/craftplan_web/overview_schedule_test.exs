@@ -14,9 +14,7 @@ defmodule CraftplanWeb.OverviewScheduleTest do
     Product
     |> Ash.Changeset.for_create(:create, %{
       name: "P-#{System.unique_integer([:positive])}",
-      sku: "SKU-#{System.unique_integer([:positive])}",
-      price: Decimal.new("5.00"),
-      status: :active
+      price: Decimal.new("5.00")
     })
     |> Ash.create!(actor: staff())
   end
@@ -24,7 +22,6 @@ defmodule CraftplanWeb.OverviewScheduleTest do
   defp customer! do
     Craftplan.CRM.Customer
     |> Ash.Changeset.for_create(:create, %{
-      type: :individual,
       first_name: "T",
       last_name: "U"
     })
@@ -106,7 +103,7 @@ defmodule CraftplanWeb.OverviewScheduleTest do
       {:ok, view, html} = live(conn, ~p"/manage/production/schedule?view=day")
 
       assert html =~ product.name
-      assert html =~ "Unbatched"
+      assert html =~ "Sin lotear"
       assert has_element?(view, ~s(.kanban-column[data-status="unbatched"]))
     end
 
@@ -140,8 +137,8 @@ defmodule CraftplanWeb.OverviewScheduleTest do
 
       html = render(view)
       assert html =~ order.reference
-      assert html =~ "Not Batched"
-      assert html =~ "Batch All"
+      assert html =~ "Sin lotear"
+      assert html =~ "Lotear todo"
     end
 
     @tag role: :staff
@@ -159,7 +156,7 @@ defmodule CraftplanWeb.OverviewScheduleTest do
 
       html = render(view)
       assert html =~ order.reference
-      assert html =~ "View full batch"
+      assert html =~ "Ver lote completo"
     end
   end
 
@@ -179,11 +176,11 @@ defmodule CraftplanWeb.OverviewScheduleTest do
 
       # Click Batch All in the modal
       view
-      |> element("button", "Batch All")
+      |> element("button", "Lotear todo")
       |> render_click()
 
       html = render(view)
-      assert html =~ "created"
+      assert html =~ "creado"
     end
   end
 
@@ -204,11 +201,11 @@ defmodule CraftplanWeb.OverviewScheduleTest do
 
       # Click Start in the modal
       view
-      |> element("button", "Start")
+      |> element("button", "Iniciar")
       |> render_click()
 
       html = render(view)
-      assert html =~ "started"
+      assert html =~ "iniciado"
 
       assert has_element?(
                view,
@@ -237,11 +234,11 @@ defmodule CraftplanWeb.OverviewScheduleTest do
 
       # Click Mark Done to show completion form
       view
-      |> element("button", "Mark Done")
+      |> element("button", "Marcar como completado")
       |> render_click()
 
       html = render(view)
-      assert html =~ "Produced qty"
+      assert html =~ "Cantidad producida"
       assert html =~ "Cancel"
 
       # Submit completion form
@@ -300,7 +297,7 @@ defmodule CraftplanWeb.OverviewScheduleTest do
       })
 
       html = render(view)
-      assert html =~ "started"
+      assert html =~ "iniciado"
 
       assert has_element?(
                view,
@@ -330,8 +327,8 @@ defmodule CraftplanWeb.OverviewScheduleTest do
 
       html = render(view)
       # Should open modal with completion form
-      assert html =~ "Produced qty"
-      assert html =~ "Complete"
+      assert html =~ "Cantidad producida"
+      assert html =~ "Completar"
     end
 
     @tag role: :staff
@@ -355,7 +352,7 @@ defmodule CraftplanWeb.OverviewScheduleTest do
       })
 
       html = render(view)
-      assert html =~ "Cannot move a batch backward"
+      assert html =~ "No se puede mover un lote hacia atrás"
     end
 
     @tag role: :staff
@@ -376,7 +373,7 @@ defmodule CraftplanWeb.OverviewScheduleTest do
       })
 
       html = render(view)
-      assert html =~ "Batch must be started before completing"
+      assert html =~ "El lote debe iniciarse antes de completarse"
     end
   end
 
@@ -390,7 +387,7 @@ defmodule CraftplanWeb.OverviewScheduleTest do
       {:ok, _view, html} = live(conn, ~p"/manage/production/schedule?view=week")
 
       assert html =~ product.name
-      assert html =~ "Unbatched"
+      assert html =~ "Sin lotear"
     end
 
     @tag role: :staff
@@ -408,7 +405,7 @@ defmodule CraftplanWeb.OverviewScheduleTest do
       html = render_patch(view, ~p"/manage/production/schedule?view=day&date=#{date}")
 
       # After patch, we should be in day view with kanban columns
-      assert html =~ "Unbatched"
+      assert html =~ "Sin lotear"
     end
   end
 

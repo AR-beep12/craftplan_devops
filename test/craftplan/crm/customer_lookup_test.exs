@@ -7,7 +7,6 @@ defmodule Craftplan.CRM.CustomerLookupTest do
     {:ok, customer} =
       CRM.Customer
       |> Ash.Changeset.for_create(:create, %{
-        type: :individual,
         first_name: "Alex",
         last_name: "Guest",
         email: "guest@example.com"

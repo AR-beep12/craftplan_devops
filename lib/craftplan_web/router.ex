@@ -7,20 +7,8 @@ defmodule CraftplanWeb.Router do
   #
   # Plugs
   #
-  # Content Security Policy compatible with LiveView and topbar
-  @csp Enum.join(
-         [
-           "default-src 'self'",
-           "base-uri 'self'",
-           "frame-ancestors 'self'",
-           "img-src 'self' data: blob: http://minio:9000 http://localhost:9000",
-           "style-src 'self' 'unsafe-inline'",
-           "font-src 'self' data:",
-           "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-           "connect-src 'self' ws: wss:"
-         ],
-         "; "
-       )
+  # Content Security Policy compatible with LiveView and topbar.
+  # Built per request so the public S3/MinIO origin can come from the environment.
 
   def put_session_timezone(conn, _opts) do
     timezone = conn.cookies["timezone"]
@@ -259,5 +247,45 @@ defmodule CraftplanWeb.Router do
   # Phoenix 1.8 secures defaults in `put_secure_browser_headers`. We provide an
   # explicit CSP compatible with LiveView, topbar, and dev websocket connections.
   # Tighten as needed for your deployment.
-  defp put_csp(conn, _opts), do: Plug.Conn.put_resp_header(conn, "content-security-policy", @csp)
+  defp put_csp(conn, _opts), do: Plug.Conn.put_resp_header(conn, "content-security-policy", csp())
+
+  defp csp do
+    Enum.join(
+      [
+        "default-src 'self'",
+        "base-uri 'self'",
+        "frame-ancestors 'self'",
+        Enum.join(
+          [
+            "img-src 'self' data: blob: http://minio:9000 http://localhost:9000"
+            | public_s3_origin()
+          ],
+          " "
+        ),
+        "style-src 'self' 'unsafe-inline' https://rsms.me",
+        "font-src 'self' data: https://rsms.me",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+        "connect-src 'self' ws: wss:"
+      ],
+      "; "
+    )
+  end
+
+  # Browser-reachable origin of the S3/MinIO server that serves product photos
+  # (same variables used by CraftplanWeb.PhotoUrl).
+  defp public_s3_origin do
+    case System.get_env("AWS_S3_PUBLIC_HOST") do
+      host when host in [nil, ""] ->
+        []
+
+      host ->
+        scheme = System.get_env("AWS_S3_PUBLIC_SCHEME") || "http://"
+        port = System.get_env("AWS_S3_PUBLIC_PORT") || "9000"
+
+        default_port? =
+          (scheme == "https://" and port == "443") or (scheme == "http://" and port == "80")
+
+        [if(default_port?, do: scheme <> host, else: "#{scheme}#{host}:#{port}")]
+    end
+  end
 end

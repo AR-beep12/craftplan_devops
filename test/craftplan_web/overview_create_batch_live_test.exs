@@ -27,9 +27,7 @@ defmodule CraftplanWeb.OverviewCreateBatchLiveTest do
       Product
       |> Ash.Changeset.for_create(:create, %{
         name: "P-#{System.unique_integer()}",
-        sku: "SKU-#{System.unique_integer()}",
-        price: Decimal.new("3.00"),
-        status: :active
+        price: Decimal.new("3.00")
       })
       |> Ash.create!(actor: Craftplan.DataCase.staff_actor())
 
@@ -39,8 +37,7 @@ defmodule CraftplanWeb.OverviewCreateBatchLiveTest do
         product_id: prod.id,
         components: [
           %{"component_type" => :material, "material_id" => material.id, "quantity" => 1}
-        ],
-        status: :active
+        ]
       })
       |> Ash.create!()
 
@@ -53,7 +50,6 @@ defmodule CraftplanWeb.OverviewCreateBatchLiveTest do
       customer_id:
         Craftplan.CRM.Customer
         |> Ash.Changeset.for_create(:create, %{
-          type: :individual,
           first_name: "Grace",
           last_name: "Hopper"
         })
@@ -82,12 +78,12 @@ defmodule CraftplanWeb.OverviewCreateBatchLiveTest do
     |> render_click()
 
     view
-    |> element("button", "Batch All")
+    |> element("button", "Lotear todo")
     |> render_click()
 
     # Should stay on page (no redirect), show flash
     html = render(view)
-    assert html =~ "created"
+    assert html =~ "creado"
 
     # Fetch the newly created batch
     {:ok, batch} =
@@ -148,13 +144,13 @@ defmodule CraftplanWeb.OverviewCreateBatchLiveTest do
       |> render_click()
 
       view
-      |> element("button", "Batch All")
+      |> element("button", "Lotear todo")
       |> render_click()
 
       assert render(view) =~ "Nothing remaining to allocate"
     else
       # Item is already in a batch column — no unbatched card expected
-      assert html =~ "Open"
+      assert html =~ "Abierto"
     end
   end
 end

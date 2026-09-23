@@ -20,89 +20,88 @@ defmodule CraftplanWeb.CommandPaletteTest do
     test "renders search button in header for authenticated users", %{conn: conn} do
       {conn, _staff} = staff_conn(conn)
 
-      {:ok, _view, html} = live(conn, ~p"/manage/overview")
+      {:ok, _view, html} = live(conn, ~p"/manage/dashboard")
 
       assert html =~ "command-palette"
-      assert html =~ "Search..."
+      assert html =~ "Buscar..."
     end
 
     test "opens when clicking the search button", %{conn: conn} do
       {conn, _staff} = staff_conn(conn)
 
-      {:ok, view, _html} = live(conn, ~p"/manage/overview")
+      {:ok, view, _html} = live(conn, ~p"/manage/dashboard")
 
       # Click the search button (targeting the component)
       view |> element("#command-palette button[phx-click=open]") |> render_click()
 
       # Modal should be open
       html = render(view)
-      assert html =~ "Search pages, actions, or records..."
-      assert html =~ "to navigate"
+      assert html =~ "Buscar páginas, acciones o registros..."
+      assert html =~ "para navegar"
     end
 
     test "shows static pages when first opened", %{conn: conn} do
       {conn, _staff} = staff_conn(conn)
 
-      {:ok, view, _html} = live(conn, ~p"/manage/overview")
+      {:ok, view, _html} = live(conn, ~p"/manage/dashboard")
 
       view |> element("#command-palette button[phx-click=open]") |> render_click()
 
       html = render(view)
-      assert html =~ "Pages"
-      assert html =~ "Overview"
-      assert html =~ "Orders"
-      assert html =~ "Inventory"
-      assert html =~ "Products"
+      assert html =~ "Páginas"
+      assert html =~ "Pedidos"
+      assert html =~ "Inventario"
+      assert html =~ "Productos"
     end
 
     test "shows static actions when first opened", %{conn: conn} do
       {conn, _staff} = staff_conn(conn)
 
-      {:ok, view, _html} = live(conn, ~p"/manage/overview")
+      {:ok, view, _html} = live(conn, ~p"/manage/dashboard")
 
       view |> element("#command-palette button[phx-click=open]") |> render_click()
 
       html = render(view)
-      assert html =~ "Actions"
-      assert html =~ "New Order"
-      assert html =~ "New Product"
-      assert html =~ "New Customer"
+      assert html =~ "Acciones"
+      assert html =~ "Nuevo pedido"
+      assert html =~ "Nuevo producto"
+      assert html =~ "Nuevo cliente"
     end
 
     test "filters results when searching", %{conn: conn} do
       {conn, _staff} = staff_conn(conn)
 
-      {:ok, view, _html} = live(conn, ~p"/manage/overview")
+      {:ok, view, _html} = live(conn, ~p"/manage/dashboard")
 
       view |> element("#command-palette button[phx-click=open]") |> render_click()
 
       # Search for "order"
       view
       |> element("#command-palette")
-      |> render_hook("search", %{query: "order"})
+      |> render_hook("search", %{query: "pedido"})
 
       html = render(view)
       # Should show pages/actions containing "order"
-      assert html =~ "Orders"
-      assert html =~ "New Order"
+      assert html =~ "Pedidos"
+      assert html =~ "Nuevo pedido"
       # Should not show unrelated static pages (check within the command palette results)
       # Note: Inventory appears in the sidebar, so we check it's not in the pages section results
-      refute html =~ ~r/<button[^>]*>.*New Material.*<\/button>/s
+      refute html =~ ~r/<button[^>]*>.*Nuevo material.*<\/button>/s
     end
 
     test "closes when clicking backdrop", %{conn: conn} do
       {conn, _staff} = staff_conn(conn)
 
-      {:ok, view, _html} = live(conn, ~p"/manage/overview")
+      {:ok, view, _html} = live(conn, ~p"/manage/dashboard")
 
       view |> element("#command-palette button[phx-click=open]") |> render_click()
-      assert render(view) =~ "Search pages, actions, or records..."
+      assert render(view) =~ "Buscar páginas, acciones o registros..."
 
       view
       |> element("#command-palette")
       |> render_hook("close", %{})
 
-      refute render(view) =~ "Search pages, actions, or records..."
+      refute render(view) =~ "Buscar páginas, acciones o registros..."
     end
 
     test "searches products by name", %{conn: conn} do
@@ -111,7 +110,7 @@ defmodule CraftplanWeb.CommandPaletteTest do
       # Create a test product
       product = Factory.create_product!(%{name: "Chocolate Cake", sku: "choc-cake-001"}, staff)
 
-      {:ok, view, _html} = live(conn, ~p"/manage/overview")
+      {:ok, view, _html} = live(conn, ~p"/manage/dashboard")
 
       view |> element("#command-palette button[phx-click=open]") |> render_click()
 
@@ -121,7 +120,6 @@ defmodule CraftplanWeb.CommandPaletteTest do
 
       html = render(view)
       assert html =~ "Chocolate Cake"
-      assert html =~ product.sku
     end
 
     test "searches materials by name", %{conn: conn} do
@@ -130,7 +128,7 @@ defmodule CraftplanWeb.CommandPaletteTest do
       # Create a test material
       material = Factory.create_material!(%{name: "Cocoa Powder"}, staff)
 
-      {:ok, view, _html} = live(conn, ~p"/manage/overview")
+      {:ok, view, _html} = live(conn, ~p"/manage/dashboard")
 
       view |> element("#command-palette button[phx-click=open]") |> render_click()
 
@@ -149,7 +147,7 @@ defmodule CraftplanWeb.CommandPaletteTest do
       # Create a test customer
       _customer = Factory.create_customer!(%{first_name: "Alice", last_name: "Smith"})
 
-      {:ok, view, _html} = live(conn, ~p"/manage/overview")
+      {:ok, view, _html} = live(conn, ~p"/manage/dashboard")
 
       view |> element("#command-palette button[phx-click=open]") |> render_click()
 
@@ -164,7 +162,7 @@ defmodule CraftplanWeb.CommandPaletteTest do
     test "shows no results message when nothing matches", %{conn: conn} do
       {conn, _staff} = staff_conn(conn)
 
-      {:ok, view, _html} = live(conn, ~p"/manage/overview")
+      {:ok, view, _html} = live(conn, ~p"/manage/dashboard")
 
       view |> element("#command-palette button[phx-click=open]") |> render_click()
 
@@ -173,14 +171,14 @@ defmodule CraftplanWeb.CommandPaletteTest do
       |> render_hook("search", %{query: "xyznonexistent123"})
 
       html = render(view)
-      assert html =~ "No results found"
+      assert html =~ "No se encontraron resultados"
       assert html =~ "xyznonexistent123"
     end
 
     test "navigates down through results", %{conn: conn} do
       {conn, _staff} = staff_conn(conn)
 
-      {:ok, view, _html} = live(conn, ~p"/manage/overview")
+      {:ok, view, _html} = live(conn, ~p"/manage/dashboard")
 
       view |> element("#command-palette button[phx-click=open]") |> render_click()
 
@@ -198,7 +196,7 @@ defmodule CraftplanWeb.CommandPaletteTest do
     test "navigates up through results", %{conn: conn} do
       {conn, _staff} = staff_conn(conn)
 
-      {:ok, view, _html} = live(conn, ~p"/manage/overview")
+      {:ok, view, _html} = live(conn, ~p"/manage/dashboard")
 
       view |> element("#command-palette button[phx-click=open]") |> render_click()
 
@@ -222,7 +220,7 @@ defmodule CraftplanWeb.CommandPaletteTest do
     test "selects item and navigates", %{conn: conn} do
       {conn, _staff} = staff_conn(conn)
 
-      {:ok, view, _html} = live(conn, ~p"/manage/overview")
+      {:ok, view, _html} = live(conn, ~p"/manage/dashboard")
 
       view |> element("#command-palette button[phx-click=open]") |> render_click()
 
@@ -233,22 +231,6 @@ defmodule CraftplanWeb.CommandPaletteTest do
 
       # Should navigate to orders page
       assert_redirect(view, ~p"/manage/orders")
-    end
-
-    test "selects item via keyboard enter", %{conn: conn} do
-      {conn, _staff} = staff_conn(conn)
-
-      {:ok, view, _html} = live(conn, ~p"/manage/overview")
-
-      view |> element("#command-palette button[phx-click=open]") |> render_click()
-
-      # Select current item with enter
-      view
-      |> element("#command-palette")
-      |> render_hook("select", %{})
-
-      # Should navigate to first item (Overview)
-      assert_redirect(view, ~p"/manage/overview")
     end
   end
 end

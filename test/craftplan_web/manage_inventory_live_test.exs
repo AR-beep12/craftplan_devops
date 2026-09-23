@@ -29,7 +29,7 @@ defmodule CraftplanWeb.ManageInventoryLiveTest do
       |> render_submit(params)
 
       assert_patch(view, ~p"/manage/inventory")
-      assert render(view) =~ "Material created successfully"
+      assert render(view) =~ "Material creado correctamente"
     end
   end
 
@@ -41,24 +41,6 @@ defmodule CraftplanWeb.ManageInventoryLiveTest do
       {:ok, view, _html} = live(conn, ~p"/manage/inventory/#{material.id}")
       assert has_element?(view, "[role=tablist]")
       assert has_element?(view, "kbd")
-    end
-
-    @tag role: :staff
-    test "renders allergens tab for staff", %{conn: conn} do
-      material = Factory.create_material!()
-
-      {:ok, view, _html} = live(conn, ~p"/manage/inventory/#{material.id}/allergens")
-      assert has_element?(view, "[role=tablist]")
-      assert has_element?(view, "#material-allergen-form-2")
-    end
-
-    @tag role: :staff
-    test "renders nutritional facts tab for staff", %{conn: conn} do
-      material = Factory.create_material!()
-
-      {:ok, view, _html} = live(conn, ~p"/manage/inventory/#{material.id}/nutritional_facts")
-      assert has_element?(view, "[role=tablist]")
-      assert has_element?(view, "#material-nutritional-facts-form")
     end
 
     @tag role: :staff

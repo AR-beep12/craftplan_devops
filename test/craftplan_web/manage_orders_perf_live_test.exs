@@ -39,19 +39,19 @@ defmodule CraftplanWeb.ManageOrdersPerfLiveTest do
       end
 
       {:ok, view, html} = live(conn, ~p"/manage/orders")
-      assert html =~ "Showing 1-100 of 120"
+      assert html =~ "Mostrando 1-100 de 120"
       assert has_element?(view, "button[phx-click=next_page]:not([disabled])")
 
       next = view |> element("button[phx-click=next_page]") |> render_click()
-      assert next =~ "Showing 101-120 of 120"
+      assert next =~ "Mostrando 101-120 de 120"
       assert has_element?(view, "button[phx-click=prev_page]:not([disabled])")
       assert has_element?(view, "button[phx-click=next_page][disabled]")
 
       render_click(view, "next_page", %{})
-      assert has_element?(view, "span", "Showing 101-120 of 120")
+      assert has_element?(view, "span", "Mostrando 101-120 de 120")
 
       prev = view |> element("button[phx-click=prev_page]") |> render_click()
-      assert prev =~ "Showing 1-100 of 120"
+      assert prev =~ "Mostrando 1-100 de 120"
     end
   end
 
@@ -142,7 +142,7 @@ defmodule CraftplanWeb.ManageOrdersPerfLiveTest do
         )
 
       {:ok, view, html} = live(conn, ~p"/manage/orders")
-      assert html =~ "of 1"
+      assert html =~ "de 1"
 
       send(
         view.pid,
@@ -155,7 +155,7 @@ defmodule CraftplanWeb.ManageOrdersPerfLiveTest do
           )}}
       )
 
-      assert render(view) =~ "of 2"
+      assert render(view) =~ "de 2"
     end
   end
 

@@ -15,6 +15,11 @@ defmodule CraftplanWeb.CustomerLive.Show do
     ~H"""
     <.header>
       {@customer.full_name}
+      <:actions>
+        <.link navigate={~p"/manage/customers/#{@customer.reference}/edit"}>
+          <.button variant={:primary}>Editar</.button>
+        </.link>
+      </:actions>
     </.header>
     <.sub_nav links={@tabs_links} />
     <div class="p mt-4 space-y-6">

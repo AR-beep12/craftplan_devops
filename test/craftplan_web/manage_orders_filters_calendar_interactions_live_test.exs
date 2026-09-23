@@ -11,7 +11,6 @@ defmodule CraftplanWeb.ManageOrdersFiltersCalendarInteractionsLiveTest do
     c =
       Customer
       |> Ash.Changeset.for_create(:create, %{
-        type: :individual,
         first_name: customer_name,
         last_name: "Test"
       })
@@ -21,9 +20,7 @@ defmodule CraftplanWeb.ManageOrdersFiltersCalendarInteractionsLiveTest do
       Product
       |> Ash.Changeset.for_create(:create, %{
         name: "P-#{System.unique_integer()}",
-        sku: "SKU-#{System.unique_integer()}",
-        price: Decimal.new("3.50"),
-        status: :active
+        price: Decimal.new("3.50")
       })
       |> Ash.create!(actor: Craftplan.DataCase.staff_actor())
 

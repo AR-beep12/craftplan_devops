@@ -464,6 +464,7 @@ defmodule CraftplanWeb.InventoryLive.Index do
       |> assign(:material_day_quantity, nil)
       |> assign(:material_day_balance, nil)
       |> assign(:materials_empty?, true)
+      |> stream(:materials, [])
 
     {:ok, socket}
   end

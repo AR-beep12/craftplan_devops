@@ -15,9 +15,9 @@ defmodule CraftplanWeb.SettingsEmailSenderTest do
     test "renders email sender section with both fields", %{conn: conn} do
       {:ok, view, html} = conn |> admin_conn() |> live(~p"/manage/settings/general")
 
-      assert html =~ "Email Sender"
-      assert html =~ "Sender name"
-      assert html =~ "Sender email"
+      assert html =~ "Remitente de correo"
+      assert html =~ "Nombre del remitente"
+      assert html =~ "Correo del remitente"
       assert has_element?(view, "#email-sender-settings")
       assert has_element?(view, ~s(input[name="settings[email_from_name]"]))
       assert has_element?(view, ~s(input[name="settings[email_from_address]"]))

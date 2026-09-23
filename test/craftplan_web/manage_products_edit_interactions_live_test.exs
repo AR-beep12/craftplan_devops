@@ -9,9 +9,7 @@ defmodule CraftplanWeb.ManageProductsEditInteractionsLiveTest do
     Product
     |> Ash.Changeset.for_create(:create, %{
       name: "P-#{System.unique_integer()}",
-      sku: "SKU-#{System.unique_integer()}",
-      price: Decimal.new("4.00"),
-      status: :active
+      price: Decimal.new("4.00")
     })
     |> Ash.create!(actor: Craftplan.DataCase.staff_actor())
   end
@@ -19,7 +17,7 @@ defmodule CraftplanWeb.ManageProductsEditInteractionsLiveTest do
   @tag role: :staff
   test "edit product name and save", %{conn: conn} do
     p = create_product!()
-    {:ok, view, _} = live(conn, ~p"/manage/products/#{p.sku}/edit")
+    {:ok, view, _} = live(conn, ~p"/manage/products/#{p.id}/edit")
 
     params = %{"product" => %{"name" => p.name <> "X"}}
 
@@ -27,7 +25,7 @@ defmodule CraftplanWeb.ManageProductsEditInteractionsLiveTest do
     |> element("#product-form")
     |> render_submit(params)
 
-    assert_patch(view, ~p"/manage/products/#{p.sku}/details")
-    assert render(view) =~ "Product updated successfully"
+    assert_patch(view, ~p"/manage/products/#{p.id}/details")
+    assert render(view) =~ "Producto actualizado correctamente"
   end
 end

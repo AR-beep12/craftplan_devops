@@ -72,7 +72,7 @@ defmodule CraftplanWeb.ManageCustomersLiveTest do
       assert has_element?(view, "#customer_orders")
 
       {:ok, view, _html} = live(conn, ~p"/manage/customers/#{c.reference}/statistics")
-      assert render(view) =~ "Total Orders"
+      assert render(view) =~ "Total de pedidos"
     end
 
     @tag role: :staff

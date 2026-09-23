@@ -40,6 +40,6 @@ defmodule CraftplanWeb.ImportModalComponentTest do
     # Errors should disable Next to Import
     assert has_element?(view, "#csv-mapping-modal-next-import[disabled]")
     # And Errors tab should show a table header
-    assert has_element?(view, "#csv-mapping-modal-content thead th", "Row")
+    assert has_element?(view, "#csv-mapping-modal-content thead th", "Fila")
   end
 end

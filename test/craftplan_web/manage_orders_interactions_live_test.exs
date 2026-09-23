@@ -10,9 +10,7 @@ defmodule CraftplanWeb.ManageOrdersInteractionsLiveTest do
     Product
     |> Ash.Changeset.for_create(:create, %{
       name: "P-#{System.unique_integer()}",
-      sku: "SKU-#{System.unique_integer()}",
-      price: Decimal.new("4.50"),
-      status: :active
+      price: Decimal.new("4.50")
     })
     |> Ash.create!(actor: Craftplan.DataCase.staff_actor())
   end
@@ -20,7 +18,6 @@ defmodule CraftplanWeb.ManageOrdersInteractionsLiveTest do
   defp create_customer! do
     Customer
     |> Ash.Changeset.for_create(:create, %{
-      type: :individual,
       first_name: "Ada",
       last_name: "Lovelace",
       email: "ada+#{System.unique_integer()}@local"
@@ -69,6 +66,6 @@ defmodule CraftplanWeb.ManageOrdersInteractionsLiveTest do
     |> element("#order-item-form")
     |> render_submit(params)
 
-    assert render(view) =~ "Order saved successfully"
+    assert render(view) =~ "Pedido guardado correctamente"
   end
 end

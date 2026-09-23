@@ -26,6 +26,6 @@ defmodule CraftplanWeb.ManageInventoryEditInteractionsLiveTest do
     |> render_submit(params)
 
     assert_patch(view, ~p"/manage/inventory/#{m.id}/details")
-    assert render(view) =~ "Material updated successfully"
+    assert render(view) =~ "Material actualizado correctamente"
   end
 end

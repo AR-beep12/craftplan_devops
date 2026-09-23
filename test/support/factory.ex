@@ -39,10 +39,6 @@ defmodule Craftplan.Test.Factory do
         quantity: Map.get(attrs, :quantity, Decimal.new("10")),
         extra_description: Map.get(attrs, :extra_description, "desc extra #{System.unique_integer([:positive])}")
       }
-      |> maybe_put(:sku, Map.get(attrs, :sku))
-      |> maybe_put(:price, Map.get(attrs, :price))
-      |> maybe_put(:minimum_stock, Map.get(attrs, :minimum_stock))
-      |> maybe_put(:maximum_stock, Map.get(attrs, :maximum_stock))
 
     Material
     |> Ash.Changeset.for_create(:create, params)
@@ -84,7 +80,6 @@ defmodule Craftplan.Test.Factory do
   def create_customer!(attrs \\ %{}, _actor \\ staff_actor()) do
     params =
       %{
-        type: :individual,
         first_name: Map.get(attrs, :first_name, "Jane"),
         last_name: Map.get(attrs, :last_name, "Doe"),
         email: Map.get(attrs, :email, "jane.doe+#{System.unique_integer([:positive])}@local")

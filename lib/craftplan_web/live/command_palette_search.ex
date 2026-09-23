@@ -75,6 +75,7 @@ defmodule CraftplanWeb.CommandPaletteSearch do
     pattern = "%#{query}%"
 
     Craftplan.Catalog.Product
+    |> load(:category)
     |> filter(ilike(name, ^pattern))
     |> limit(5)
     |> Ash.read!(actor: actor)

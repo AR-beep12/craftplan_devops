@@ -22,10 +22,10 @@ defmodule Craftplan.Types.UnitTest do
   end
 
   test "piece special cases" do
-    assert Unit.abbreviation(:piece, 0) == "no pieces"
-    assert Unit.abbreviation(:piece, 1) =~ "1 piece"
-    assert Unit.abbreviation(:piece, -1) =~ "-1 piece"
-    assert Unit.abbreviation(:piece, 3) =~ "pieces"
+    assert Unit.abbreviation(:piece, 0) == "sin piezas"
+    assert Unit.abbreviation(:piece, 1) =~ "1 pieza"
+    assert Unit.abbreviation(:piece, -1) =~ "-1 pieza"
+    assert Unit.abbreviation(:piece, 3) =~ "piezas"
   end
 
   test "kcal displays correctly without conversion" do
@@ -50,7 +50,7 @@ defmodule Craftplan.Types.UnitTest do
   test "single-argument abbreviation returns unit symbol" do
     assert Unit.abbreviation(:gram) == "g"
     assert Unit.abbreviation(:milliliter) == "ml"
-    assert Unit.abbreviation(:piece) == "pc"
+    assert Unit.abbreviation(:piece) == "pz"
     assert Unit.abbreviation(:kcal) == "kcal"
     assert Unit.abbreviation(:milligram) == "mg"
     assert Unit.abbreviation(:percent) == "%"

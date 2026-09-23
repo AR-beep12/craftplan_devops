@@ -10,7 +10,6 @@ defmodule Craftplan.Orders.OrderItemInRangeTest do
     {:ok, customer} =
       CRM.Customer
       |> Ash.Changeset.for_create(:create, %{
-        type: :individual,
         first_name: "Al",
         last_name: "Ice",
         email: "al.ice@example.com"
@@ -23,9 +22,7 @@ defmodule Craftplan.Orders.OrderItemInRangeTest do
       Catalog.Product
       |> Ash.Changeset.for_create(:create, %{
         name: "P1",
-        status: :active,
-        price: Decimal.new("5.00"),
-        sku: "P-1"
+        price: Decimal.new("5.00")
       })
       |> Ash.create(actor: staff)
 
@@ -33,9 +30,7 @@ defmodule Craftplan.Orders.OrderItemInRangeTest do
       Catalog.Product
       |> Ash.Changeset.for_create(:create, %{
         name: "P2",
-        status: :active,
-        price: Decimal.new("7.00"),
-        sku: "P-2"
+        price: Decimal.new("7.00")
       })
       |> Ash.create(actor: staff)
 

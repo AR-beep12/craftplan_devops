@@ -14,9 +14,7 @@ defmodule CraftplanWeb.ProductionBatchLiveActionsTest do
     Product
     |> Ash.Changeset.for_create(:create, %{
       name: "P-#{System.unique_integer()}",
-      sku: "SKU-#{System.unique_integer()}",
-      price: Decimal.new("5.00"),
-      status: :active
+      price: Decimal.new("5.00")
     })
     |> Ash.create!(actor: staff())
   end
@@ -33,7 +31,6 @@ defmodule CraftplanWeb.ProductionBatchLiveActionsTest do
     customer =
       Craftplan.CRM.Customer
       |> Ash.Changeset.for_create(:create, %{
-        type: :individual,
         first_name: "T",
         last_name: "U"
       })
@@ -141,8 +138,8 @@ defmodule CraftplanWeb.ProductionBatchLiveActionsTest do
       view |> element("button[phx-click=start_batch]") |> render_click()
 
       html = render(view)
-      assert html =~ "in_progress"
-      assert html =~ "Batch started"
+      assert html =~ "En progreso"
+      assert html =~ "Lote iniciado"
     end
 
     @tag role: :staff
@@ -152,12 +149,12 @@ defmodule CraftplanWeb.ProductionBatchLiveActionsTest do
 
       {:ok, view, html} = live(conn, ~p"/manage/production/batches/#{batch.batch_code}")
 
-      assert html =~ "Batch #{batch.batch_code}"
+      assert html =~ "Lote #{batch.batch_code}"
       assert has_element?(view, "#batch-summary")
       assert html =~ "Product"
-      assert html =~ "Status"
-      assert html =~ "Produced"
-      assert html =~ "Average Unit Cost"
+      assert html =~ "Estado"
+      assert html =~ "roducid"
+      assert html =~ "Costo unitario promedio"
     end
 
     @tag role: :staff
@@ -207,8 +204,8 @@ defmodule CraftplanWeb.ProductionBatchLiveActionsTest do
       view |> element("button[phx-click=start_batch]") |> render_click()
 
       html = render(view)
-      assert html =~ "Completed quantities per order item"
-      assert html =~ "planned:"
+      assert html =~ "Cantidades completadas por artículo de pedido"
+      assert html =~ "planificado:"
       assert html =~ "3"
       assert html =~ order.reference
       assert html =~ prod.name
@@ -223,7 +220,7 @@ defmodule CraftplanWeb.ProductionBatchLiveActionsTest do
       view |> element("button[phx-click=start_batch]") |> render_click()
 
       html = render(view)
-      refute html =~ "Completed quantities per order item"
+      refute html =~ "Cantidades completadas por artículo de pedido"
     end
 
     @tag role: :staff
@@ -246,8 +243,8 @@ defmodule CraftplanWeb.ProductionBatchLiveActionsTest do
 
       html = render(view)
       assert html =~ "Sugar"
-      assert html =~ "Required:"
-      assert html =~ "stock:"
+      assert html =~ "Requerido:"
+      assert html =~ "existencias:"
     end
 
     @tag role: :staff
@@ -268,7 +265,7 @@ defmodule CraftplanWeb.ProductionBatchLiveActionsTest do
       |> render_submit()
 
       html = render(view)
-      assert html =~ "completed"
+      assert html =~ "ompletado"
     end
 
     @tag role: :staff
@@ -296,7 +293,7 @@ defmodule CraftplanWeb.ProductionBatchLiveActionsTest do
       |> render_submit()
 
       html = render(view)
-      assert html =~ "completed"
+      assert html =~ "ompletado"
     end
 
     @tag role: :staff
@@ -315,7 +312,7 @@ defmodule CraftplanWeb.ProductionBatchLiveActionsTest do
       })
       |> render_submit()
 
-      assert render(view) =~ "completed"
+      assert render(view) =~ "ompletado"
     end
 
     @tag role: :staff
@@ -331,7 +328,7 @@ defmodule CraftplanWeb.ProductionBatchLiveActionsTest do
       |> render_submit()
 
       html = render(view)
-      assert html =~ "Invalid completion payload"
+      assert html =~ "Datos de finalización no válidos"
     end
 
     @tag role: :staff
@@ -350,7 +347,7 @@ defmodule CraftplanWeb.ProductionBatchLiveActionsTest do
       |> render_submit()
 
       html = render(view)
-      assert html =~ "Complete failed"
+      assert html =~ "Error al completar"
     end
   end
 
@@ -368,7 +365,7 @@ defmodule CraftplanWeb.ProductionBatchLiveActionsTest do
 
       # Step 1: Start
       view |> element("button[phx-click=start_batch]") |> render_click()
-      assert render(view) =~ "in_progress"
+      assert render(view) =~ "En progreso"
 
       # Step 2: Complete (auto-consumes via FIFO)
       view
@@ -380,7 +377,7 @@ defmodule CraftplanWeb.ProductionBatchLiveActionsTest do
       |> render_submit()
 
       html = render(view)
-      assert html =~ "completed"
+      assert html =~ "ompletado"
 
       # After completion, no action buttons or forms should appear
       refute has_element?(view, "button[phx-click=start_batch]")

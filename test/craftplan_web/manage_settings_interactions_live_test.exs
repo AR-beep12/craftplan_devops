@@ -13,7 +13,7 @@ defmodule CraftplanWeb.ManageSettingsInteractionsLiveTest do
     |> element("#settings-form")
     |> render_submit(params)
 
-    assert render(view) =~ "Settings updated successfully"
+    assert render(view) =~ "Configuración actualizada correctamente"
   end
 
   @tag role: :admin

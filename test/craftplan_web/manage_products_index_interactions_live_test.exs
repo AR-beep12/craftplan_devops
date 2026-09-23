@@ -7,16 +7,12 @@ defmodule CraftplanWeb.ManageProductsIndexInteractionsLiveTest do
 
   defp create_product!(attrs \\ %{}) do
     name = Map.get(attrs, :name, "P-#{System.unique_integer()}")
-    sku = Map.get(attrs, :sku, "SKU-#{System.unique_integer()}")
     price = Map.get(attrs, :price, Decimal.new("4.00"))
-    status = Map.get(attrs, :status, :active)
 
     Product
     |> Ash.Changeset.for_create(:create, %{
       name: name,
-      sku: sku,
-      price: price,
-      status: status
+      price: price
     })
     |> Ash.create!(actor: Craftplan.DataCase.staff_actor())
   end
@@ -31,7 +27,7 @@ defmodule CraftplanWeb.ManageProductsIndexInteractionsLiveTest do
     |> element("a[phx-click]")
     |> render_click()
 
-    assert render(view) =~ "Product deleted successfully"
-    refute render(view) =~ p.sku
+    assert render(view) =~ "Producto eliminado correctamente"
+    refute render(view) =~ p.name
   end
 end

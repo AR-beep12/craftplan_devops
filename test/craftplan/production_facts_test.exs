@@ -12,7 +12,6 @@ defmodule Craftplan.ProductionFactsTest do
     {:ok, c} =
       CRM.Customer
       |> Ash.Changeset.for_create(:create, %{
-        type: :individual,
         first_name: "A",
         last_name: "B",
         email: "a@b.c"
@@ -23,10 +22,7 @@ defmodule Craftplan.ProductionFactsTest do
       Catalog.Product
       |> Ash.Changeset.for_create(:create, %{
         name: "Prod",
-        status: :active,
-        price: Decimal.new("9.00"),
-        sku: "PR-1",
-        max_daily_quantity: 4
+        price: Decimal.new("9.00")
       })
       |> Ash.create(actor: staff)
 

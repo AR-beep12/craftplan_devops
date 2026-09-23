@@ -12,6 +12,6 @@ defmodule CraftplanWeb.PageControllerTest do
     conn = get(conn, ~p"/")
     body = html_response(conn, 200)
     assert body =~ "Craftplan"
-    assert body =~ "Log in to workspace"
+    assert body =~ "Bienvenida a tu espacio de trabajo"
   end
 end

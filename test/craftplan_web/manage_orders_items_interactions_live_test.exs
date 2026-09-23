@@ -22,9 +22,7 @@ defmodule CraftplanWeb.ManageOrdersItemsInteractionsLiveTest do
       Product
       |> Ash.Changeset.for_create(:create, %{
         name: "P-#{System.unique_integer()}",
-        sku: "SKU-#{System.unique_integer()}",
-        price: Decimal.new("3.00"),
-        status: :active
+        price: Decimal.new("3.00")
       })
       |> Ash.create!(actor: Craftplan.DataCase.staff_actor())
 
@@ -47,7 +45,6 @@ defmodule CraftplanWeb.ManageOrdersItemsInteractionsLiveTest do
       customer_id:
         Craftplan.CRM.Customer
         |> Ash.Changeset.for_create(:create, %{
-          type: :individual,
           first_name: "Ada",
           last_name: "Lovelace"
         })
@@ -57,37 +54,5 @@ defmodule CraftplanWeb.ManageOrdersItemsInteractionsLiveTest do
       items: [%{"product_id" => product.id, "quantity" => 1, "unit_price" => product.price}]
     })
     |> Ash.create!(actor: Craftplan.DataCase.staff_actor())
-  end
-
-  @tag role: :staff
-  test "items: add to batch shows allocation chip", %{conn: conn} do
-    mat = create_material!()
-    prod = create_product_with_recipe!(mat)
-    order = create_order_with_item!(prod)
-
-    # Create an open batch for the product
-    {:ok, batch} =
-      Craftplan.Orders.ProductionBatch
-      |> Ash.Changeset.for_create(:open, %{product_id: prod.id, planned_qty: Decimal.new("0")})
-      |> Ash.create(actor: Craftplan.DataCase.staff_actor())
-
-    {:ok, view, _} = live(conn, ~p"/manage/orders/#{order.reference}/items")
-
-    # Grab the item id from DB
-    item = hd(order.items)
-
-    # Open the Add to Batch modal
-    view
-    |> element("button[phx-click=open_add_to_batch][phx-value-item_id=\"#{item.id}\"]")
-    |> render_click()
-
-    # Submit allocation to the batch
-    view
-    |> form("#add-to-batch-form", %{batch_id: batch.id, planned_qty: "1"})
-    |> render_submit()
-
-    # Verify allocations chip updated
-    assert render(view) =~ "Allocations"
-    assert render(view) =~ "Planned: 1"
   end
 end

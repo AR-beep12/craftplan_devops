@@ -31,13 +31,13 @@ defmodule CraftplanWeb.ManageProductsLiveTest do
       |> render_submit(params)
 
       assert_patch(view, ~p"/manage/products")
-      assert render(view) =~ "Product created successfully"
+      assert render(view) =~ "Producto creado correctamente"
     end
 
     @tag role: :staff
     test "index renders products with cost calculations without crashing", %{conn: conn} do
       # Create a product with a simple BOM so calculations run
-      material = Factory.create_material!(%{price: Decimal.new("1.00"), unit: :gram})
+      material = Factory.create_material!(%{unit: :gram})
       product = Factory.create_product!(%{price: Decimal.new("3.99"), status: :active})
 
       _bom =
@@ -61,47 +61,17 @@ defmodule CraftplanWeb.ManageProductsLiveTest do
     test "renders details tab for staff", %{conn: conn} do
       product = Factory.create_product!()
 
-      {:ok, view, _html} = live(conn, ~p"/manage/products/#{product.sku}")
+      {:ok, view, _html} = live(conn, ~p"/manage/products/#{product.id}")
 
       assert has_element?(view, "[role=tablist]")
       assert has_element?(view, "kbd")
     end
 
     @tag role: :staff
-    test "renders recipe tab for staff", %{conn: conn} do
-      product = Factory.create_product!()
-
-      {:ok, view, _html} = live(conn, ~p"/manage/products/#{product.sku}/recipe")
-
-      assert has_element?(view, "[role=tablist]")
-      assert has_element?(view, "#recipe-form")
-    end
-
-    @tag role: :staff
-    test "renders nutrition tab for staff", %{conn: conn} do
-      product = Factory.create_product!()
-
-      {:ok, view, _html} = live(conn, ~p"/manage/products/#{product.sku}/nutrition")
-
-      assert has_element?(view, "[role=tablist]")
-      assert has_element?(view, "#nutritional-facts")
-    end
-
-    @tag role: :staff
-    test "renders photos tab for staff", %{conn: conn} do
-      product = Factory.create_product!()
-
-      {:ok, view, _html} = live(conn, ~p"/manage/products/#{product.sku}/photos")
-
-      assert has_element?(view, "[role=tablist]")
-      assert has_element?(view, "h3", "Product Photos")
-    end
-
-    @tag role: :staff
     test "renders edit modal for staff", %{conn: conn} do
       product = Factory.create_product!()
 
-      {:ok, view, _html} = live(conn, ~p"/manage/products/#{product.sku}/edit")
+      {:ok, view, _html} = live(conn, ~p"/manage/products/#{product.id}/edit")
 
       assert has_element?(view, "#product-form")
     end

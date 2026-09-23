@@ -19,12 +19,12 @@ defmodule CraftplanWeb.ProductionBatchLiveTest do
 
     product =
       Factory.create_product!(
-        %{name: "Alloc Bread", sku: "alloc-bread", price: D.new("12.00")},
+        %{name: "Alloc Bread", price: D.new("12.00")},
         actor
       )
 
     material =
-      Factory.create_material!(%{name: "Alloc Flour", unit: :gram, price: D.new("3.00")}, actor)
+      Factory.create_material!(%{name: "Alloc Flour", unit: :gram}, actor)
 
     Factory.create_recipe!(product, [%{material_id: material.id, quantity: D.new("1.0")}], actor)
 
@@ -61,12 +61,12 @@ defmodule CraftplanWeb.ProductionBatchLiveTest do
 
     product =
       Factory.create_product!(
-        %{name: "Batch Bread", sku: "batch-bread", price: D.new("12.00")},
+        %{name: "Batch Bread", price: D.new("12.00")},
         actor
       )
 
     material =
-      Factory.create_material!(%{name: "Flour", unit: :gram, price: D.new("3.00")}, actor)
+      Factory.create_material!(%{name: "Flour", unit: :gram}, actor)
 
     Factory.create_recipe!(product, [%{material_id: material.id, quantity: D.new("1.0")}], actor)
 

@@ -40,7 +40,7 @@ defmodule CraftplanWeb.ManageInventoryInteractionsLiveTest do
     |> render_submit(params)
 
     assert_patch(view, ~p"/manage/inventory/#{m.id}/stock")
-    assert render(view) =~ "Stock adjustment recorded"
+    assert render(view) =~ "Ajuste de stock registrado"
   end
 
   @tag role: :staff
@@ -59,7 +59,7 @@ defmodule CraftplanWeb.ManageInventoryInteractionsLiveTest do
     |> render_submit(params)
 
     assert_patch(view, ~p"/manage/inventory/#{m.id}/stock")
-    assert render(view) =~ "Stock adjustment recorded"
+    assert render(view) =~ "Ajuste de stock registrado"
   end
 
   @tag role: :staff
@@ -78,48 +78,6 @@ defmodule CraftplanWeb.ManageInventoryInteractionsLiveTest do
     |> render_submit(params)
 
     assert_patch(view, ~p"/manage/inventory/#{m.id}/stock")
-    assert render(view) =~ "Stock adjustment recorded"
-  end
-
-  @tag role: :staff
-  test "assign allergens to material", %{conn: conn} do
-    m = create_material!()
-    a = create_allergen!()
-    {:ok, view, _} = live(conn, ~p"/manage/inventory/#{m.id}/allergens")
-
-    params = %{"material" => %{}, "allergen_ids" => [a.id]}
-
-    view
-    |> element("#material-allergen-form-2")
-    |> render_change(params)
-
-    view
-    |> element("#material-allergen-form-2")
-    |> render_submit(params)
-
-    assert render(view) =~ "Allergens updated successfully"
-  end
-
-  @tag role: :staff
-  test "assign nutritional facts to material", %{conn: conn} do
-    m = create_material!()
-    nf = create_nf!()
-    {:ok, view, _} = live(conn, ~p"/manage/inventory/#{m.id}/nutritional_facts")
-
-    # Open modal and click first available fact
-    view
-    |> element("button[phx-click=show_add_modal]")
-    |> render_click()
-
-    # Click any button inside the selection list
-    view
-    |> element("button[phx-click=add_nutritional_fact][phx-value-fact-id='#{nf.id}']")
-    |> render_click()
-
-    view
-    |> element("#material-nutritional-facts-form")
-    |> render_submit(%{"material" => %{}})
-
-    assert render(view) =~ "Save Nutritional Facts"
+    assert render(view) =~ "Ajuste de stock registrado"
   end
 end

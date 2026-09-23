@@ -11,7 +11,6 @@ defmodule Craftplan.Orders.CalculateTotalsChangeTest do
     {:ok, customer} =
       CRM.Customer
       |> Ash.Changeset.for_create(:create, %{
-        type: :individual,
         first_name: "John",
         last_name: "Doe",
         email: "jdoe@example.com"
@@ -23,9 +22,7 @@ defmodule Craftplan.Orders.CalculateTotalsChangeTest do
       Catalog.Product
       |> Ash.Changeset.for_create(:create, %{
         name: "Test Product",
-        status: :active,
-        price: Decimal.new("12.50"),
-        sku: "TP-001"
+        price: Decimal.new("12.50")
       })
       |> Ash.create(actor: staff)
 

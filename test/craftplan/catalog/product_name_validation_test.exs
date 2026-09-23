@@ -9,9 +9,7 @@ defmodule Craftplan.Catalog.ProductNameValidationTest do
     Product
     |> Ash.Changeset.for_create(:create, %{
       name: name,
-      sku: "SKU-#{System.unique_integer([:positive])}",
-      price: Decimal.new("10.00"),
-      status: :active
+      price: Decimal.new("10.00")
     })
     |> Ash.create(actor: staff())
   end

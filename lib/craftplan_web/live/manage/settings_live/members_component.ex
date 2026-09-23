@@ -15,6 +15,7 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
     assigns =
       assigns
       |> assign_new(:show_invite_modal, fn -> false end)
+      |> assign_new(:show_create_modal, fn -> false end)
       |> assign_new(:show_edit_modal, fn -> false end)
       |> assign_new(:editing_member, fn -> nil end)
 
@@ -26,9 +27,25 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
         </:subtitle>
         Usuarios
         <:actions>
-          <.button type="button" variant={:primary} phx-click="show_invite_modal" phx-target={@myself}>
-            <.icon name="hero-plus" class="mr-2 -ml-1 h-4 w-4" /> Invitar usuario
-          </.button>
+          <div class="flex flex-wrap items-center gap-3">
+            <.button
+              type="button"
+              variant={:secondary}
+              phx-click="show_create_modal"
+              phx-target={@myself}
+            >
+              <.icon name="hero-user-plus" class="mr-2 -ml-1 h-4 w-4" /> Crear usuario
+            </.button>
+
+            <.button
+              type="button"
+              variant={:primary}
+              phx-click="show_invite_modal"
+              phx-target={@myself}
+            >
+              <.icon name="hero-plus" class="mr-2 -ml-1 h-4 w-4" /> Invitar usuario
+            </.button>
+          </div>
         </:actions>
       </.header>
 
@@ -128,6 +145,51 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
       </.modal>
 
       <.modal
+        :if={@show_create_modal}
+        id="create-member-modal"
+        show
+        title="Crear usuario"
+        description="Crea una cuenta directamente con correo y contraseña. No se envía ningún correo."
+        on_cancel={JS.push("hide_create_modal", target: @myself)}
+      >
+        <.simple_form
+          for={@create_form}
+          id="create-member-form"
+          phx-target={@myself}
+          phx-change="validate_create"
+          phx-submit="create_member"
+        >
+          <.input
+            field={@create_form[:email]}
+            type="email"
+            label="Correo electrónico"
+            placeholder="member@example.com"
+          />
+          <.input
+            field={@create_form[:password]}
+            type="password"
+            label="Contraseña"
+            placeholder="Mínimo 8 caracteres"
+          />
+          <.input
+            field={@create_form[:password_confirmation]}
+            type="password"
+            label="Confirmar contraseña"
+          />
+          <.input
+            field={@create_form[:role]}
+            type="radiogroup"
+            label="Rol"
+            options={[{"Personal", :staff}, {"Administrador", :admin}]}
+            value={@create_form[:role].value || :staff}
+          />
+          <:actions>
+            <.button variant={:primary} phx-disable-with="Creando...">Crear usuario</.button>
+          </:actions>
+        </.simple_form>
+      </.modal>
+
+      <.modal
         :if={@show_edit_modal}
         id="edit-role-modal"
         show
@@ -167,9 +229,11 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
      |> assign(assigns)
      |> assign(:members, members)
      |> assign(:show_invite_modal, false)
+     |> assign(:show_create_modal, false)
      |> assign(:show_edit_modal, false)
      |> assign(:editing_member, nil)
      |> assign(:invite_form, invite_form())
+     |> assign(:create_form, create_form())
      |> assign(:role_form, role_form(:staff))}
   end
 
@@ -181,6 +245,16 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
   @impl true
   def handle_event("hide_invite_modal", _, socket) do
     {:noreply, assign(socket, show_invite_modal: false, invite_form: invite_form())}
+  end
+
+  @impl true
+  def handle_event("show_create_modal", _, socket) do
+    {:noreply, assign(socket, :show_create_modal, true)}
+  end
+
+  @impl true
+  def handle_event("hide_create_modal", _, socket) do
+    {:noreply, assign(socket, show_create_modal: false, create_form: create_form())}
   end
 
   @impl true
@@ -210,6 +284,11 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
   end
 
   @impl true
+  def handle_event("validate_create", %{"new_member" => params}, socket) do
+    {:noreply, assign(socket, :create_form, create_form(params))}
+  end
+
+  @impl true
   def handle_event("invite_member", %{"invite" => params}, socket) do
     invite_params = %{
       email: params["email"],
@@ -234,6 +313,34 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
            :error,
            "No se pudo invitar al miembro. Es posible que el correo ya esté en uso."
          )}
+    end
+  end
+
+  @impl true
+  def handle_event("create_member", %{"new_member" => params}, socket) do
+    create_params = %{
+      email: params["email"],
+      role: params["role"] || "staff",
+      password: params["password"],
+      password_confirmation: params["password_confirmation"]
+    }
+
+    case Accounts.create_member(create_params, actor: socket.assigns.current_user) do
+      {:ok, _user} ->
+        members = load_members(socket.assigns.current_user)
+
+        {:noreply,
+         socket
+         |> assign(:members, members)
+         |> assign(:show_create_modal, false)
+         |> assign(:create_form, create_form())
+         |> put_flash(:info, "Usuario creado correctamente")}
+
+      {:error, error} ->
+        {:noreply,
+         socket
+         |> assign(:create_form, create_form(params))
+         |> put_flash(:error, create_error_message(error))}
     end
   end
 
@@ -282,6 +389,27 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
   defp invite_form(params \\ %{}) do
     to_form(Map.merge(%{"email" => "", "role" => "staff"}, params), as: "invite")
   end
+
+  defp create_form(params \\ %{}) do
+    to_form(
+      Map.merge(
+        %{"email" => "", "password" => "", "password_confirmation" => "", "role" => "staff"},
+        params
+      ),
+      as: "new_member"
+    )
+  end
+
+  defp create_error_message(%Ash.Error.Invalid{errors: errors}) do
+    errors
+    |> Enum.map_join(" ", &Exception.message/1)
+    |> case do
+      "" -> "No se pudo crear el usuario."
+      message -> message
+    end
+  end
+
+  defp create_error_message(_error), do: "No se pudo crear el usuario. Es posible que el correo ya esté en uso."
 
   defp role_form(role) do
     to_form(%{"role" => to_string(role)}, as: "role_edit")

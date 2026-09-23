@@ -38,7 +38,13 @@ defmodule Craftplan.Accounts.User do
         require_interaction? true
         confirm_on_create? true
         confirm_on_update? false
-        auto_confirm_actions [:sign_in_with_magic_link, :reset_password_with_password]
+
+        auto_confirm_actions [
+          :sign_in_with_magic_link,
+          :reset_password_with_password,
+          :create_member
+        ]
+
         sender Craftplan.Accounts.User.Senders.SendNewUserConfirmationEmail
       end
     end
@@ -95,6 +101,44 @@ defmodule Craftplan.Accounts.User do
         hashed = Bcrypt.hash_pwd_salt(temp_password)
         Ash.Changeset.force_change_attribute(changeset, :hashed_password, hashed)
       end
+    end
+
+    create :create_member do
+      description """
+      Admin creates a new team member directly with an email and password,
+      without sending a confirmation email. The account is active immediately.
+      """
+
+      argument :email, :ci_string do
+        allow_nil? false
+      end
+
+      argument :role, Role do
+        allow_nil? false
+        default :staff
+      end
+
+      argument :password, :string do
+        description "The proposed password for the user, in plain text."
+        allow_nil? false
+        constraints min_length: 8
+        sensitive? true
+      end
+
+      argument :password_confirmation, :string do
+        description "The proposed password for the user (again), in plain text."
+        allow_nil? false
+        sensitive? true
+      end
+
+      change set_attribute(:email, arg(:email))
+      change set_attribute(:role, arg(:role))
+
+      # Hashes the provided password
+      change HashPasswordChange
+
+      # validates that the password matches the confirmation
+      validate PasswordConfirmationValidation
     end
 
     read :get_by_subject do
@@ -259,7 +303,7 @@ defmodule Craftplan.Accounts.User do
       authorize_if always()
     end
 
-    bypass action([:list_members, :invite, :update_role, :remove_member]) do
+    bypass action([:list_members, :invite, :create_member, :update_role, :remove_member]) do
       authorize_if actor_attribute_equals(:role, :admin)
     end
 

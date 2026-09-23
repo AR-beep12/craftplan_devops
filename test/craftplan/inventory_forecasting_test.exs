@@ -23,9 +23,7 @@ defmodule Craftplan.InventoryForecastingTest do
       Product
       |> Ash.Changeset.for_create(:create, %{
         name: "Prod-#{System.unique_integer()}",
-        sku: "SKU-#{System.unique_integer()}",
-        price: Decimal.new("3.00"),
-        status: :active
+        price: Decimal.new("3.00")
       })
       |> Ash.create!(actor: Craftplan.DataCase.staff_actor())
 
@@ -47,7 +45,6 @@ defmodule Craftplan.InventoryForecastingTest do
     customer =
       Craftplan.CRM.Customer
       |> Ash.Changeset.for_create(:create, %{
-        type: :individual,
         first_name: "Cust",
         last_name: "One"
       })

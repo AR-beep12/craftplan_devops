@@ -5,6 +5,25 @@ defmodule CraftplanWeb.InventoryLive.FormComponentMaterial do
   alias AshPhoenix.Form
   alias Craftplan.Inventory
 
+  @colors [
+    "Blanco",
+    "Negro",
+    "Gris",
+    "Rojo",
+    "Naranja",
+    "Amarillo",
+    "Verde",
+    "Azul",
+    "Morado",
+    "Rosa",
+    "Café",
+    "Beige",
+    "Dorado",
+    "Plateado",
+    "Transparente",
+    "Natural"
+  ]
+
   @impl true
   def render(assigns) do
     ~H"""
@@ -18,7 +37,13 @@ defmodule CraftplanWeb.InventoryLive.FormComponentMaterial do
       >
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <.input field={@form[:name]} type="text" label="Nombre" />
-          <.input field={@form[:color]} type="text" label="Color" />
+          <.input
+            field={@form[:color]}
+            type="select"
+            label="Color"
+            prompt="Selecciona un color"
+            options={color_options(@form)}
+          />
         </div>
 
         <div :if={@material} class="rounded-md border border-stone-200 bg-stone-50 p-3">
@@ -106,6 +131,18 @@ defmodule CraftplanWeb.InventoryLive.FormComponentMaterial do
 
       {:error, form} ->
         {:noreply, assign(socket, :form, form)}
+    end
+  end
+
+  # Includes the material's current color even if it's not one of the
+  # predefined options, so existing data isn't lost or blanked out on edit.
+  defp color_options(form) do
+    current = form[:color].value
+
+    if current not in [nil, ""] and current not in @colors do
+      @colors ++ [current]
+    else
+      @colors
     end
   end
 

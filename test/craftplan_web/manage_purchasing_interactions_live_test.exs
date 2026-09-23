@@ -37,7 +37,7 @@ defmodule CraftplanWeb.ManagePurchasingInteractionsLiveTest do
     |> element("#supplier-form")
     |> render_submit(params)
 
-    assert render(view) =~ "Supplier saved"
+    assert render(view) =~ "Proveedor guardado"
   end
 
   @tag role: :staff
@@ -59,7 +59,7 @@ defmodule CraftplanWeb.ManagePurchasingInteractionsLiveTest do
     |> element("#purchase-order-form")
     |> render_submit(po_params)
 
-    assert render(view) =~ "Purchase order"
+    assert render(view) =~ "Orden de compra"
 
     # Fetch created PO and navigate to add_item directly
     po = hd(Craftplan.Inventory.list_purchase_orders!(actor: Craftplan.DataCase.staff_actor()))
@@ -76,7 +76,7 @@ defmodule CraftplanWeb.ManagePurchasingInteractionsLiveTest do
       }
     })
 
-    assert render(index) =~ "Item added"
+    assert render(index) =~ "Artículo agregado"
 
     # Navigate to show and mark received
     {:ok, show, _} = live(conn, ~p"/manage/purchasing/#{po.reference}")
@@ -87,6 +87,6 @@ defmodule CraftplanWeb.ManagePurchasingInteractionsLiveTest do
 
     # Revisit show to assert status updated
     {:ok, show2, _} = live(conn, ~p"/manage/purchasing/#{po.reference}")
-    assert render(show2) =~ "received"
+    assert render(show2) =~ "ecibid"
   end
 end

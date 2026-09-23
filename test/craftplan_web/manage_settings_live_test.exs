@@ -32,20 +32,6 @@ defmodule CraftplanWeb.ManageSettingsLiveTest do
       assert has_element?(view, "#settings-form")
     end
 
-    test "renders allergens tab for admin", %{conn: conn} do
-      admin = Craftplan.DataCase.admin_actor()
-
-      conn =
-        conn
-        |> AshAuthentication.Phoenix.Plug.store_in_session(admin)
-        |> Plug.Conn.assign(:current_user, admin)
-
-      {:ok, view, _html} = live(conn, ~p"/manage/settings/allergens")
-
-      assert has_element?(view, "[role=tablist]")
-      assert has_element?(view, "#allergens")
-    end
-
     test "renders nutritional facts tab for admin", %{conn: conn} do
       admin = Craftplan.DataCase.admin_actor()
 

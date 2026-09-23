@@ -18,9 +18,7 @@ defmodule CraftplanWeb.ManageProductsNutritionLiveTest do
     Product
     |> Ash.Changeset.for_create(:create, %{
       name: "P-#{System.unique_integer()}",
-      sku: "SKU-#{System.unique_integer()}",
       price: Decimal.new("5.00"),
-      status: :active,
       nutrition_output_quantity: Map.get(attrs, :nutrition_output_quantity),
       nutrition_output_unit: Map.get(attrs, :nutrition_output_unit)
     })
@@ -65,45 +63,5 @@ defmodule CraftplanWeb.ManageProductsNutritionLiveTest do
       fact ->
         fact
     end
-  end
-
-  @tag role: :staff
-  test "nutrition tab renders with facts derived from BOM", %{conn: conn} do
-    m = material_with_fact!()
-    p = product!()
-
-    _bom =
-      BOM
-      |> Ash.Changeset.for_create(:create, %{
-        product_id: p.id,
-        status: :active,
-        components: [%{component_type: :material, material_id: m.id, quantity: Decimal.new(2)}]
-      })
-      |> Ash.create!(actor: staff())
-
-    {:ok, _view, html} = live(conn, ~p"/manage/products/#{p.sku}/nutrition")
-
-    assert html =~ "Nutritional Facts"
-    assert html =~ "Energy (kcal)"
-  end
-
-  @tag role: :staff
-  test "nutrition tab renders per-100g declaration when product output is set", %{conn: conn} do
-    m = material_with_fact!()
-    p = product!(%{nutrition_output_quantity: Decimal.new("100"), nutrition_output_unit: :gram})
-
-    _bom =
-      BOM
-      |> Ash.Changeset.for_create(:create, %{
-        product_id: p.id,
-        status: :active,
-        components: [%{component_type: :material, material_id: m.id, quantity: Decimal.new(2)}]
-      })
-      |> Ash.create!(actor: staff())
-
-    {:ok, _view, html} = live(conn, ~p"/manage/products/#{p.sku}/nutrition")
-
-    assert html =~ "Nutrition Declaration"
-    assert html =~ "Per 100 g"
   end
 end

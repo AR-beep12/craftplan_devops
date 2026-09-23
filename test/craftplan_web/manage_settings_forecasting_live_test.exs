@@ -14,13 +14,13 @@ defmodule CraftplanWeb.ManageSettingsForecastingLiveTest do
 
       {:ok, _view, html} = live(conn, ~p"/manage/settings/general")
 
-      assert html =~ "Inventory Forecasting"
-      assert html =~ "Lookback days"
-      assert html =~ "Default horizon"
-      assert html =~ "Actual usage weight"
-      assert html =~ "Planned usage weight"
-      assert html =~ "Default service level"
-      assert html =~ "Min samples for variability"
+      assert html =~ "Pronóstico de inventario"
+      assert html =~ "Días de historial"
+      assert html =~ "Horizonte predeterminado"
+      assert html =~ "Peso del uso real"
+      assert html =~ "Peso del uso planificado"
+      assert html =~ "Nivel de servicio predeterminado"
+      assert html =~ "Muestras mínimas para variabilidad"
     end
 
     test "can update forecasting settings", %{conn: conn} do
@@ -47,7 +47,7 @@ defmodule CraftplanWeb.ManageSettingsForecastingLiveTest do
         }
       })
 
-      assert render(view) =~ "Settings updated successfully"
+      assert render(view) =~ "Configuración actualizada correctamente"
 
       # Verify the values persisted
       {:ok, _view2, html} = live(conn, ~p"/manage/settings/general")

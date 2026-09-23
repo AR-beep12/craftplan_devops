@@ -22,8 +22,8 @@ defmodule CraftplanWeb.SettingsCalendarFeedLiveTest do
 
       {:ok, view, _html} = live(conn, ~p"/manage/settings/calendar")
 
-      assert has_element?(view, "header", "Calendar Feed")
-      assert has_element?(view, "h3", "How to subscribe")
+      assert has_element?(view, "header", "Feed de calendario")
+      assert has_element?(view, "h3", "Cómo suscribirse")
       assert has_element?(view, "h4", "Google Calendar")
       assert has_element?(view, "h4", "Apple Calendar")
     end
@@ -33,8 +33,8 @@ defmodule CraftplanWeb.SettingsCalendarFeedLiveTest do
 
       {:ok, view, _html} = live(conn, ~p"/manage/settings/calendar")
 
-      assert has_element?(view, "div", "No calendar feeds yet")
-      assert has_element?(view, "#generate-calendar-feed-btn", "Generate Calendar Feed")
+      assert has_element?(view, "div", "Aún no hay feeds de calendario")
+      assert has_element?(view, "#generate-calendar-feed-btn", "Generar feed de calendario")
     end
 
     test "clicking Generate Calendar Feed creates key and shows subscription URL", %{conn: conn} do
@@ -48,7 +48,7 @@ defmodule CraftplanWeb.SettingsCalendarFeedLiveTest do
       assert has_element?(view, "#calendar-new-feed-url")
       html = render(view)
       assert html =~ "feed.ics?key=cpk_"
-      assert html =~ "Copy this URL now"
+      assert html =~ "Copia esta URL ahora"
     end
 
     test "generated feed appears in the feeds table", %{conn: conn} do
@@ -59,8 +59,8 @@ defmodule CraftplanWeb.SettingsCalendarFeedLiveTest do
       view |> element("#generate-calendar-feed-btn") |> render_click()
 
       # Feed should appear in table
-      assert has_element?(view, "#calendar-feeds", "Calendar Feed")
-      assert has_element?(view, "#calendar-feeds", "Never")
+      assert has_element?(view, "#calendar-feeds", "Feed de calendario")
+      assert has_element?(view, "#calendar-feeds", "Nunca")
     end
 
     test "lists existing suitable keys in the table", %{conn: conn} do
@@ -91,7 +91,7 @@ defmodule CraftplanWeb.SettingsCalendarFeedLiveTest do
 
       html = render(view)
       refute html =~ "Products Only"
-      assert has_element?(view, "div", "No calendar feeds yet")
+      assert has_element?(view, "div", "Aún no hay feeds de calendario")
     end
 
     test "revoking a feed removes it from the list", %{conn: conn} do
@@ -101,13 +101,13 @@ defmodule CraftplanWeb.SettingsCalendarFeedLiveTest do
 
       # Create a feed first
       view |> element("#generate-calendar-feed-btn") |> render_click()
-      assert has_element?(view, "#calendar-feeds", "Calendar Feed")
+      assert has_element?(view, "#calendar-feeds", "Feed de calendario")
 
       # Revoke it
-      view |> element("#calendar-feeds button", "Revoke") |> render_click()
+      view |> element("#calendar-feeds button", "Revocar") |> render_click()
 
       # Should show empty state again
-      assert has_element?(view, "div", "No calendar feeds yet")
+      assert has_element?(view, "div", "Aún no hay feeds de calendario")
     end
 
     test "navigation shows Calendar Feed in settings sub-links", %{conn: conn} do
@@ -115,7 +115,7 @@ defmodule CraftplanWeb.SettingsCalendarFeedLiveTest do
 
       {:ok, _view, html} = live(conn, ~p"/manage/settings/calendar")
 
-      assert html =~ "Calendar Feed"
+      assert html =~ "Feed de calendario"
     end
   end
 end

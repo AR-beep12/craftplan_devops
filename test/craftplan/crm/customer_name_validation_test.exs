@@ -6,7 +6,6 @@ defmodule Craftplan.CRM.CustomerNameValidationTest do
   defp create_customer(first_name, last_name) do
     Customer
     |> Ash.Changeset.for_create(:create, %{
-      type: :individual,
       first_name: first_name,
       last_name: last_name,
       email: "test+#{System.unique_integer([:positive])}@local"

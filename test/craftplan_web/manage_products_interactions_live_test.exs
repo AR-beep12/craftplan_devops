@@ -16,9 +16,7 @@ defmodule CraftplanWeb.ManageProductsInteractionsLiveTest do
     Product
     |> Ash.Changeset.for_create(:create, %{
       name: name,
-      sku: sku,
       price: price,
-      status: :active,
       photos: photos,
       featured_photo: featured_photo
     })
@@ -44,7 +42,7 @@ defmodule CraftplanWeb.ManageProductsInteractionsLiveTest do
     product = create_product!()
     material = create_material!()
 
-    {:ok, view, _} = live(conn, ~p"/manage/products/#{product.sku}/recipe")
+    {:ok, view, _} = live(conn, ~p"/manage/products/#{product.id}/details")
 
     # Open add material modal
     view
@@ -73,7 +71,7 @@ defmodule CraftplanWeb.ManageProductsInteractionsLiveTest do
     })
 
     html = render(view)
-    assert html =~ "Recipe saved successfully" or html =~ "Recipe updated successfully"
+    assert html =~ "Material guardado exitosamente" or html =~ "Material guardado exitosamente"
   end
 
   @tag role: :staff
@@ -81,7 +79,7 @@ defmodule CraftplanWeb.ManageProductsInteractionsLiveTest do
     product = create_product!()
     material = create_material!()
 
-    {:ok, view, _} = live(conn, ~p"/manage/products/#{product.sku}/recipe")
+    {:ok, view, _} = live(conn, ~p"/manage/products/#{product.id}/details")
 
     view
     |> element("button[phx-click=show_add_modal]")
@@ -106,10 +104,10 @@ defmodule CraftplanWeb.ManageProductsInteractionsLiveTest do
       }
     })
 
-    assert_patch(view, ~p"/manage/products/#{product.sku}/recipe")
+    assert_patch(view, ~p"/manage/products/#{product.id}/details")
 
     # Reload
-    {:ok, _view2, html} = live(conn, ~p"/manage/products/#{product.sku}/recipe")
+    {:ok, _view2, html} = live(conn, ~p"/manage/products/#{product.id}/details")
     assert html =~ material.name
   end
 end

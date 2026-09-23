@@ -53,7 +53,7 @@ defmodule CraftplanWeb.SettingsMembersLiveTest do
     test "admin sees Members tab", %{conn: conn} do
       {:ok, view, _html} = live(conn, ~p"/manage/settings/members")
 
-      assert has_element?(view, "header", "Members")
+      assert has_element?(view, "header", "Usuarios")
     end
 
     @tag role: :admin
@@ -74,8 +74,8 @@ defmodule CraftplanWeb.SettingsMembersLiveTest do
 
       html = render(view)
 
-      assert html =~ "Edit"
-      assert html =~ "Remove"
+      assert html =~ "Editar"
+      assert html =~ "Quitar"
       assert html =~ to_string(admin.email)
     end
   end
@@ -85,7 +85,7 @@ defmodule CraftplanWeb.SettingsMembersLiveTest do
     test "opens invite modal", %{conn: conn} do
       {:ok, view, _html} = live(conn, ~p"/manage/settings/members")
 
-      view |> element("button", "Invite Member") |> render_click()
+      view |> element("button", "Invitar usuario") |> render_click()
 
       assert has_element?(view, "#invite-member-modal")
       assert has_element?(view, "#invite-member-form")
@@ -95,7 +95,7 @@ defmodule CraftplanWeb.SettingsMembersLiveTest do
     test "invites new staff member and shows in table", %{conn: conn} do
       {:ok, view, _html} = live(conn, ~p"/manage/settings/members")
 
-      view |> element("button", "Invite Member") |> render_click()
+      view |> element("button", "Invitar usuario") |> render_click()
 
       email = "invited+#{System.unique_integer()}@test.com"
 
@@ -118,7 +118,7 @@ defmodule CraftplanWeb.SettingsMembersLiveTest do
 
       {:ok, view, _html} = live(conn, ~p"/manage/settings/members")
 
-      view |> element("button", "Edit") |> render_click()
+      view |> element("button", "Editar") |> render_click()
 
       assert has_element?(view, "#edit-role-modal")
 
@@ -145,7 +145,7 @@ defmodule CraftplanWeb.SettingsMembersLiveTest do
 
       assert render(view) =~ email
 
-      view |> element("button", "Remove") |> render_click()
+      view |> element("button", "Quitar") |> render_click()
 
       refute render(view) =~ email
     end

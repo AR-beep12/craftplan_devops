@@ -95,16 +95,15 @@ defmodule CraftplanWeb.CSVExportTest do
       body = response(conn, 200)
       [header | rows] = CSV.parse_string(body, skip_headers: false)
 
-      assert header == ["reference", "type", "first_name", "last_name", "email", "phone"]
+      assert header == ["reference", "first_name", "last_name", "email", "phone"]
       assert length(rows) >= 1
 
       [row | _] = rows
       # reference starts with CUS_
       assert Enum.at(row, 0) =~ "CUS_"
-      assert Enum.at(row, 1) == "individual"
-      assert Enum.at(row, 2) == "Bob"
-      assert Enum.at(row, 3) == "Jones"
-      assert Enum.at(row, 4) == "bob@test.com"
+      assert Enum.at(row, 1) == "Bob"
+      assert Enum.at(row, 2) == "Jones"
+      assert Enum.at(row, 3) == "bob@test.com"
     end
 
     @tag role: :admin
@@ -212,13 +211,13 @@ defmodule CraftplanWeb.CSVExportTest do
 
       {:ok, view, html} = live(conn, ~p"/manage/settings/csv")
 
-      assert html =~ "Export data"
-      assert html =~ "Entity to export"
+      assert html =~ "Exportar datos"
+      assert html =~ "Entidad a exportar"
 
       # All three entities should be available
-      assert html =~ "Orders"
-      assert html =~ "Customers"
-      assert html =~ "Inventory movements"
+      assert html =~ "Pedidos"
+      assert html =~ "Clientes"
+      assert html =~ "Movimientos de inventario"
 
       # Select customers and verify redirect target
       result =
@@ -272,7 +271,7 @@ defmodule CraftplanWeb.CSVExportTest do
 
       assert is_binary(csv)
       [header | _] = CSV.parse_string(csv, skip_headers: false)
-      assert length(header) == 6
+      assert length(header) == 5
     end
 
     test "movements exporter produces parseable CSV" do

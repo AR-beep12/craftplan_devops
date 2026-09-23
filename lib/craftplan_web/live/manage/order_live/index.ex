@@ -38,6 +38,15 @@ defmodule CraftplanWeb.OrderLive.Index do
     }
   end
 
+  defp empty_filters do
+    %{
+      "status" => [],
+      "delivery_date_start" => "",
+      "delivery_date_end" => "",
+      "customer_name" => ""
+    }
+  end
+
   @impl true
   def render(assigns) do
     assigns =
@@ -477,7 +486,7 @@ defmodule CraftplanWeb.OrderLive.Index do
 
   @impl true
   def handle_event("reset_filters", _params, socket) do
-    new_filters = default_filters()
+    new_filters = empty_filters()
     filter_opts = parse_filters(new_filters)
 
     {:noreply,
@@ -554,6 +563,8 @@ defmodule CraftplanWeb.OrderLive.Index do
 
   @impl true
   def handle_event("apply_filters", %{"filters" => raw_filters}, socket) do
+    # An empty checkbox group sends no "status" key, so default it to [] to let users clear it.
+    raw_filters = Map.put_new(raw_filters, "status", [])
     new_filters = Map.merge(socket.assigns.filters, raw_filters)
     filter_opts = parse_filters(new_filters)
 
@@ -747,15 +758,25 @@ defmodule CraftplanWeb.OrderLive.Index do
       status: parse_list(filters["status"]),
       delivery_date_start: parse_date(filters["delivery_date_start"], ~T[00:00:00]),
       delivery_date_end: parse_date(filters["delivery_date_end"], ~T[23:59:59]),
-      customer_name: filters["customer_name"]
+      customer_name: parse_text(filters["customer_name"])
     }
   end
+
+  defp parse_text(value) when is_binary(value) do
+    case String.trim(value) do
+      "" -> nil
+      trimmed -> trimmed
+    end
+  end
+
+  defp parse_text(_), do: nil
 
   defp parse_list([]), do: nil
   defp parse_list(nil), do: nil
   defp parse_list(list) when is_list(list), do: list
   defp parse_list(value), do: [value]
 
+  defp parse_date(nil, _time), do: nil
   defp parse_date("", _time), do: nil
 
   defp parse_date(date_str, time) do

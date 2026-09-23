@@ -13,8 +13,6 @@ defmodule CraftplanWeb.PrintViewsTest do
     Product
     |> Ash.Changeset.for_create(:create, %{
       name: Map.get(attrs, :name, "Print Test Product"),
-      sku: Map.get(attrs, :sku, "SKU-" <> Ecto.UUID.generate()),
-      status: :active,
       price: Map.get(attrs, :price, Decimal.new("5.00"))
     })
     |> Ash.create!(actor: staff())
@@ -26,7 +24,6 @@ defmodule CraftplanWeb.PrintViewsTest do
     cust =
       Customer
       |> Ash.Changeset.for_create(:create, %{
-        type: :individual,
         first_name: "Jane",
         last_name: "Doe"
       })
@@ -65,7 +62,7 @@ defmodule CraftplanWeb.PrintViewsTest do
   @tag role: :staff
   test "product label contains print classes", %{conn: conn} do
     prod = create_product!()
-    {:ok, _view, html} = live(conn, ~p"/manage/products/#{prod.sku}/label")
+    {:ok, _view, html} = live(conn, ~p"/manage/products/#{prod.id}/label")
 
     assert html =~ "print:max-w-full"
     assert html =~ "print:hidden"

@@ -10,7 +10,7 @@ defmodule Craftplan.Types.Unit do
     gram: "g",
     liter: "l",
     milliliter: "ml",
-    piece: "pc",
+    piece: "pz",
     kcal: "kcal",
     kilojoule: "kJ",
     milligram: "mg",
@@ -20,7 +20,7 @@ defmodule Craftplan.Types.Unit do
   @singular_names %{
     gram: "gram",
     milliliter: "milliliter",
-    piece: "piece",
+    piece: "pieza",
     kcal: "kcal",
     kilojoule: "kJ",
     milligram: "mg",
@@ -30,7 +30,7 @@ defmodule Craftplan.Types.Unit do
   @plural_names %{
     gram: "grams",
     milliliter: "milliliters",
-    piece: "pieces",
+    piece: "piezas",
     kcal: "kcal",
     kilojoule: "kJ",
     milligram: "mg",
@@ -101,7 +101,7 @@ defmodule Craftplan.Types.Unit do
   def abbreviation(:milliliter, value), do: "#{format_number(value)}#{@unit_abbreviations.milliliter}"
 
   # Piece special cases
-  def abbreviation(:piece, 0), do: "no pieces"
+  def abbreviation(:piece, 0), do: "sin piezas"
   def abbreviation(:piece, 1), do: "1 #{@singular_names.piece}"
   def abbreviation(:piece, -1), do: "-1 #{@singular_names.piece}"
   def abbreviation(:piece, value) when is_integer(value), do: "#{value} #{@plural_names.piece}"

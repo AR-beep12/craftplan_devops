@@ -595,8 +595,7 @@ defmodule CraftplanWeb.Layouts do
   defp shop_links do
     [
       %{label: "Inicio", navigate: ~p"/", icon: :home, exact: "/"},
-      %{label: "Iniciar sesión", navigate: ~p"/sign-in", icon: :login, exact: "/sign-in"},
-      %{label: "Restablecer contraseña", navigate: ~p"/reset", icon: :settings, exact: "/reset"}
+      %{label: "Iniciar sesión", navigate: ~p"/sign-in", icon: :login, exact: "/sign-in"}
     ]
   end
 

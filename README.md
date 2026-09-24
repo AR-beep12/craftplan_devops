@@ -11,6 +11,34 @@
 </p>
 
 
+## Sobre este fork
+
+Este repositorio es un **fork de [Craftplan](https://github.com/puemos/craftplan)** adaptado a un negocio local (identidad visual "Hali"). Lo que lo diferencia del proyecto original:
+
+- **Interfaz en español**, incluidas unidades y moneda.
+- **Funciones recortadas a propósito** porque el negocio no las usa (por ejemplo, alérgenos en la navegación). Antes de "restaurar" algo que falta, revisa `CLAUDE.md`.
+- **Refactor de productos, clientes, inventario y pedidos** (productos con categorías y sin `sku`, clientes sin dirección, materiales sin `sku` ni precio, descripción en pedidos).
+- **Gestión de usuarios** con creación directa (correo y contraseña), sin depender del correo de invitación.
+- **Despliegue propio:** VPS en Contabo con Docker Compose, nginx y GitHub Actions.
+
+**Documentación de este fork**
+
+| Tema | Dónde |
+|---|---|
+| Despliegue en producción, nginx, fotos (MinIO), secretos y CI/CD | [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md) |
+| Comandos de desarrollo, arquitectura y convenciones | [CLAUDE.md](CLAUDE.md) y [AGENTS.md](AGENTS.md) |
+| Variables de entorno | [.env.example](.env.example) |
+
+**Correr en local**
+
+```bash
+docker compose -f docker-compose.dev.yml up -d   # PostgreSQL, MinIO y Mailpit
+mise exec -- mix setup                           # dependencias, base de datos y datos de ejemplo
+mise exec -- mix phx.server                      # http://localhost:4000
+```
+
+> El resto de este README, la demo, las guías de `docs/src` y los enlaces a issues son del **proyecto original** (en inglés) y pueden no reflejar las diferencias de este fork.
+
 <div align="center">
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-craftplan.fly.dev-blue)](https://craftplan.fly.dev)

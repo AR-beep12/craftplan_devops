@@ -1,7 +1,7 @@
 defmodule Craftplan.CSV.Importers.Customers do
   @moduledoc """
   CSV importer for customers (dry-run + import).
-  Expected headers: type, first_name, last_name, email.
+  Expected headers: first_name, last_name, email.
   """
 
   alias NimbleCSV.RFC4180, as: CSV

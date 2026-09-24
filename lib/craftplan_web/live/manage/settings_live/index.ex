@@ -279,22 +279,22 @@ defmodule CraftplanWeb.SettingsLive.Index do
         value: "products",
         label: "Productos",
         icon: "hero-cube-solid",
-        description: "Importa SKUs de productos, precios base e información de producción predeterminada.",
-        includes: "Nombres, SKUs, precios, empaque, alérgenos"
+        description: "Importa productos con su nombre y precio. Si el producto ya existe, se actualiza.",
+        includes: "Nombre y precio"
       },
       %{
         value: "materials",
         label: "Materiales",
         icon: "hero-archive-box-solid",
         description: "Carga masiva de materias primas para mantener recetas e inventario precisos.",
-        includes: "Nombres, proveedores, unidades, costo, etiquetas de alérgenos"
+        includes: "Nombre, unidad, color, cantidad y descripción"
       },
       %{
         value: "customers",
         label: "Clientes",
         icon: "hero-user-group-solid",
         description: "Trae registros de clientes para reutilizar en pedidos y facturas.",
-        includes: "Nombres, empresa, datos de contacto, notas de entrega"
+        includes: "Nombre, apellido y correo electrónico"
       }
     ]
   end

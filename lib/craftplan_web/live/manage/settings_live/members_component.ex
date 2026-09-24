@@ -4,6 +4,8 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
 
   alias Craftplan.Accounts
 
+  require Logger
+
   @role_colors [
     admin: "bg-purple-100 text-purple-700 border-purple-300",
     staff: "bg-blue-100 text-blue-700 border-blue-300",
@@ -16,6 +18,7 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
       assigns
       |> assign_new(:show_invite_modal, fn -> false end)
       |> assign_new(:show_create_modal, fn -> false end)
+      |> assign_new(:create_error, fn -> nil end)
       |> assign_new(:show_edit_modal, fn -> false end)
       |> assign_new(:editing_member, fn -> nil end)
 
@@ -159,6 +162,15 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
           phx-change="validate_create"
           phx-submit="create_member"
         >
+          <div
+            :if={@create_error}
+            id="create-member-error"
+            role="alert"
+            class="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700"
+          >
+            {@create_error}
+          </div>
+
           <.input
             field={@create_form[:email]}
             type="email"
@@ -234,6 +246,7 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
      |> assign(:editing_member, nil)
      |> assign(:invite_form, invite_form())
      |> assign(:create_form, create_form())
+     |> assign(:create_error, nil)
      |> assign(:role_form, role_form(:staff))}
   end
 
@@ -254,7 +267,7 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
 
   @impl true
   def handle_event("hide_create_modal", _, socket) do
-    {:noreply, assign(socket, show_create_modal: false, create_form: create_form())}
+    {:noreply, assign(socket, show_create_modal: false, create_form: create_form(), create_error: nil)}
   end
 
   @impl true
@@ -285,7 +298,7 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
 
   @impl true
   def handle_event("validate_create", %{"new_member" => params}, socket) do
-    {:noreply, assign(socket, :create_form, create_form(params))}
+    {:noreply, socket |> assign(:create_form, create_form(params)) |> assign(:create_error, nil)}
   end
 
   @impl true
@@ -334,13 +347,16 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
          |> assign(:members, members)
          |> assign(:show_create_modal, false)
          |> assign(:create_form, create_form())
+         |> assign(:create_error, nil)
          |> put_flash(:info, "Usuario creado correctamente")}
 
       {:error, error} ->
+        Logger.error("create_member failed: " <> String.slice(Exception.message(error), 0, 500))
+
         {:noreply,
          socket
          |> assign(:create_form, create_form(params))
-         |> put_flash(:error, create_error_message(error))}
+         |> assign(:create_error, create_error_message(error))}
     end
   end
 
@@ -401,15 +417,35 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
   end
 
   defp create_error_message(%Ash.Error.Invalid{errors: errors}) do
-    errors
-    |> Enum.map_join(" ", &Exception.message/1)
-    |> case do
-      "" -> "No se pudo crear el usuario."
-      message -> message
+    case errors |> Enum.map(&format_create_error/1) |> Enum.uniq() do
+      [] -> "No se pudo crear el usuario."
+      messages -> Enum.join(messages, " ")
     end
   end
 
-  defp create_error_message(_error), do: "No se pudo crear el usuario. Es posible que el correo ya esté en uso."
+  defp create_error_message(_error), do: "No se pudo crear el usuario. Inténtalo de nuevo."
+
+  defp format_create_error(%{field: field, message: message}) when not is_nil(field) and is_binary(message) do
+    "#{field_label(field)} #{translate_error(message)}."
+  end
+
+  defp format_create_error(error), do: Exception.message(error)
+
+  defp field_label(:email), do: "El correo"
+  defp field_label(:password), do: "La contraseña"
+  defp field_label(:password_confirmation), do: "La confirmación de contraseña"
+  defp field_label(field), do: "El campo #{field}"
+
+  defp translate_error("has already been taken"), do: "ya está registrado"
+  defp translate_error("does not match"), do: "no coincide con la contraseña"
+  defp translate_error("is required"), do: "es obligatorio"
+  defp translate_error("is invalid"), do: "no es válido"
+
+  defp translate_error(message) do
+    if String.contains?(message, "greater than or equal to"),
+      do: "debe tener al menos 8 caracteres",
+      else: message
+  end
 
   defp role_form(role) do
     to_form(%{"role" => to_string(role)}, as: "role_edit")

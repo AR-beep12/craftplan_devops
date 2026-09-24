@@ -111,6 +111,90 @@ defmodule CraftplanWeb.SettingsMembersLiveTest do
     end
   end
 
+  describe "create user" do
+    defp submit_create(view, email, password, confirmation) do
+      view |> element("button", "Crear usuario") |> render_click()
+
+      view
+      |> form("#create-member-form", %{
+        "new_member" => %{
+          "email" => email,
+          "password" => password,
+          "password_confirmation" => confirmation,
+          "role" => "staff"
+        }
+      })
+      |> render_submit()
+    end
+
+    @tag role: :admin
+    test "creates a confirmed user and closes the modal", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/manage/settings/members")
+      email = "creado+#{System.unique_integer([:positive])}@test.com"
+
+      submit_create(view, email, "Password123!", "Password123!")
+
+      refute has_element?(view, "#create-member-modal")
+      assert render(view) =~ email
+    end
+
+    @tag role: :admin
+    test "the created user is confirmed and can sign in with the given password", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/manage/settings/members")
+      email = "login+#{System.unique_integer([:positive])}@test.com"
+
+      submit_create(view, email, "Password123!", "Password123!")
+
+      assert {:ok, user} =
+               User
+               |> Ash.Query.for_read(
+                 :sign_in_with_password,
+                 %{email: email, password: "Password123!"},
+                 context: %{private: %{ash_authentication?: true}}
+               )
+               |> Ash.read_one()
+
+      assert user.role == :staff
+      assert user.confirmed_at
+    end
+
+    @tag role: :admin
+    test "shows an error inside the modal when the email is already registered", %{conn: conn} do
+      email = "repetido+#{System.unique_integer([:positive])}@test.com"
+      create_staff_member!(email)
+
+      {:ok, view, _html} = live(conn, ~p"/manage/settings/members")
+      submit_create(view, email, "Password123!", "Password123!")
+
+      assert has_element?(view, "#create-member-modal")
+      assert has_element?(view, "#create-member-error", "ya está registrado")
+    end
+
+    @tag role: :admin
+    test "shows an error inside the modal when the passwords do not match", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/manage/settings/members")
+
+      submit_create(
+        view,
+        "x+#{System.unique_integer([:positive])}@test.com",
+        "Password123!",
+        "Otra12345!"
+      )
+
+      assert has_element?(view, "#create-member-modal")
+      assert has_element?(view, "#create-member-error", "no coincide")
+    end
+
+    @tag role: :admin
+    test "shows an error inside the modal when the password is too short", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/manage/settings/members")
+
+      submit_create(view, "c+#{System.unique_integer([:positive])}@test.com", "corta", "corta")
+
+      assert has_element?(view, "#create-member-error", "al menos 8")
+    end
+  end
+
   describe "update role" do
     @tag role: :admin
     test "opens edit role modal and updates role", %{conn: conn} do

@@ -550,18 +550,20 @@ defmodule CraftplanWeb.ImportModalComponent do
       key: "materials",
       label: "Materiales",
       importer: Craftplan.CSV.Importers.Materials,
-      instructions: ["Requerido: name, sku, unit, price."],
+      instructions: ["Requerido: name, unit. Opcional: color, quantity, extra_description."],
       fields: [
         %{name: "name", label: "Nombre", required: true},
-        %{name: "sku", label: "SKU", required: true},
         %{name: "unit", label: "Unidad", required: true},
-        %{name: "price", label: "Precio", required: true}
+        %{name: "color", label: "Color", required: false},
+        %{name: "quantity", label: "Cantidad", required: false},
+        %{name: "extra_description", label: "Descripción", required: false}
       ],
       default_candidates: %{
         "name" => ["name"],
-        "sku" => ["sku", "code"],
         "unit" => ["unit", "uom", "units"],
-        "price" => ["price", "cost", "amount"]
+        "color" => ["color"],
+        "quantity" => ["quantity", "qty", "amount"],
+        "extra_description" => ["extra_description", "description", "notes"]
       }
     }
   end
@@ -571,15 +573,13 @@ defmodule CraftplanWeb.ImportModalComponent do
       key: "customers",
       label: "Clientes",
       importer: Craftplan.CSV.Importers.Customers,
-      instructions: ["Requerido: type, first_name, last_name, email."],
+      instructions: ["Requerido: first_name, last_name, email."],
       fields: [
-        %{name: "type", label: "Tipo", required: true},
         %{name: "first_name", label: "Nombre", required: true},
         %{name: "last_name", label: "Apellido", required: true},
         %{name: "email", label: "Correo electrónico", required: true}
       ],
       default_candidates: %{
-        "type" => ["type"],
         "first_name" => ["first_name", "firstname", "first name"],
         "last_name" => ["last_name", "lastname", "last name"],
         "email" => ["email", "email address"]

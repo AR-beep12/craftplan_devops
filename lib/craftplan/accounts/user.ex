@@ -135,10 +135,10 @@ defmodule Craftplan.Accounts.User do
       change set_attribute(:role, arg(:role))
 
       # Hashes the provided password
-      change HashPasswordChange
+      change {HashPasswordChange, strategy_name: :password}
 
       # validates that the password matches the confirmation
-      validate PasswordConfirmationValidation
+      validate {PasswordConfirmationValidation, strategy_name: :password}
     end
 
     read :get_by_subject do

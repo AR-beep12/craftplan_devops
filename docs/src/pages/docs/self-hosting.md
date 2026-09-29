@@ -24,7 +24,7 @@ Craftplan will be available at `http://localhost:4000` (or the `PORT` you config
 
 ### First-time setup
 
-On first launch, Craftplan shows a setup screen where you create your **admin account**. Once signed in, invite additional team members from **Settings → Members** — choose Staff or Admin role for each.
+On first launch, Craftplan shows a setup screen where you create your **admin account**. Once signed in, create additional team members from **Settings → Members** — choose Staff or Admin role for each.
 
 ---
 
@@ -157,10 +157,6 @@ Email is primarily configured from the **Settings UI** inside the app. Environme
 | `EMAIL_API_DOMAIN` | Mailgun domain (Mailgun only) |
 | `EMAIL_API_SECRET` | Secret key (Amazon SES only) |
 | `EMAIL_API_REGION` | AWS region (Amazon SES only, default: `us-east-1`) |
-| `SMTP_HOST` | SMTP relay hostname (alternative to API providers) |
-| `SMTP_PORT` | SMTP port (default: `587`) |
-| `SMTP_USERNAME` | SMTP username |
-| `SMTP_PASSWORD` | SMTP password |
 
 ---
 

@@ -9,6 +9,7 @@ defmodule Craftplan.Orders.Order do
 
   alias Craftplan.Orders.Changes.CalculateTotals
   alias Craftplan.Orders.Changes.ValidateConstraints
+  alias Craftplan.Orders.Changes.ValidateProductAvailability
   alias Craftplan.Orders.Order.Types.PaymentStatus
   alias Craftplan.Orders.Order.Types.Status
 
@@ -70,6 +71,7 @@ defmodule Craftplan.Orders.Order do
       argument :items, {:array, :map}
 
       change manage_relationship(:items, type: :direct_control)
+      change {ValidateProductAvailability, []}
       change {CalculateTotals, []}
       change {ValidateConstraints, []}
     end
@@ -97,6 +99,7 @@ defmodule Craftplan.Orders.Order do
       argument :items, {:array, :map}
 
       change manage_relationship(:items, type: :direct_control)
+      change {ValidateProductAvailability, []}
       change {CalculateTotals, []}
       change {ValidateConstraints, []}
     end

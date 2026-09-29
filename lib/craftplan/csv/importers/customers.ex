@@ -9,6 +9,7 @@ defmodule Craftplan.CSV.Importers.Customers do
   @type row :: %{
           first_name: String.t(),
           last_name: String.t(),
+          phone: String.t(),
           email: String.t()
         }
   @type error :: %{row: non_neg_integer(), message: String.t()}
@@ -83,6 +84,7 @@ defmodule Craftplan.CSV.Importers.Customers do
                 attrs = %{
                   first_name: row.first_name,
                   last_name: row.last_name,
+                  phone: row.phone,
                   email: row.email
                 }
 
@@ -140,7 +142,7 @@ defmodule Craftplan.CSV.Importers.Customers do
   defp apply_mapping(header_map, mapping) when mapping == %{}, do: header_map
 
   defp apply_mapping(header_map, mapping) do
-    Enum.reduce(["first_name", "last_name", "email"], header_map, fn field, acc ->
+    Enum.reduce(["first_name", "last_name", "phone", "email"], header_map, fn field, acc ->
       case Map.get(mapping, field) do
         nil ->
           acc
@@ -164,12 +166,14 @@ defmodule Craftplan.CSV.Importers.Customers do
   defp cast_row(fields, header_map) do
     first_name = fields |> fetch_field(header_map, "first_name") |> to_string() |> String.trim()
     last_name = fields |> fetch_field(header_map, "last_name") |> to_string() |> String.trim()
+    phone = fields |> fetch_field(header_map, "phone") |> to_string() |> String.trim()
     email = fields |> fetch_field(header_map, "email") |> to_string() |> String.trim()
 
     with :ok <- present?(first_name, "first_name"),
          :ok <- present?(last_name, "last_name"),
+         :ok <- present?(phone, "phone"),
          {:ok, email} <- parse_email(email) do
-      {:ok, %{first_name: first_name, last_name: last_name, email: email}}
+      {:ok, %{first_name: first_name, last_name: last_name, phone: phone, email: email}}
     end
   end
 

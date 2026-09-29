@@ -38,14 +38,6 @@ defmodule CraftplanWeb.SettingsMembersLiveTest do
                Craftplan.Accounts.update_user_role(staff_user, %{role: :admin}, actor: staff_user)
     end
 
-    @tag role: :staff
-    test "staff cannot invite members via Ash action", %{user: staff_user} do
-      assert {:error, %Forbidden{}} =
-               Craftplan.Accounts.invite_member(
-                 %{email: "hack+#{System.unique_integer()}@test.com", role: :admin},
-                 actor: staff_user
-               )
-    end
   end
 
   describe "index" do
@@ -77,37 +69,6 @@ defmodule CraftplanWeb.SettingsMembersLiveTest do
       assert html =~ "Editar"
       assert html =~ "Quitar"
       assert html =~ to_string(admin.email)
-    end
-  end
-
-  describe "invite" do
-    @tag role: :admin
-    test "opens invite modal", %{conn: conn} do
-      {:ok, view, _html} = live(conn, ~p"/manage/settings/members")
-
-      view |> element("button", "Invitar usuario") |> render_click()
-
-      assert has_element?(view, "#invite-member-modal")
-      assert has_element?(view, "#invite-member-form")
-    end
-
-    @tag role: :admin
-    test "invites new staff member and shows in table", %{conn: conn} do
-      {:ok, view, _html} = live(conn, ~p"/manage/settings/members")
-
-      view |> element("button", "Invitar usuario") |> render_click()
-
-      email = "invited+#{System.unique_integer()}@test.com"
-
-      view
-      |> form("#invite-member-form", %{"invite" => %{"email" => email}})
-      |> render_change(%{"invite" => %{"email" => email, "role" => "staff"}})
-
-      view
-      |> form("#invite-member-form", %{"invite" => %{"email" => email, "role" => "staff"}})
-      |> render_submit()
-
-      assert render(view) =~ email
     end
   end
 

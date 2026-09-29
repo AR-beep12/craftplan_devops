@@ -620,10 +620,11 @@ defmodule CraftplanWeb.OrderLive.FormComponent do
       # MapSet automatically removes duplicates, so we don't need `Enum.uniq/1`
       |> MapSet.new()
 
-    # Reject products whose IDs are in existing_product_ids
+    # Reject products whose IDs are in existing_product_ids or are deactivated
     available_products =
       for product <- all_products,
           not MapSet.member?(existing_product_ids, product.id),
+          product.selling_availability != :off,
           do: product
 
     # Preserve the previous selection if it's still available, otherwise pick the first

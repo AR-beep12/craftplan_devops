@@ -448,7 +448,13 @@ defmodule CraftplanWeb.OrderLive.Index do
     socket =
       socket
       |> assign(:filters, filters)
-      |> assign(:products, Catalog.list_products!(actor: socket.assigns[:current_user]))
+      |> assign(
+        :products,
+        Catalog.list_products!(
+          actor: socket.assigns[:current_user],
+          load: [:selling_availability]
+        )
+      )
       |> assign(
         :customers,
         CRM.list_customers!(actor: socket.assigns[:current_user], load: [:full_name])

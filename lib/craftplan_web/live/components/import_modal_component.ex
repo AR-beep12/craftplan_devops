@@ -47,7 +47,13 @@ defmodule CraftplanWeb.ImportModalComponent do
 
     ~H"""
     <div id={@id <> "-wrap"}>
-      <.modal :if={@show} id={@id} title={"Importar " <> @config.label} show={true}>
+      <.modal
+        :if={@show}
+        id={@id}
+        title={"Importar " <> @config.label}
+        show={true}
+        on_cancel={JS.push("wizard_close", target: @myself)}
+      >
         <div class="h-[600px] overflow-auto">
           <div
             phx-target={@myself}
@@ -66,9 +72,14 @@ defmodule CraftplanWeb.ImportModalComponent do
             <div :for={line <- @config.instructions}>{line}</div>
 
             <div class="mt-2">
-              <.button variant={:outline} id="csv-template-download" type="button">
+              <.link
+                id="csv-template-download"
+                href={"/manage/settings/csv/template/#{@config.key}"}
+                target="_blank"
+                class="inline-flex items-center justify-center rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-800 shadow-sm transition hover:border-primary-400 hover:text-primary-700"
+              >
                 Descargar plantilla
-              </.button>
+              </.link>
             </div>
           </div>
 
@@ -92,8 +103,18 @@ defmodule CraftplanWeb.ImportModalComponent do
               </div>
 
               <div class="sm:col-span-2">
+                <!-- Upload area -->
                 <label class="mb-1 block text-sm font-medium text-stone-700">O elige un archivo…</label>
-                <.live_file_input upload={@uploads[:csv]} class="block w-full text-sm" />
+                <label class="relative flex min-h-[120px] cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-stone-300 bg-stone-50 px-4 py-6 text-center transition hover:border-primary-400 hover:bg-primary-50/30">
+                  <.live_file_input upload={@uploads[:csv]} class="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
+                  <.icon name="hero-arrow-up-tray" class="h-8 w-8 text-stone-400" />
+                  <p class="mt-2 text-sm font-medium text-stone-600">
+                    Haz clic para seleccionar un archivo CSV
+                  </p>
+                  <p class="mt-1 text-xs text-stone-400">
+                    o arrastra y suelta aquí
+                  </p>
+                </label>
               </div>
             </div>
           </.form>
@@ -573,15 +594,17 @@ defmodule CraftplanWeb.ImportModalComponent do
       key: "customers",
       label: "Clientes",
       importer: Craftplan.CSV.Importers.Customers,
-      instructions: ["Requerido: first_name, last_name, email."],
+      instructions: ["Requerido: first_name, last_name, phone, email."],
       fields: [
         %{name: "first_name", label: "Nombre", required: true},
         %{name: "last_name", label: "Apellido", required: true},
+        %{name: "phone", label: "Teléfono", required: true},
         %{name: "email", label: "Correo electrónico", required: true}
       ],
       default_candidates: %{
         "first_name" => ["first_name", "firstname", "first name"],
         "last_name" => ["last_name", "lastname", "last name"],
+        "phone" => ["phone", "telefono", "telephone", "mobile"],
         "email" => ["email", "email address"]
       }
     }

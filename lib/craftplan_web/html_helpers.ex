@@ -301,6 +301,21 @@ defmodule CraftplanWeb.HtmlHelpers do
     format_currency(currency, amount, opts)
   end
 
+  @doc """
+  Formats a stock/quantity value for display.
+
+  Normalizes decimals so trailing zeros are stripped (`12.50` -> `"12.5"`,
+  `10.00` -> `"10"`), keeping every surface that shows a quantity consistent.
+  `nil` renders as `"0"`.
+  """
+  @spec format_quantity(Decimal.t() | number() | nil) :: String.t()
+  def format_quantity(nil), do: "0"
+
+  def format_quantity(%Decimal{} = qty), do: qty |> Decimal.normalize() |> Decimal.to_string(:normal)
+
+  def format_quantity(qty) when is_number(qty), do: to_string(qty)
+  def format_quantity(qty), do: to_string(qty)
+
   @spec format_amount(atom(), Decimal.t() | Money.t() | number() | nil) :: String.t()
   def format_amount(unit, nil), do: format_amount(unit, Decimal.new(0))
   def format_amount(unit, %Decimal{} = amount), do: format_amount(unit, Decimal.to_float(amount))

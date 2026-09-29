@@ -81,33 +81,18 @@ defmodule Craftplan.Accounts.User do
       description "Admin removes a team member"
     end
 
-    create :invite do
-      description "Admin invites a new team member by email and role"
 
-      argument :email, :ci_string do
-        allow_nil? false
-      end
-
-      argument :role, Role do
-        allow_nil? false
-        default :staff
-      end
-
-      change set_attribute(:email, arg(:email))
-      change set_attribute(:role, arg(:role))
-
-      change fn changeset, _ ->
-        temp_password = 32 |> :crypto.strong_rand_bytes() |> Base.url_encode64(padding: false)
-        hashed = Bcrypt.hash_pwd_salt(temp_password)
-        Ash.Changeset.force_change_attribute(changeset, :hashed_password, hashed)
-      end
-    end
 
     create :create_member do
       description """
       Admin creates a new team member directly with an email and password,
       without sending a confirmation email. The account is active immediately.
       """
+
+      argument :name, :string do
+        description "The display name for the user."
+        allow_nil? true
+      end
 
       argument :email, :ci_string do
         allow_nil? false
@@ -131,6 +116,7 @@ defmodule Craftplan.Accounts.User do
         sensitive? true
       end
 
+      change set_attribute(:name, arg(:name))
       change set_attribute(:email, arg(:email))
       change set_attribute(:role, arg(:role))
 
@@ -206,8 +192,13 @@ defmodule Craftplan.Accounts.User do
         allow_nil? false
       end
 
+      argument :name, :string do
+        description "The display name for the user."
+        allow_nil? true
+      end
+
       argument :role, :atom do
-        default :customer
+        default :staff
       end
 
       argument :password, :string do
@@ -224,6 +215,7 @@ defmodule Craftplan.Accounts.User do
       end
 
       # Sets the email from the argument
+      change set_attribute(:name, arg(:name))
       change set_attribute(:email, arg(:email))
 
       change set_attribute(:role, arg(:role))
@@ -303,7 +295,7 @@ defmodule Craftplan.Accounts.User do
       authorize_if always()
     end
 
-    bypass action([:list_members, :invite, :create_member, :update_role, :remove_member]) do
+    bypass action([:list_members, :create_member, :update_role, :remove_member]) do
       authorize_if actor_attribute_equals(:role, :admin)
     end
 
@@ -314,6 +306,11 @@ defmodule Craftplan.Accounts.User do
 
   attributes do
     uuid_primary_key :id
+
+    attribute :name, :string do
+      allow_nil? true
+      public? true
+    end
 
     attribute :email, :ci_string do
       allow_nil? false
@@ -330,6 +327,8 @@ defmodule Craftplan.Accounts.User do
       public? true
       default :customer
     end
+
+    timestamps()
   end
 
   identities do

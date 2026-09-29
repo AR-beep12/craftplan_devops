@@ -15,32 +15,13 @@ defmodule CraftplanWeb.SettingsLive.Index do
 
     ~H"""
     <div class="mt-4 space-y-6">
-      <div :if={@live_action in [:general, :index]}>
-        <div class="flex flex-col gap-6 lg:flex-row">
-          <div class="grow">
-            <div class="rounded-md border border-gray-200 bg-white p-6">
-              <.live_component
-                module={CraftplanWeb.SettingsLive.FormComponent}
-                id="settings-form"
-                current_user={@current_user}
-                title={@page_title}
-                action={@live_action}
-                settings={@settings}
-                patch={~p"/manage/settings/general"}
-              />
-            </div>
-          </div>
-
-          <aside class="lg:w-64"></aside>
-        </div>
-      </div>
-
       <div :if={@live_action == :categories}>
         <div>
           <.live_component
             module={CraftplanWeb.SettingsLive.CategoriesComponent}
             id="categories-component"
             current_user={@current_user}
+            settings={@settings}
           />
         </div>
       </div>
@@ -151,7 +132,13 @@ defmodule CraftplanWeb.SettingsLive.Index do
                 Genera un extracto CSV para tus flujos de trabajo de informes y contabilidad.
               </p>
 
-              <.form for={@csv_export_form} id="csv-export-form" phx-submit="csv_export">
+              <.form
+                for={@csv_export_form}
+                id="csv-export-form"
+                action="/manage/settings/csv/export"
+                method="get"
+                target="_blank"
+              >
                 <div class="mt-4 space-y-4">
                   <.input
                     type="select"
@@ -233,10 +220,6 @@ defmodule CraftplanWeb.SettingsLive.Index do
      |> assign(:show_mapping_modal, true)}
   end
 
-  def handle_event("csv_export", %{"entity" => entity}, socket) do
-    {:noreply, redirect(socket, to: ~p"/manage/settings/csv/export/#{entity}")}
-  end
-
   defp apply_action(socket, :index, _params) do
     assign(socket, :page_title, "Configuración")
   end
@@ -246,7 +229,7 @@ defmodule CraftplanWeb.SettingsLive.Index do
   end
 
   defp apply_action(socket, :categories, _params) do
-    assign(socket, :page_title, "Categorías de productos")
+    assign(socket, :page_title, "General")
   end
 
   defp apply_action(socket, :allergens, _params) do
@@ -294,7 +277,7 @@ defmodule CraftplanWeb.SettingsLive.Index do
         label: "Clientes",
         icon: "hero-user-group-solid",
         description: "Trae registros de clientes para reutilizar en pedidos y facturas.",
-        includes: "Nombre, apellido y correo electrónico"
+        includes: "Nombre, apellido, teléfono y correo electrónico"
       }
     ]
   end

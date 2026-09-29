@@ -29,7 +29,7 @@ defmodule CraftplanWeb.Layouts do
     current_path = assigns.current_path || ""
     nav_section = assigns.nav_section
     is_manage? = manage_path?(current_path, nav_section)
-    manage_links = compute_links(current_path, nav_section, manage_links())
+    manage_links = compute_links(current_path, nav_section, manage_links(assigns[:current_user]))
     shop_links = compute_links(current_path, nav_section, shop_links())
 
     if_result = if(is_manage?, do: manage_links, else: shop_links)
@@ -226,6 +226,7 @@ defmodule CraftplanWeb.Layouts do
         <ul class="mt-3 space-y-1">
           <li :for={link <- primary_links}>
             <.link
+              :if={not Map.get(link, :disabled, false)}
               navigate={link.navigate}
               class={nav_link_classes(link.active)}
               data-active={link.active}
@@ -235,6 +236,14 @@ defmodule CraftplanWeb.Layouts do
                 class={"transition-transform duration-150 group-hover:translate-x-0.5" <> if link.active, do: " text-primary-600", else: ""}
               /> <span>{link.label}</span>
             </.link>
+
+            <span
+              :if={Map.get(link, :disabled, false)}
+              class="flex cursor-not-allowed items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-stone-300"
+              title="Solo disponible para administradores"
+            >
+              <.nav_icon name={link.icon} class="h-4 w-4 shrink-0" /> <span>{link.label}</span>
+            </span>
 
             <div
               :if={link.active and @nav_sub_links != []}
@@ -545,7 +554,9 @@ defmodule CraftplanWeb.Layouts do
     nav_section != nil or String.starts_with?(current_path, "/manage")
   end
 
-  defp manage_links do
+  defp manage_links(current_user) do
+    settings_disabled = current_user && current_user.role != :admin
+
     [
       %{
         label: "Dashboard",
@@ -587,7 +598,8 @@ defmodule CraftplanWeb.Layouts do
         navigate: ~p"/manage/settings",
         icon: :settings,
         nav_section: :settings,
-        prefix: "/manage/settings"
+        prefix: "/manage/settings",
+        disabled: settings_disabled
       }
     ]
   end

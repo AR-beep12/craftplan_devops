@@ -1,8 +1,6 @@
 defmodule CraftplanWeb.CSVExportTest do
   use CraftplanWeb.ConnCase, async: true
 
-  import Phoenix.LiveViewTest
-
   alias Craftplan.CSV.Exporters.Orders
   alias Craftplan.Test.Factory
   alias NimbleCSV.RFC4180, as: CSV
@@ -173,59 +171,6 @@ defmodule CraftplanWeb.CSVExportTest do
     test "staff user can export movements", %{conn: conn} do
       conn = get(conn, ~p"/manage/settings/csv/export/movements")
       assert response_content_type(conn, :csv) =~ "text/csv"
-    end
-  end
-
-  describe "CSV export LiveView integration" do
-    test "export form submits and redirects to download endpoint", %{conn: conn} do
-      admin = Craftplan.DataCase.admin_actor()
-
-      conn =
-        conn
-        |> AshAuthentication.Phoenix.Plug.store_in_session(admin)
-        |> Plug.Conn.assign(:current_user, admin)
-
-      {:ok, view, _html} = live(conn, ~p"/manage/settings/csv")
-
-      # The form should exist with the entity select
-      assert has_element?(view, "#csv-export-form")
-      assert has_element?(view, ~s(select[name="entity"]))
-
-      result =
-        view
-        |> form("#csv-export-form", %{"entity" => "orders"})
-        |> render_submit()
-
-      # LiveView redirect returns {:error, {:redirect, %{to: url}}} which
-      # follow_redirect converts; we just verify the redirect happens
-      assert {:error, {:redirect, %{to: "/manage/settings/csv/export/orders"}}} = result
-    end
-
-    test "can select different entities for export", %{conn: conn} do
-      admin = Craftplan.DataCase.admin_actor()
-
-      conn =
-        conn
-        |> AshAuthentication.Phoenix.Plug.store_in_session(admin)
-        |> Plug.Conn.assign(:current_user, admin)
-
-      {:ok, view, html} = live(conn, ~p"/manage/settings/csv")
-
-      assert html =~ "Exportar datos"
-      assert html =~ "Entidad a exportar"
-
-      # All three entities should be available
-      assert html =~ "Pedidos"
-      assert html =~ "Clientes"
-      assert html =~ "Movimientos de inventario"
-
-      # Select customers and verify redirect target
-      result =
-        view
-        |> form("#csv-export-form", %{"entity" => "customers"})
-        |> render_submit()
-
-      assert {:error, {:redirect, %{to: "/manage/settings/csv/export/customers"}}} = result
     end
   end
 

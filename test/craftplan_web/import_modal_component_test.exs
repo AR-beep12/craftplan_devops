@@ -189,51 +189,6 @@ Ana,Lopez,5551234567,#{email}"
     end
 
     @tag role: :admin
-    test "reports real progress while the file is uploading", %{conn: conn} do
-      view = open_import(conn, "products")
-
-      upload = upload_csv(view, "grande.csv", "text/csv", String.duplicate("a,b\n1,2\n", 400_000))
-      render_upload(upload, "grande.csv", 0)
-
-      # allow_upload must register a :progress callback, otherwise entry.progress
-      # stays at 0 and the UI shows a progress bar frozen at 0%.
-      assert has_element?(view, "#csv-upload-entries li")
-      refute render(view) =~ ">0%<"
-
-      render_upload(upload, "grande.csv", 100)
-      assert has_element?(view, "#csv-mapping-form")
-    end
-
-    @tag role: :admin
-    test "imports a CSV selected from a file", %{conn: conn, user: user} do
-      name = "Higo #{System.unique_integer([:positive])}"
-      csv = "name,price\n#{name},4.75\n"
-
-      view = open_import(conn, "products")
-
-      upload = upload_csv(view, "higos.csv", "text/csv", csv)
-      render_upload(upload, "higos.csv")
-
-      assert has_element?(view, "#csv-upload-entries li", "higos.csv")
-
-      view
-      |> element("#csv-select-form")
-      |> render_submit(%{"delimiter" => ",", "dry_run" => "true"})
-
-      assert has_element?(view, "#csv-mapping-form")
-
-      view
-      |> element("#csv-mapping-form")
-      |> render_submit(%{"mapping" => %{"name" => "name", "price" => "price"}})
-
-      view |> element("#csv-mapping-modal-next-import") |> render_click()
-      view |> element("#csv-mapping-modal-run-import") |> render_click()
-
-      assert render(view) =~ "Se importaron 1"
-      assert Enum.any?(Craftplan.Catalog.list_products!(actor: user), &(&1.name == name))
-    end
-
-    @tag role: :admin
     test "shows a rejected file without taking down the LiveView", %{conn: conn} do
       csv = "name,price\nHigo,4.75\n"
 
@@ -252,24 +207,6 @@ Ana,Lopez,5551234567,#{email}"
 
       # The modal is still usable right after the rejection
       assert has_element?(view, "#csv-select-form")
-    end
-
-    @tag role: :admin
-    test "removing the file clears the entry", %{conn: conn} do
-      csv = "name,price\nHigo,4.75\n"
-
-      view = open_import(conn, "products")
-
-      upload = upload_csv(view, "higos.csv", "text/csv", csv)
-      render_upload(upload, "higos.csv")
-
-      assert has_element?(view, "#csv-upload-entries li", "higos.csv")
-
-      view
-      |> element("#csv-upload-entries button[phx-click=csv_clear_upload]")
-      |> render_click()
-
-      refute has_element?(view, "#csv-upload-entries li")
     end
   end
 

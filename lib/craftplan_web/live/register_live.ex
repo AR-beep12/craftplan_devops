@@ -56,7 +56,7 @@ defmodule CraftplanWeb.RegisterLive do
 
         <p class="text-center text-sm text-stone-600">
           ¿Ya tienes cuenta?
-          <.link navigate={~p"/sign-in"} class="font-medium text-primary-600 hover:text-primary-500">
+          <.link navigate={~p"/sign-in"} class="text-primary-600 font-medium hover:text-primary-500">
             Inicia sesión
           </.link>
         </p>

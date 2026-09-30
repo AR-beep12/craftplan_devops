@@ -89,8 +89,6 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
         </div>
       </div>
 
-      
-
       <.modal
         :if={@show_create_modal}
         id="create-member-modal"
@@ -189,11 +187,11 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
     {:ok,
      socket
      |> assign(assigns)
-      |> assign(:members, members)
-      |> assign(:show_create_modal, false)
-      |> assign(:show_edit_modal, false)
-      |> assign(:editing_member, nil)
-      |> assign(:create_form, create_form())
+     |> assign(:members, members)
+     |> assign(:show_create_modal, false)
+     |> assign(:show_edit_modal, false)
+     |> assign(:editing_member, nil)
+     |> assign(:create_form, create_form())
      |> assign(:create_error, nil)
      |> assign(:role_form, role_form(:staff))}
   end
@@ -233,7 +231,6 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
   def handle_event("validate_create", %{"new_member" => params}, socket) do
     {:noreply, socket |> assign(:create_form, create_form(params)) |> assign(:create_error, nil)}
   end
-
 
   @impl true
   def handle_event("create_member", %{"new_member" => params}, socket) do
@@ -312,7 +309,13 @@ defmodule CraftplanWeb.SettingsLive.MembersComponent do
   defp create_form(params \\ %{}) do
     to_form(
       Map.merge(
-        %{"name" => "", "email" => "", "password" => "", "password_confirmation" => "", "role" => "staff"},
+        %{
+          "name" => "",
+          "email" => "",
+          "password" => "",
+          "password_confirmation" => "",
+          "role" => "staff"
+        },
         params
       ),
       as: "new_member"

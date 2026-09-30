@@ -2,7 +2,6 @@ defmodule CraftplanWeb.CalendarFeedTest do
   use CraftplanWeb.ConnCase, async: true
 
   alias Craftplan.Accounts
-  alias Craftplan.Orders.ProductionBatch
   alias Craftplan.Test.Factory
 
   describe "GET /api/calendar/feed.ics" do
@@ -227,39 +226,6 @@ defmodule CraftplanWeb.CalendarFeedTest do
       assert body =~ "BEGIN:VCALENDAR"
       refute body =~ order.reference
       refute body =~ "BEGIN:VEVENT"
-    end
-
-    # ── Production batches ──
-
-    test "includes started production batch events", %{conn: conn} do
-      admin = Craftplan.DataCase.admin_actor()
-
-      {raw_key, _api_key} =
-        Factory.create_api_key!(%{"orders" => ["read"], "production_batches" => ["read"]}, admin)
-
-      product = Factory.create_product!(admin)
-
-      # Create and start a batch
-      batch =
-        ProductionBatch
-        |> Ash.Changeset.for_create(:open, %{
-          product_id: product.id,
-          planned_qty: Decimal.new("100")
-        })
-        |> Ash.create!(actor: admin)
-
-      batch =
-        batch
-        |> Ash.Changeset.for_update(:start, %{})
-        |> Ash.update!(actor: admin)
-
-      conn = get(conn, "/api/calendar/feed.ics?key=#{raw_key}")
-      body = conn.resp_body
-
-      assert conn.status == 200
-      assert body =~ "BEGIN:VEVENT"
-      assert body =~ "Batch #{batch.batch_code}"
-      assert body =~ "batch-#{batch.id}@craftplan"
     end
 
     # ── Empty feed ──

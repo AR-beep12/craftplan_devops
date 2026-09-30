@@ -37,7 +37,6 @@ defmodule CraftplanWeb.SettingsMembersLiveTest do
       assert {:error, %Forbidden{}} =
                Craftplan.Accounts.update_user_role(staff_user, %{role: :admin}, actor: staff_user)
     end
-
   end
 
   describe "index" do

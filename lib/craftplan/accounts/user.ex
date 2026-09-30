@@ -81,8 +81,6 @@ defmodule Craftplan.Accounts.User do
       description "Admin removes a team member"
     end
 
-
-
     create :create_member do
       description """
       Admin creates a new team member directly with an email and password,

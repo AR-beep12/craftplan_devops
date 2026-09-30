@@ -218,7 +218,8 @@ defmodule CraftplanWeb.SettingsLive.CategoriesComponent do
 
     settings_form =
       if assigns[:settings] do
-        AshPhoenix.Form.for_update(assigns.settings, :update,
+        assigns.settings
+        |> AshPhoenix.Form.for_update(:update,
           as: "settings",
           actor: assigns[:current_user]
         )
@@ -322,9 +323,7 @@ defmodule CraftplanWeb.SettingsLive.CategoriesComponent do
   def handle_event("toggle_active", %{"id" => id}, socket) do
     category = Catalog.get_category_by_id!(id, actor: socket.assigns.current_user)
 
-    case Catalog.update_category(category, %{active: !category.active},
-           actor: socket.assigns.current_user
-         ) do
+    case Catalog.update_category(category, %{active: !category.active}, actor: socket.assigns.current_user) do
       {:ok, _} ->
         categories =
           [actor: socket.assigns.current_user]

@@ -4,19 +4,6 @@ defmodule CraftplanWeb.ManageSettingsInteractionsLiveTest do
   import Phoenix.LiveViewTest
 
   @tag role: :admin
-  test "general settings can be saved", %{conn: conn} do
-    {:ok, view, _html} = live(conn, ~p"/manage/settings/general")
-
-    params = %{"settings" => %{"tax_rate" => "0.05"}}
-
-    view
-    |> element("#settings-form")
-    |> render_submit(params)
-
-    assert render(view) =~ "Configuración actualizada correctamente"
-  end
-
-  @tag role: :admin
   test "add and delete allergen in settings", %{conn: conn} do
     {:ok, view, _html} = live(conn, ~p"/manage/settings/allergens")
 

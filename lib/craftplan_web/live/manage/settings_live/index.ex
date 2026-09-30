@@ -193,13 +193,6 @@ defmodule CraftplanWeb.SettingsLive.Index do
       |> assign(:selected_entity, nil)
       |> assign_new(:current_user, fn -> nil end)
 
-    # Always configure CSV upload; harmless on other tabs and avoids missing @uploads
-    socket =
-      allow_upload(socket, :csv,
-        accept: [".csv", "text/csv"],
-        max_entries: 1
-      )
-
     {:ok, socket}
   end
 

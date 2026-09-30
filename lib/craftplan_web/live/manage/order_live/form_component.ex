@@ -180,15 +180,56 @@ defmodule CraftplanWeb.OrderLive.FormComponent do
             class="mt-2 flex items-end gap-2"
           >
             <div class="grow">
-              <.input
-                phx-change="selected-product-change"
+              <div
+                id="product-select-widget"
+                phx-hook="CategorySearch"
                 phx-target={@myself}
-                name="product_id"
-                id="product-picker"
-                type="select"
-                value={@selected_product}
-                options={Enum.map(@available_products, &{&1.name, &1.id})}
-              />
+                data-open-event="open_product_dropdown"
+                data-close-event="close_product_dropdown"
+                class="relative"
+              >
+                <input
+                  id="product-picker"
+                  type="text"
+                  name="product_q"
+                  value={@product_query}
+                  placeholder="Buscar producto..."
+                  autocomplete="off"
+                  phx-target={@myself}
+                  phx-keyup="search_product"
+                  phx-change="search_product"
+                  class="block w-full rounded-lg border border-stone-300 px-3 py-2 text-sm shadow-sm focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400"
+                />
+
+                <div
+                  :if={@product_dropdown_open?}
+                  class="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-md border border-stone-200 bg-white shadow-lg"
+                >
+                  <button
+                    :for={product <- @filtered_products}
+                    type="button"
+                    phx-click="select_product"
+                    phx-value-id={product.id}
+                    phx-target={@myself}
+                    class={[
+                      "flex w-full items-center px-3 py-2 text-left text-sm hover:bg-stone-100",
+                      @selected_product == product.id && "bg-stone-100 font-medium"
+                    ]}
+                  >
+                    {product.name}
+                    <span
+                      :if={@selected_product == product.id}
+                      class="ml-auto text-xs text-stone-500"
+                    >
+                      ✓
+                    </span>
+                  </button>
+
+                  <div :if={@filtered_products == []} class="px-3 py-2 text-sm text-stone-500">
+                    Sin resultados
+                  </div>
+                </div>
+              </div>
             </div>
 
             <.button
@@ -323,17 +364,18 @@ defmodule CraftplanWeb.OrderLive.FormComponent do
   def update(assigns, socket) do
     socket = assign(socket, assigns)
 
-    socket = assign_form(socket)
+    socket =
+      socket
+      |> assign_form()
+      |> assign_new(:selected_product, fn -> nil end)
+      |> assign_new(:product_query, fn -> "" end)
+      |> assign_new(:product_dropdown_open?, fn -> false end)
+      |> assign_new(:filtered_products, fn -> [] end)
+      |> assign(:changed, false)
+      |> assign_product_picker()
 
     products_map =
       Map.new(assigns.products, fn p -> {p.id, p} end)
-
-    {available_products, selected_product} =
-      recompute_availability(
-        socket.assigns.form,
-        assigns.products,
-        Map.get(socket.assigns, :selected_product)
-      )
 
     {customer_query, filtered_customers} =
       init_customer_state(socket.assigns.form, assigns[:customers] || [])
@@ -347,11 +389,8 @@ defmodule CraftplanWeb.OrderLive.FormComponent do
 
     {:ok,
      socket
-     |> assign(:changed, false)
      |> assign(:draft, draft)
      |> assign(:products_map, products_map)
-     |> assign(:available_products, available_products)
-     |> assign(:selected_product, selected_product)
      |> assign(:customers, assigns[:customers] || [])
      |> assign(:customer_query, customer_query)
      |> assign(:filtered_customers, filtered_customers)
@@ -371,19 +410,11 @@ defmodule CraftplanWeb.OrderLive.FormComponent do
 
     form = Form.validate(socket.assigns.form, order_params)
 
-    {available_products, selected_product} =
-      recompute_availability(
-        form,
-        socket.assigns.products,
-        Map.get(socket.assigns, :selected_product)
-      )
-
     {:noreply,
      socket
      |> assign(:form, form)
      |> assign(:changed, true)
-     |> assign(:available_products, available_products)
-     |> assign(:selected_product, selected_product)}
+     |> assign_product_picker()}
   end
 
   @impl true
@@ -424,64 +455,64 @@ defmodule CraftplanWeb.OrderLive.FormComponent do
   end
 
   @impl true
-  def handle_event("selected-product-change", %{"product_id" => product_id}, socket) do
-    {:noreply, assign(socket, :selected_product, product_id)}
-  end
-
-  def handle_event("selected-product-change", _params, socket) do
-    {:noreply, socket}
-  end
-
-  @impl true
   def handle_event("add_form", %{"path" => path}, socket) do
     form =
-      Form.add_form(socket.assigns.form, path,
-        params: %{product_id: Map.get(socket.assigns, :selected_product), quantity: 0}
-      )
-
-    {available_products, selected_product} =
-      recompute_availability(
-        form,
-        socket.assigns.products,
-        Map.get(socket.assigns, :selected_product)
-      )
+      Form.add_form(socket.assigns.form, path, params: %{product_id: socket.assigns.selected_product, quantity: 0})
 
     {:noreply,
      socket
      |> assign(:form, form)
      |> assign(:changed, true)
-     |> assign(:available_products, available_products)
-     |> assign(:selected_product, selected_product)}
+     |> assign_product_picker()}
   end
 
   @impl true
   def handle_event("remove_form", %{"path" => path}, socket) do
     form = Form.remove_form(socket.assigns.form, path)
 
-    {available_products, selected_product} =
-      recompute_availability(
-        form,
-        socket.assigns.products,
-        Map.get(socket.assigns, :selected_product)
-      )
-
     {:noreply,
      socket
      |> assign(:form, form)
      |> assign(:changed, true)
-     |> assign(:available_products, available_products)
-     |> assign(:selected_product, selected_product)}
+     |> assign_product_picker()}
+  end
+
+  # --- Producto buscable (mismo patrón que el cliente, sin creación inline) ---
+
+  def handle_event("search_product", params, socket) do
+    {:noreply,
+     socket
+     |> assign(:product_query, search_query(params, "product_q"))
+     |> assign_filtered_products()
+     |> assign(:product_dropdown_open?, true)}
+  end
+
+  def handle_event("open_product_dropdown", _params, socket) do
+    {:noreply, assign(socket, :product_dropdown_open?, true)}
+  end
+
+  def handle_event("close_product_dropdown", _params, socket) do
+    {:noreply, assign(socket, :product_dropdown_open?, false)}
+  end
+
+  def handle_event("select_product", %{"id" => id}, socket) do
+    if Enum.any?(socket.assigns.available_products, &(&1.id == id)) do
+      {:noreply,
+       socket
+       |> assign(:selected_product, id)
+       |> assign(:product_query, product_name(socket.assigns.available_products, id))
+       |> assign_filtered_products()
+       |> assign(:product_dropdown_open?, false)
+       |> assign(:changed, true)}
+    else
+      {:noreply, socket}
+    end
   end
 
   # --- Cliente buscable (mismo patrón que categoría en productos) ---
 
   def handle_event("search_customer", params, socket) do
-    q =
-      Map.get(params, "q") ||
-        Map.get(params, "value") ||
-        Map.get(params, "_value") || ""
-
-    q = if is_binary(q), do: String.trim(q), else: ""
+    q = search_query(params, "q")
 
     {:noreply,
      socket
@@ -608,6 +639,61 @@ defmodule CraftplanWeb.OrderLive.FormComponent do
       end
 
     assign(socket, :form, to_form(form))
+  end
+
+  # Recalcula el selector de producto y sincroniza el texto del buscador con la
+  # selección. Sólo reescribe el texto cuando la selección cambia para no pisar
+  # lo que el usuario está escribiendo.
+  defp assign_product_picker(socket) do
+    previous_id = socket.assigns.selected_product
+
+    {available_products, selected_product} =
+      recompute_availability(socket.assigns.form, socket.assigns.products, previous_id)
+
+    socket =
+      socket
+      |> assign(:available_products, available_products)
+      |> assign(:selected_product, selected_product)
+
+    socket =
+      if selected_product == previous_id do
+        socket
+      else
+        assign(socket, :product_query, product_name(available_products, selected_product))
+      end
+
+    socket
+    |> assign_filtered_products()
+    |> assign(:product_dropdown_open?, false)
+  end
+
+  defp assign_filtered_products(socket) do
+    assign(
+      socket,
+      :filtered_products,
+      filter_products(socket.assigns.available_products, socket.assigns.product_query)
+    )
+  end
+
+  defp product_name(_products, nil), do: ""
+
+  defp product_name(products, id) do
+    case Enum.find(products, &(&1.id == id)) do
+      nil -> ""
+      product -> product.name || ""
+    end
+  end
+
+  defp filter_products(products, ""), do: products
+
+  defp filter_products(products, query) do
+    normalized = String.downcase(query)
+
+    Enum.filter(products, fn product ->
+      (product.name || "")
+      |> String.downcase()
+      |> String.contains?(normalized)
+    end)
   end
 
   defp recompute_availability(form, all_products, previous_id) do
@@ -793,6 +879,14 @@ defmodule CraftplanWeb.OrderLive.FormComponent do
       |> String.downcase()
       |> String.contains?(String.downcase(query))
     end)
+  end
+
+  # `phx-keyup` no serializa el formulario, así que caemos a "value"; con
+  # `phx-change` llegan todos los campos, por eso el nombre del input gana.
+  defp search_query(params, key) do
+    value = Map.get(params, key) || Map.get(params, "value") || Map.get(params, "_value") || ""
+
+    if is_binary(value), do: String.trim(value), else: ""
   end
 
   defp assign_show_create_customer?(socket) do

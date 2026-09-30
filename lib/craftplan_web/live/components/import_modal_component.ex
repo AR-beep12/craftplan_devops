@@ -11,6 +11,14 @@ defmodule CraftplanWeb.ImportModalComponent do
   """
   use CraftplanWeb, :live_component
 
+  alias Phoenix.LiveView.UploadConfig
+
+  # Match by extension: browsers report all kinds of MIME types for a CSV
+  # ("text/plain", "application/vnd.ms-excel", or none at all), and LiveView
+  # accepts an entry as soon as its extension matches. The content itself is
+  # validated later, on the mapping step.
+  @accepted_csv_types [".csv", ".txt"]
+
   # Internal assigns defaults
   @impl true
   def update(assigns, socket) do
@@ -34,7 +42,11 @@ defmodule CraftplanWeb.ImportModalComponent do
         socket
       else
         socket
-        |> allow_upload(:csv, accept: [".csv", "text/csv"], max_entries: 1)
+        |> allow_upload(:csv,
+          accept: @accepted_csv_types,
+          max_entries: 1,
+          progress: &handle_csv_progress/3
+        )
         |> assign(:_upload_init, true)
       end
 
@@ -43,12 +55,22 @@ defmodule CraftplanWeb.ImportModalComponent do
 
   @impl true
   def render(assigns) do
-    assigns = assign(assigns, :config, entity_config(assigns[:entity]))
+    assigns =
+      assigns
+      |> assign(:config, entity_config(assigns[:entity]))
+      |> assign(:csv_upload, assigns.uploads[:csv])
+      |> assign(:csv_entries, csv_entries(assigns.uploads[:csv]))
 
     ~H"""
     <div id={@id <> "-wrap"}>
-      <.modal :if={@show} id={@id} title={"Importar " <> @config.label} show={true}>
-        <div class="h-[600px] overflow-auto">
+      <.modal
+        :if={@show}
+        id={@id}
+        title={"Importar " <> @config.label}
+        show={true}
+        on_cancel={JS.push("wizard_close", target: @myself)}
+      >
+        <div>
           <div
             phx-target={@myself}
             class="bg-white/95 sticky top-0 z-20 -mx-6 mb-4 px-6 py-3 backdrop-blur supports-[backdrop-filter]:bg-white/60"
@@ -66,9 +88,14 @@ defmodule CraftplanWeb.ImportModalComponent do
             <div :for={line <- @config.instructions}>{line}</div>
 
             <div class="mt-2">
-              <.button variant={:outline} id="csv-template-download" type="button">
+              <.link
+                id="csv-template-download"
+                href={"/manage/settings/csv/template/#{@config.key}"}
+                target="_blank"
+                class="inline-flex items-center justify-center rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-800 shadow-sm transition hover:border-primary-400 hover:text-primary-700"
+              >
                 Descargar plantilla
-              </.button>
+              </.link>
             </div>
           </div>
 
@@ -77,6 +104,7 @@ defmodule CraftplanWeb.ImportModalComponent do
             for={@csv_form}
             id="csv-select-form"
             phx-target={@myself}
+            phx-change="csv_select_change"
             phx-submit="csv_import"
           >
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -92,8 +120,71 @@ defmodule CraftplanWeb.ImportModalComponent do
               </div>
 
               <div class="sm:col-span-2">
+                <!-- Upload area. phx-drop-target is required by LiveView, without it
+                     dropping a file on this label is silently discarded. -->
                 <label class="mb-1 block text-sm font-medium text-stone-700">O elige un archivo…</label>
-                <.live_file_input upload={@uploads[:csv]} class="block w-full text-sm" />
+                <label
+                  id="csv-dropzone"
+                  for={@csv_upload.ref}
+                  phx-drop-target={@csv_upload.ref}
+                  class="min-h-[120px] relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-stone-300 bg-stone-50 px-4 py-6 text-center transition phx-drop-target-active:border-primary-500 phx-drop-target-active:bg-primary-50 hover:border-primary-400 hover:bg-primary-50/30"
+                >
+                  <.live_file_input
+                    upload={@csv_upload}
+                    class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                  />
+                  <.icon name="hero-arrow-up-tray" class="h-8 w-8 text-stone-400" />
+                  <p class="mt-2 text-sm font-medium text-stone-600">
+                    Haz clic para seleccionar un archivo CSV
+                  </p>
+                  <p class="mt-1 text-xs text-stone-400">
+                    o arrastra y suelta aquí
+                  </p>
+                </label>
+
+                <ul id="csv-upload-entries" class="mt-2 space-y-1">
+                  <li
+                    :for={entry <- @csv_entries}
+                    id={"csv-upload-#{entry.ref}"}
+                    class="flex items-center gap-2 rounded-md border border-stone-200 bg-white px-3 py-2 text-xs"
+                  >
+                    <.icon name="hero-document-text" class="h-4 w-4 shrink-0 text-stone-400" />
+                    <span class="flex-1 truncate font-medium text-stone-700">
+                      {entry.client_name}
+                    </span>
+
+                    <%= case entry.status do %>
+                      <% {:ready, _} -> %>
+                        <span id={"csv-upload-#{entry.ref}-ready"} class="text-emerald-700">
+                          Listo — pulsa Siguiente
+                        </span>
+                      <% {:rejected, message} -> %>
+                        <span id={"csv-upload-#{entry.ref}-error"} class="text-red-700">
+                          {message}
+                        </span>
+                      <% {:uploading, _} -> %>
+                        <progress
+                          id={"csv-upload-#{entry.ref}-progress"}
+                          value={entry.progress}
+                          max="100"
+                          class="h-1.5 w-20"
+                        ></progress>
+                        <span class="tabular-nums text-stone-500">{entry.progress}%</span>
+                    <% end %>
+
+                    <button
+                      id={"csv-upload-#{entry.ref}-remove"}
+                      type="button"
+                      phx-target={@myself}
+                      phx-click="csv_clear_upload"
+                      phx-value-ref={entry.ref}
+                      aria-label="Quitar archivo"
+                      class="text-stone-400 transition hover:text-stone-700"
+                    >
+                      <.icon name="hero-x-mark-solid" class="h-4 w-4" />
+                    </button>
+                  </li>
+                </ul>
               </div>
             </div>
           </.form>
@@ -252,6 +343,7 @@ defmodule CraftplanWeb.ImportModalComponent do
               type="submit"
               id={@id <> "-next"}
               form="csv-select-form"
+              disabled={upload_pending?(@csv_upload)}
               variant={:primary}
             >
               Siguiente
@@ -304,7 +396,38 @@ defmodule CraftplanWeb.ImportModalComponent do
   @impl true
   def handle_event("wizard_close", _params, socket) do
     send(self(), {:import_modal, :closed})
-    {:noreply, assign(socket, :show, false)}
+    {:noreply, socket |> cancel_csv_upload() |> assign(:show, false)}
+  end
+
+  @impl true
+  def handle_event("csv_clear_upload", %{"ref" => ref}, socket) do
+    {:noreply, cancel_upload(socket, :csv, ref)}
+  end
+
+  # LiveView only starts an upload when the file input (or its form) declares
+  # phx-change, so this is what actually kicks off both click-to-pick and
+  # drag-and-drop. Typing in the paste box fires the same event, so it must
+  # stay a cheap no-op unless a file is actually waiting to be read.
+  @impl true
+  def handle_event("csv_select_change", params, socket) do
+    delimiter = params["delimiter"] || socket.assigns[:csv_delimiter] || ","
+    entity = socket.assigns.entity || "products"
+
+    socket = assign(socket, :csv_delimiter, delimiter)
+
+    case consume_uploaded_csv(socket) do
+      {:ok, csv_content} ->
+        do_csv_preview(entity, csv_content, delimiter, socket)
+
+      {:error, {:rejected, reasons}} ->
+        {:noreply,
+         socket
+         |> cancel_csv_upload()
+         |> put_flash(:error, "Archivo rechazado: #{reasons}. Selecciona un archivo CSV válido.")}
+
+      {:error, _reason} ->
+        {:noreply, socket}
+    end
   end
 
   @impl true
@@ -347,12 +470,29 @@ defmodule CraftplanWeb.ImportModalComponent do
           {:ok, csv_content} ->
             do_csv_preview(entity, csv_content, delimiter, socket)
 
-          :error ->
+          {:error, :no_file} ->
             {:noreply,
              put_flash(
                socket,
-               :info,
-               "Sube un archivo o pega contenido CSV para la ejecución de prueba."
+               :error,
+               "Selecciona un archivo CSV o pega su contenido en el campo de texto."
+             )}
+
+          {:error, :uploading} ->
+            {:noreply,
+             put_flash(
+               socket,
+               :error,
+               "El archivo todavía se está subiendo. Espera a que termine e inténtalo de nuevo."
+             )}
+
+          {:error, {:rejected, reasons}} ->
+            {:noreply,
+             socket
+             |> cancel_csv_upload()
+             |> put_flash(
+               :error,
+               "Archivo rechazado: #{reasons}. Selecciona un archivo CSV válido."
              )}
         end
 
@@ -360,8 +500,8 @@ defmodule CraftplanWeb.ImportModalComponent do
         {:noreply,
          put_flash(
            socket,
-           :info,
-           "Sube un archivo o pega contenido CSV para la ejecución de prueba."
+           :error,
+           "Activa la ejecución de prueba para revisar la vista previa antes de importar."
          )}
     end
   end
@@ -479,6 +619,7 @@ defmodule CraftplanWeb.ImportModalComponent do
        socket
        |> assign(:dry_run_summary, msg)
        |> assign(:csv_errors, errors)
+       |> assign(:csv_mapping, mapping)
        |> assign(:map_view_tab, if(errors == [], do: :preview, else: :errors))
        |> assign(:wizard_step, :map)}
     else
@@ -487,21 +628,98 @@ defmodule CraftplanWeb.ImportModalComponent do
   end
 
   defp consume_uploaded_csv(socket) do
-    entries = (socket.assigns.uploads[:csv] && socket.assigns.uploads.csv.entries) || []
+    upload = socket.assigns[:uploads][:csv]
 
-    if entries == [] do
-      :error
-    else
-      result =
-        consume_uploaded_entries(socket, :csv, fn %{path: path}, _entry ->
-          {:ok, File.read!(path)}
-        end)
+    cond do
+      upload.entries == [] ->
+        {:error, :no_file}
 
-      case result do
-        [content | _] -> {:ok, content}
-        [] -> :error
-      end
+      Enum.any?(upload.entries, &rejected?(&1, upload)) ->
+        {:error, {:rejected, rejected_reasons(upload)}}
+
+      Enum.any?(upload.entries, &(not &1.done?)) ->
+        {:error, :uploading}
+
+      true ->
+        {:ok, read_uploaded_csv(socket)}
     end
+  end
+
+  # LiveView only reports upload progress server-side when a :progress callback
+  # is registered, otherwise entry.progress stays at 0 forever. This is also
+  # the only signal that fires when the transfer finishes, so it is where the
+  # wizard moves on to the mapping step by itself.
+  defp handle_csv_progress(_name, entry, socket) do
+    if entry.done? && socket.assigns.wizard_step == :provide do
+      csv = read_uploaded_csv(socket)
+      entity = socket.assigns.entity || "products"
+      do_csv_preview(entity, csv, socket.assigns[:csv_delimiter] || ",", socket)
+    else
+      {:noreply, socket}
+    end
+  end
+
+  defp read_uploaded_csv(socket) do
+    [content | _] =
+      consume_uploaded_entries(socket, :csv, fn %{path: path}, _entry ->
+        {:ok, File.read!(path)}
+      end)
+
+    content
+  end
+
+  defp csv_entries(%UploadConfig{} = upload) do
+    for entry <- upload.entries do
+      %{
+        ref: entry.ref,
+        client_name: entry.client_name,
+        progress: entry.progress,
+        status: entry_status(entry, upload)
+      }
+    end
+  end
+
+  defp entry_status(%{done?: true}, _upload), do: {:ready, ""}
+
+  defp entry_status(entry, upload) do
+    if rejected?(entry, upload) do
+      {:rejected, Enum.join(Phoenix.Component.upload_errors(upload, entry), ", ")}
+    else
+      {:uploading, ""}
+    end
+  end
+
+  defp rejected?(%{cancelled?: true}, _upload), do: true
+
+  defp rejected?(%{valid?: false}, _upload), do: true
+
+  defp rejected?(%{done?: true}, _upload), do: false
+
+  defp rejected?(_entry, _upload), do: false
+
+  defp rejected_reasons(%UploadConfig{} = upload) do
+    upload.entries
+    |> Enum.flat_map(fn entry ->
+      case entry_status(entry, upload) do
+        {:rejected, ""} -> ["el archivo no cumple los tipos de archivo permitidos"]
+        {:rejected, message} -> [message]
+        _ -> []
+      end
+    end)
+    |> Enum.uniq()
+    |> Enum.join(", ")
+  end
+
+  defp upload_pending?(%UploadConfig{} = upload) do
+    Enum.any?(upload.entries, &(not &1.done? and not rejected?(&1, upload)))
+  end
+
+  defp upload_pending?(_upload), do: false
+
+  defp cancel_csv_upload(socket) do
+    Enum.reduce(socket.assigns[:uploads][:csv].entries, socket, fn entry, acc ->
+      cancel_upload(acc, :csv, entry.ref)
+    end)
   end
 
   defp default_mapping_for(entity, headers) do
@@ -573,15 +791,17 @@ defmodule CraftplanWeb.ImportModalComponent do
       key: "customers",
       label: "Clientes",
       importer: Craftplan.CSV.Importers.Customers,
-      instructions: ["Requerido: first_name, last_name, email."],
+      instructions: ["Requerido: first_name, last_name, phone, email."],
       fields: [
         %{name: "first_name", label: "Nombre", required: true},
         %{name: "last_name", label: "Apellido", required: true},
+        %{name: "phone", label: "Teléfono", required: true},
         %{name: "email", label: "Correo electrónico", required: true}
       ],
       default_candidates: %{
         "first_name" => ["first_name", "firstname", "first name"],
         "last_name" => ["last_name", "lastname", "last name"],
+        "phone" => ["phone", "telefono", "telephone", "mobile"],
         "email" => ["email", "email address"]
       }
     }

@@ -555,9 +555,9 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
                 >
                   <div class="border-r border-stone-200 p-0 pr-6 pb-1 font-normal">Nombre</div>
 
-                  <div class="border-r border-stone-200 p-0 pr-6 pb-1 pl-4 font-normal">SKU</div>
+                  <div class="border-r border-stone-200 p-0 pr-6 pb-1 pl-4 font-normal">Color</div>
 
-                  <div class="p-0 pr-6 pb-1 pl-4 font-normal">Precio</div>
+                  <div class="p-0 pr-6 pb-1 pl-4 font-normal">Cantidad</div>
                 </div>
 
                 <div role="row" class="col-span-4 hidden py-4 text-stone-400 last:block">
@@ -582,7 +582,7 @@ defmodule CraftplanWeb.ProductLive.FormComponentRecipe do
 
                     <div class="relative border-b border-stone-200 p-0 pl-4">
                       <div class="block py-3 text-sm text-stone-800">
-                        {(material.quantity && Decimal.to_string(material.quantity)) || "0"}
+                        {format_quantity(material.current_stock)}
                       </div>
                     </div>
                   </button>

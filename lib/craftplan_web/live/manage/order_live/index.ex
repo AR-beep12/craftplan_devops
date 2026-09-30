@@ -148,12 +148,6 @@ defmodule CraftplanWeb.OrderLive.Index do
             rows={@streams.orders}
             row_click={fn {_id, order} -> JS.navigate(~p"/manage/orders/#{order.reference}") end}
           >
-            <:empty>
-              <div class="rounded-md border border-dashed border-stone-200 bg-stone-50 py-10 text-center text-sm text-stone-500">
-                Ningún pedido coincide con los filtros actuales.
-              </div>
-            </:empty>
-
             <:col :let={{_id, order}} label="Cliente">
               <.link
                 class="hover:text-primary-600 hover:underline"
@@ -178,6 +172,7 @@ defmodule CraftplanWeb.OrderLive.Index do
             <:col :let={{_id, order}} label="Estado">
               <.badge
                 text={order_status_label(order.status)}
+                value={order.status}
                 colors={[
                   {order.status,
                    "#{order_status_color(order.status)} #{order_status_bg(order.status)}"}
@@ -185,6 +180,14 @@ defmodule CraftplanWeb.OrderLive.Index do
               />
             </:col>
           </.table>
+
+          <div
+            :if={@orders_empty?}
+            id="orders-empty"
+            class="rounded-md border border-dashed border-stone-200 bg-stone-50 py-10 text-center text-sm text-stone-500"
+          >
+            Ningún pedido coincide con los filtros actuales.
+          </div>
 
           <div class="mt-4 flex items-center justify-between text-sm text-stone-600">
             <span>{page_label(@page_offset, @page_size, @page_count)}</span>
@@ -409,6 +412,7 @@ defmodule CraftplanWeb.OrderLive.Index do
             <:item title="Estado">
               <.badge
                 text={order_status_label(@selected_order.status)}
+                value={@selected_order.status}
                 colors={[
                   {@selected_order.status,
                    "#{order_status_color(@selected_order.status)} #{order_status_bg(@selected_order.status)}"}
@@ -448,7 +452,13 @@ defmodule CraftplanWeb.OrderLive.Index do
     socket =
       socket
       |> assign(:filters, filters)
-      |> assign(:products, Catalog.list_products!(actor: socket.assigns[:current_user]))
+      |> assign(
+        :products,
+        Catalog.list_products!(
+          actor: socket.assigns[:current_user],
+          load: [:selling_availability]
+        )
+      )
       |> assign(
         :customers,
         CRM.list_customers!(actor: socket.assigns[:current_user], load: [:full_name])
@@ -666,6 +676,7 @@ defmodule CraftplanWeb.OrderLive.Index do
     |> assign(:page_offset, page.offset)
     |> assign(:page_count, page.count)
     |> assign(:page_more, page.more?)
+    |> assign(:orders_empty?, Enum.empty?(page.results))
     |> stream(:orders, page.results, reset: true)
   end
 

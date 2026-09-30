@@ -158,19 +158,6 @@ if config_env() == :prod do
       config :swoosh, :api_client, Finch
       config :swoosh, :finch_name, Craftplan.Finch
 
-    System.get_env("SMTP_HOST") != nil ->
-      config :craftplan, Craftplan.Mailer,
-        adapter: Swoosh.Adapters.SMTP,
-        relay: System.get_env("SMTP_HOST"),
-        port: String.to_integer(System.get_env("SMTP_PORT") || "587"),
-        username: System.get_env("SMTP_USERNAME"),
-        password: System.get_env("SMTP_PASSWORD"),
-        tls: :always,
-        auth: :always
-
-      config :swoosh, :api_client, Finch
-      config :swoosh, :finch_name, Craftplan.Finch
-
     true ->
       # No email provider configured — use Logger adapter so emails are
       # logged instead of crashing (Local adapter's memory store is

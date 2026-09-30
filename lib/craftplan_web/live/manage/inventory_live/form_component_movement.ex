@@ -79,6 +79,14 @@ defmodule CraftplanWeb.InventoryLive.FormComponentMovement do
             ]}>
               {format_preview(@material.unit, @calculated_new_total)}
             </span>
+            <%= if negative?(@calculated_new_total) do %>
+              <p id="movement-stock-warning" class="mt-1 text-xs text-red-600">
+                No hay stock suficiente. Solo puedes restar hasta {format_preview(
+                  @material.unit,
+                  available_stock(@material)
+                )}.
+              </p>
+            <% end %>
           <% else %>
             Ingresa una cantidad para ver el nuevo nivel de stock
           <% end %>
@@ -136,6 +144,8 @@ defmodule CraftplanWeb.InventoryLive.FormComponentMovement do
   defp new_total(_current_stock, _mode, nil), do: nil
   defp new_total(current_stock, :add, quantity), do: D.add(current_stock, quantity)
   defp new_total(current_stock, :subtract, quantity), do: D.sub(current_stock, quantity)
+
+  defp available_stock(material), do: material.current_stock || D.new(0)
 
   defp sign_quantity(params, :subtract) do
     case parse_quantity(params["quantity"]) do

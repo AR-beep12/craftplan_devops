@@ -150,13 +150,6 @@ defmodule CraftplanWeb.InventoryLive.FormComponentMaterial do
   defp material_action_label(:update), do: "actualizado"
   defp material_action_label(type), do: to_string(type)
 
-  defp format_quantity(nil), do: "0"
-
-  defp format_quantity(%Decimal{} = qty), do: qty |> Decimal.normalize() |> Decimal.to_string(:normal)
-
-  defp format_quantity(qty) when is_number(qty), do: to_string(qty)
-  defp format_quantity(qty), do: to_string(qty)
-
   defp assign_form(%{assigns: %{material: material}} = socket) do
     form =
       if material do

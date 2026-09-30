@@ -94,7 +94,7 @@ defmodule CraftplanWeb.AuthOverrides do
     set :interstitial_class, "flex flex-row justify-between content-between text-sm font-medium"
     set :toggler_class, "flex-none text-stone-500 hover:text-stone-600 px-2 first:pl-0 last:pr-0"
     set :sign_in_toggle_text, "¿Ya tienes una cuenta?"
-    set :register_toggle_text, "¿Necesitas una cuenta?"
+    set :register_toggle_text, nil
     # nil oculta el enlace "¿Olvidaste tu contraseña?" de la pantalla de inicio de sesión
     set :reset_toggle_text, nil
     set :show_first, :sign_in

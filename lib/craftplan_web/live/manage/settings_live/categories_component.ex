@@ -9,15 +9,62 @@ defmodule CraftplanWeb.SettingsLive.CategoriesComponent do
 
   @impl true
   def render(assigns) do
-    assigns = assign_new(assigns, :show_modal, fn -> false end)
+    assigns =
+      assigns
+      |> assign_new(:show_modal, fn -> false end)
+      |> assign_new(:settings, fn -> nil end)
 
     ~H"""
     <div class="space-y-6">
       <.header>
         <:subtitle>
-          Gestiona las categorías de productos. Las categorías activas aparecen en el formulario de productos.
+          Configura la moneda predeterminada.
         </:subtitle>
-        Categorías
+        General
+      </.header>
+
+      <section
+        id="general-settings"
+        aria-labelledby="general-settings-title"
+        class="rounded-md border border-gray-200 bg-white"
+      >
+        <div class="border-b border-stone-200 px-4 py-3">
+          <h3 id="general-settings-title" class="text-base font-semibold text-stone-800">
+            Moneda predeterminada
+          </h3>
+
+          <p class="mt-1 text-sm text-stone-600">
+            Define la moneda utilizada en pedidos, facturas e informes.
+          </p>
+        </div>
+
+        <div class="space-y-4 p-4">
+          <.simple_form
+            :if={@settings}
+            for={@settings_form}
+            id="settings-form"
+            phx-target={@myself}
+            phx-change="validate_settings"
+            phx-submit="save_settings"
+          >
+            <.input
+              field={@settings_form[:currency]}
+              type="select"
+              options={currency_options()}
+              label="Moneda predeterminada"
+            />
+            <:actions>
+              <.button variant={:primary} phx-disable-with="Guardando...">Guardar</.button>
+            </:actions>
+          </.simple_form>
+        </div>
+      </section>
+
+      <.header>
+        <:subtitle>
+          Gestiona las categorías de productos.
+        </:subtitle>
+        Categorias
       </.header>
 
       <div class="flex flex-col gap-6 lg:flex-row">
@@ -169,6 +216,15 @@ defmodule CraftplanWeb.SettingsLive.CategoriesComponent do
     form = new_category_form(assigns.current_user)
     search_query = Map.get(socket.assigns, :search_query, "")
 
+    settings_form =
+      if assigns[:settings] do
+        AshPhoenix.Form.for_update(assigns.settings, :update,
+          as: "settings",
+          actor: assigns[:current_user]
+        )
+        |> to_form()
+      end
+
     {:ok,
      socket
      |> assign(assigns)
@@ -176,7 +232,28 @@ defmodule CraftplanWeb.SettingsLive.CategoriesComponent do
      |> assign(:search_query, search_query)
      |> assign(:visible_categories, filter_categories(categories, search_query))
      |> assign(:form, form)
+     |> assign(:settings_form, settings_form)
      |> assign(:show_modal, false)}
+  end
+
+  @impl true
+  def handle_event("validate_settings", %{"settings" => params}, socket) do
+    form = AshPhoenix.Form.validate(socket.assigns.settings_form, params)
+    {:noreply, assign(socket, :settings_form, form)}
+  end
+
+  @impl true
+  def handle_event("save_settings", %{"settings" => params}, socket) do
+    case AshPhoenix.Form.submit(socket.assigns.settings_form, params: params) do
+      {:ok, settings} ->
+        {:noreply,
+         socket
+         |> assign(:settings, settings)
+         |> put_flash(:info, "Configuración actualizada correctamente")}
+
+      {:error, form} ->
+        {:noreply, assign(socket, :settings_form, form)}
+    end
   end
 
   @impl true
@@ -245,7 +322,9 @@ defmodule CraftplanWeb.SettingsLive.CategoriesComponent do
   def handle_event("toggle_active", %{"id" => id}, socket) do
     category = Catalog.get_category_by_id!(id, actor: socket.assigns.current_user)
 
-    case Catalog.update_category(category, %{active: !category.active}, actor: socket.assigns.current_user) do
+    case Catalog.update_category(category, %{active: !category.active},
+           actor: socket.assigns.current_user
+         ) do
       {:ok, _} ->
         categories =
           [actor: socket.assigns.current_user]
@@ -290,6 +369,32 @@ defmodule CraftplanWeb.SettingsLive.CategoriesComponent do
     |> AshPhoenix.Form.for_create(:create, actor: user, as: "category")
     |> to_form()
   end
+
+  @priority_currencies [:USD, :EUR]
+
+  defp currency_options do
+    priority_options = Enum.map(@priority_currencies, &{currency_display_name(&1), &1})
+
+    rest_options =
+      Craftplan.Types.Currency.values()
+      |> Enum.reject(&(&1 in @priority_currencies))
+      |> Enum.map(&{currency_display_name(&1), &1})
+      |> Enum.reject(fn {name, _code} -> is_nil(name) end)
+      |> Enum.sort_by(fn {name, _code} -> name end)
+
+    priority_options ++ rest_options
+  end
+
+  defp currency_display_name(code) do
+    code
+    |> Cldr.Currency.display_name!(backend: Craftplan.Cldr, locale: "es")
+    |> capitalize_first()
+  rescue
+    _ -> code |> to_string() |> String.upcase()
+  end
+
+  defp capitalize_first(<<first::utf8, rest::binary>>), do: String.upcase(<<first::utf8>>) <> rest
+  defp capitalize_first(other), do: other
 
   defp filter_categories(categories, ""), do: categories
 

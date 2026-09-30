@@ -65,6 +65,12 @@ defmodule CraftplanWeb.ManageInventoryInteractionsLiveTest do
   @tag role: :staff
   test "adjust stock via subtract", %{conn: conn} do
     m = create_material!()
+
+    Craftplan.Inventory.adjust_stock!(
+      %{material_id: m.id, quantity: Decimal.new("10"), reason: "seed"},
+      actor: Craftplan.DataCase.staff_actor()
+    )
+
     {:ok, view, _} = live(conn, ~p"/manage/inventory/#{m.id}/adjust")
 
     view
@@ -79,5 +85,23 @@ defmodule CraftplanWeb.ManageInventoryInteractionsLiveTest do
 
     assert_patch(view, ~p"/manage/inventory/#{m.id}/stock")
     assert render(view) =~ "Ajuste de stock registrado"
+  end
+
+  @tag role: :staff
+  test "subtracting more than the available stock is rejected", %{conn: conn} do
+    m = create_material!()
+    {:ok, view, _} = live(conn, ~p"/manage/inventory/#{m.id}/adjust")
+
+    view
+    |> element("button[phx-click=set_mode][phx-value-mode=subtract]")
+    |> render_click()
+
+    params = %{"movement" => %{"material_id" => m.id, "quantity" => "1", "reason" => "sub"}}
+
+    view
+    |> element("#movement-form")
+    |> render_submit(params)
+
+    assert render(view) =~ "Stock insuficiente"
   end
 end

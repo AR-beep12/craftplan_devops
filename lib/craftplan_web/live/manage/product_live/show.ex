@@ -95,10 +95,12 @@ defmodule CraftplanWeb.ProductLive.Show do
 
   @impl true
   def mount(_params, _session, socket) do
+    actor = socket.assigns[:current_user]
+
     {:ok,
      assign(socket,
-       materials_available: list_available_materials(),
-       products_available: list_available_products()
+       materials_available: list_available_materials(actor),
+       products_available: list_available_products(actor)
      )}
   end
 
@@ -106,6 +108,7 @@ defmodule CraftplanWeb.ProductLive.Show do
   def handle_params(%{"id" => id} = params, _, socket) do
     product =
       Catalog.get_product_by_id!(id,
+        actor: socket.assigns[:current_user],
         load: [
           :markup_percentage,
           :gross_profit,
@@ -152,6 +155,7 @@ defmodule CraftplanWeb.ProductLive.Show do
       |> assign(:selected_bom_version, selected_bom_version)
       |> assign(:tabs_links, tabs_links)
       |> assign(:breadcrumbs, product_breadcrumbs(product, live_action))
+      |> assign(:materials_available, list_available_materials(socket.assigns.current_user))
 
     {:noreply, socket}
   end
@@ -198,6 +202,7 @@ defmodule CraftplanWeb.ProductLive.Show do
      socket
      |> put_flash(:info, "Material guardado exitosamente")
      |> assign(:product, product)
+     |> assign(:materials_available, list_available_materials(socket.assigns.current_user))
      |> push_event("close-modal", %{id: "product-material-modal"})}
   end
 
@@ -267,12 +272,12 @@ defmodule CraftplanWeb.ProductLive.Show do
     end
   end
 
-  defp list_available_materials do
-    Inventory.list_materials!()
+  defp list_available_materials(actor) do
+    Inventory.list_materials!(load: [:current_stock], actor: actor)
   end
 
-  defp list_available_products do
-    Catalog.list_products!(load: [:bom_unit_cost])
+  defp list_available_products(actor) do
+    Catalog.list_products!(load: [:bom_unit_cost], actor: actor)
   end
 
   defp nutrition_heading(facts) do

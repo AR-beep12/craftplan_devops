@@ -149,15 +149,6 @@ You can also configure the email provider via environment variables at deploy ti
 | `EMAIL_API_DOMAIN` | Sending domain (Mailgun only) |
 | `EMAIL_API_REGION` | AWS region (Amazon SES only, default: `us-east-1`) |
 
-For backward compatibility, if `EMAIL_PROVIDER` is not set but `SMTP_HOST` is present, Craftplan uses the SMTP adapter with the legacy variables:
-
-| Variable | Description |
-|----------|-------------|
-| `SMTP_HOST` | Mail server hostname |
-| `SMTP_PORT` | Mail server port (default: 587) |
-| `SMTP_USERNAME` | Auth username |
-| `SMTP_PASSWORD` | Auth password |
-
 ### Encryption Key
 
 In production, a `CLOAK_KEY` environment variable is required to encrypt and decrypt API keys stored in the database. Generate one with:

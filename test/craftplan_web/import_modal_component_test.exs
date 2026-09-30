@@ -57,6 +57,7 @@ defmodule CraftplanWeb.ImportModalComponentTest do
 
     view |> element("#csv-mapping-modal-next-import") |> render_click()
     view |> element("#csv-mapping-modal-run-import") |> render_click()
+
     view
   end
 
@@ -89,13 +90,14 @@ defmodule CraftplanWeb.ImportModalComponentTest do
     @tag role: :admin
     test "imports customers without a type column", %{conn: conn, user: user} do
       email = "cliente#{System.unique_integer([:positive])}@test.com"
-      csv = "first_name,last_name,email
-Ana,Lopez,#{email}"
+      csv = "first_name,last_name,phone,email
+Ana,Lopez,5551234567,#{email}"
 
       view =
         run_import(conn, "customers", csv, %{
           "first_name" => "first_name",
           "last_name" => "last_name",
+          "phone" => "phone",
           "email" => "email"
         })
 
@@ -118,5 +120,178 @@ Ana,Lopez,#{email}"
       assert render(view) =~ "Se importaron 1"
       assert Enum.any?(Craftplan.Catalog.list_products!(actor: user), &(&1.name == name))
     end
+
+    @tag role: :admin
+    test "honours the mapping chosen in the mapping step", %{conn: conn, user: user} do
+      name = "Membrillo #{System.unique_integer([:positive])}"
+      csv = "denominacion,importe\n#{name},8.25\n"
+
+      view =
+        run_import(conn, "products", csv, %{
+          "name" => "denominacion",
+          "price" => "importe"
+        })
+
+      assert render(view) =~ "Se importaron 1"
+      assert Enum.any?(Craftplan.Catalog.list_products!(actor: user), &(&1.name == name))
+    end
+  end
+
+  describe "file upload" do
+    @tag role: :admin
+    test "dropzone is wired to the file input", %{conn: conn} do
+      view = open_import(conn, "products")
+
+      # LiveView silently discards dropped files unless the container carries
+      # phx-drop-target pointing at the id of the live file input.
+      assert has_element?(view, "#csv-dropzone[phx-drop-target]")
+      assert has_element?(view, "#csv-select-form input[type=file][data-phx-upload-ref]")
+
+      html = render(view)
+
+      [_, drop_target] = Regex.run(~r/id="csv-dropzone"[^>]*phx-drop-target="([^"]+)"/, html)
+      [_, input_id] = Regex.run(~r/<input id="([^"]+)" type="file"/, html)
+
+      assert drop_target == input_id
+    end
+
+    @tag role: :admin
+    test "the select form declares phx-change so the browser starts the upload", %{conn: conn} do
+      view = open_import(conn, "products")
+
+      # LiveView bails out of the file input "input" event when neither the
+      # input nor its form declares phx-change, so the upload never starts and
+      # nothing shows up. Assert the attribute and a real change event.
+      assert has_element?(view, "#csv-select-form[phx-change=csv_select_change]")
+
+      view
+      |> element("#csv-select-form")
+      |> render_change(%{"delimiter" => ";", "dry_run" => "true", "csv_content" => ""})
+
+      # No file uploaded yet, so the change event is a no-op and the wizard
+      # stays on the first step.
+      assert has_element?(view, "#csv-select-form")
+      refute has_element?(view, "#csv-mapping-form")
+    end
+
+    @tag role: :admin
+    test "loads the file automatically once it finishes uploading", %{conn: conn} do
+      csv = "name,price\nHigo,4.75\n"
+
+      view = open_import(conn, "products")
+
+      upload = upload_csv(view, "higos.csv", "text/csv", csv)
+      render_upload(upload, "higos.csv")
+
+      # The upload finished on its own, so the wizard is already on the mapping
+      # step without pressing "Siguiente".
+      assert has_element?(view, "#csv-mapping-form")
+    end
+
+    @tag role: :admin
+    test "reports real progress while the file is uploading", %{conn: conn} do
+      view = open_import(conn, "products")
+
+      upload = upload_csv(view, "grande.csv", "text/csv", String.duplicate("a,b\n1,2\n", 400_000))
+      render_upload(upload, "grande.csv", 0)
+
+      # allow_upload must register a :progress callback, otherwise entry.progress
+      # stays at 0 and the UI shows a progress bar frozen at 0%.
+      assert has_element?(view, "#csv-upload-entries li")
+      refute render(view) =~ ">0%<"
+
+      render_upload(upload, "grande.csv", 100)
+      assert has_element?(view, "#csv-mapping-form")
+    end
+
+    @tag role: :admin
+    test "imports a CSV selected from a file", %{conn: conn, user: user} do
+      name = "Higo #{System.unique_integer([:positive])}"
+      csv = "name,price\n#{name},4.75\n"
+
+      view = open_import(conn, "products")
+
+      upload = upload_csv(view, "higos.csv", "text/csv", csv)
+      render_upload(upload, "higos.csv")
+
+      assert has_element?(view, "#csv-upload-entries li", "higos.csv")
+
+      view
+      |> element("#csv-select-form")
+      |> render_submit(%{"delimiter" => ",", "dry_run" => "true"})
+
+      assert has_element?(view, "#csv-mapping-form")
+
+      view
+      |> element("#csv-mapping-form")
+      |> render_submit(%{"mapping" => %{"name" => "name", "price" => "price"}})
+
+      view |> element("#csv-mapping-modal-next-import") |> render_click()
+      view |> element("#csv-mapping-modal-run-import") |> render_click()
+
+      assert render(view) =~ "Se importaron 1"
+      assert Enum.any?(Craftplan.Catalog.list_products!(actor: user), &(&1.name == name))
+    end
+
+    @tag role: :admin
+    test "shows a rejected file without taking down the LiveView", %{conn: conn} do
+      csv = "name,price\nHigo,4.75\n"
+
+      view = open_import(conn, "products")
+
+      upload = upload_csv(view, "higos.xyz", "application/zip", csv)
+      render_upload(upload, "higos.xyz")
+
+      view
+      |> element("#csv-select-form")
+      |> render_submit(%{"delimiter" => ",", "dry_run" => "true"})
+
+      assert Process.alive?(view.pid)
+      refute has_element?(view, "#csv-mapping-form")
+      refute has_element?(view, "#csv-upload-entries li")
+
+      # The modal is still usable right after the rejection
+      assert has_element?(view, "#csv-select-form")
+    end
+
+    @tag role: :admin
+    test "removing the file clears the entry", %{conn: conn} do
+      csv = "name,price\nHigo,4.75\n"
+
+      view = open_import(conn, "products")
+
+      upload = upload_csv(view, "higos.csv", "text/csv", csv)
+      render_upload(upload, "higos.csv")
+
+      assert has_element?(view, "#csv-upload-entries li", "higos.csv")
+
+      view
+      |> element("#csv-upload-entries button[phx-click=csv_clear_upload]")
+      |> render_click()
+
+      refute has_element?(view, "#csv-upload-entries li")
+    end
+  end
+
+  defp open_import(conn, entity) do
+    {:ok, view, _html} = live(conn, ~p"/manage/settings/csv")
+
+    view
+    |> element("button[phx-click=open_import][phx-value-entity=#{entity}]")
+    |> render_click()
+
+    view
+  end
+
+  defp upload_csv(view, name, type, content) do
+    file_input(view, "#csv-select-form", :csv, [
+      %{
+        last_modified: 1_594_171_879_000,
+        name: name,
+        content: content,
+        size: byte_size(content),
+        type: type
+      }
+    ])
   end
 end

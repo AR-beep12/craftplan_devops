@@ -38,6 +38,7 @@ defmodule Craftplan.Inventory.Movement do
       accept [:quantity, :reason, :material_id, :lot_id]
 
       change set_attribute(:occurred_at, &DateTime.utc_now/0)
+      change Craftplan.Inventory.Changes.ValidateStockNotNegative
     end
   end
 

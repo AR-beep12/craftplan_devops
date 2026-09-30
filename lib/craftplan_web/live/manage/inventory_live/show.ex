@@ -347,11 +347,4 @@ defmodule CraftplanWeb.InventoryLive.Show do
       ]
     )
   end
-
-  defp format_quantity(nil), do: "0"
-
-  defp format_quantity(%Decimal{} = qty), do: qty |> Decimal.normalize() |> Decimal.to_string(:normal)
-
-  defp format_quantity(qty) when is_number(qty), do: to_string(qty)
-  defp format_quantity(qty), do: to_string(qty)
 end

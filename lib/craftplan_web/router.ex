@@ -56,8 +56,7 @@ defmodule CraftplanWeb.Router do
     auth_routes AuthController, Craftplan.Accounts.User, path: "/auth"
     sign_out_route AuthController
 
-    sign_in_route register_path: "/register",
-                  reset_path: "/reset",
+    sign_in_route reset_path: "/reset",
                   auth_routes_prefix: "/auth",
                   on_mount: [
                     CraftplanWeb.LiveCurrentPath,
@@ -92,7 +91,7 @@ defmodule CraftplanWeb.Router do
         {CraftplanWeb.LiveUserAuth, :live_admin_required}
       ] do
       # Settings Routes
-      live "/manage/settings", SettingsLive.Index, :index
+      live "/manage/settings", SettingsLive.Index, :categories
       live "/manage/settings/general", SettingsLive.Index, :general
       live "/manage/settings/categories", SettingsLive.Index, :categories
       live "/manage/settings/allergens", SettingsLive.Index, :allergens
@@ -105,6 +104,8 @@ defmodule CraftplanWeb.Router do
 
     # CSV Export (regular controller, not LiveView)
     get "/manage/settings/csv/export/:entity", CSVExportController, :export
+    get "/manage/settings/csv/export", CSVExportController, :export
+    get "/manage/settings/csv/template/:entity", CSVExportController, :template
 
     # PDF exports (regular controllers, not LiveView)
     get "/manage/production/batches/:batch_code/sheet.pdf", BatchSheetController, :show

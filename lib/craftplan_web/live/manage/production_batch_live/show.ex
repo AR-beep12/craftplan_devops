@@ -104,7 +104,7 @@ defmodule CraftplanWeb.ProductionBatchLive.Show do
                 <div class="text-xs text-stone-500">Estado del lote de un vistazo</div>
               </.summary_card>
 
-              <.summary_card label="Producido" value={format_quantity(@totals)}>
+              <.summary_card label="Producido" value={format_totals_quantity(@totals)}>
                 <div class="text-xs text-stone-500">Unidades totales en este lote</div>
               </.summary_card>
 
@@ -674,9 +674,9 @@ defmodule CraftplanWeb.ProductionBatchLive.Show do
     """
   end
 
-  defp format_quantity(nil), do: "—"
+  defp format_totals_quantity(nil), do: "—"
 
-  defp format_quantity(%{quantity: qty}) do
+  defp format_totals_quantity(%{quantity: qty}) do
     D.to_string(qty || D.new(0))
   end
 

@@ -65,6 +65,7 @@ defmodule CraftplanWeb.OrderLive.Show do
             <div class="flex items-center gap-2">
               <.badge
                 text={order_status_label(@order.status)}
+                value={@order.status}
                 colors={[
                   {@order.status,
                    "#{order_status_color(@order.status)} #{order_status_bg(@order.status)}"}
@@ -140,6 +141,7 @@ defmodule CraftplanWeb.OrderLive.Show do
           <:col :let={item} label="Estado">
             <.badge
               text={order_item_status_label(item.status)}
+              value={item.status}
               colors={[
                 {:todo, "#{order_item_status_bg(:todo)} #{order_item_status_color(:todo)}"},
                 {:in_progress,

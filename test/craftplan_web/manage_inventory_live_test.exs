@@ -146,8 +146,9 @@ defmodule CraftplanWeb.ManageInventoryLiveTest do
     end
 
     @tag role: :staff
-    test "subtract below zero shows red preview without clamping", %{conn: conn} do
+    test "subtract below zero is rejected and stock stays the same", %{conn: conn} do
       material = create_material_with_stock!("10")
+      actor = Craftplan.DataCase.staff_actor()
 
       {:ok, view, _html} = live(conn, ~p"/manage/inventory/#{material.id}/adjust")
 
@@ -160,6 +161,22 @@ defmodule CraftplanWeb.ManageInventoryLiveTest do
 
       assert html =~ "text-red-600"
       assert html =~ "-40"
+      assert html =~ "No hay stock suficiente"
+
+      view
+      |> form("#movement-form", %{"movement" => %{"quantity" => "50"}})
+      |> render_submit()
+
+      assert render(view) =~ "Stock insuficiente"
+
+      reloaded =
+        Ash.load!(
+          Craftplan.Inventory.get_material_by_id!(material.id, actor: actor),
+          :current_stock,
+          actor: actor
+        )
+
+      assert Decimal.equal?(reloaded.current_stock, Decimal.new("10"))
     end
   end
 end
